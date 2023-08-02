@@ -1,2 +1,2 @@
 # Rocket Software 2024
-A repository for the 2023 avionics computer code.
+Avionics Computer Software for the 2023-2024 Academic Year

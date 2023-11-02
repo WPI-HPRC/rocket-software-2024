@@ -1,5 +1,5 @@
 /**
- * @file GNSS.h
+ * @file GNSS.cpp
  * @author Ritvik Garg
  * @brief GNSS base code
  * @version 1.0

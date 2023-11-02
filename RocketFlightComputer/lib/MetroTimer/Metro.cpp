@@ -5,7 +5,8 @@
 #else
 #include "WProgram.h"
 #endif
-#include "Metro.h"
+
+#include <Metro.h>
 
 Metro::Metro() :
     previous_millis(0)

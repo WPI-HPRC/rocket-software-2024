@@ -1,7 +1,8 @@
 /* Rayhan Semy and Amber Cronin
 10/7/2023*/
-#include "LPS25/Barometer.h"
+#include <Barometer.h>
 #include <Wire.h>
+
 Barometer::Barometer()
 {
 }

@@ -1,7 +1,8 @@
 #include "PreLaunch.h"
 #include "State.h"
 #include "Launch.h"
-#include <lib/Sensors/Sensors.h>
+
+
 PreLaunch::PreLaunch()
 {
 }
@@ -9,9 +10,7 @@ void PreLaunch::initialize_impl()
 {
     // Initialize sensors
     // We **definitely** don't want to spin forever here, but it doesn't hurt to try multiple times if initializing fails at first
-    while (!bno.begin(OPERATION_MODE_IMUPLUS))
-    {
-    }
+
 }
 void PreLaunch::loop_impl()
 {

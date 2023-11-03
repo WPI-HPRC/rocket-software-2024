@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <lib/MetroTimer/Metro.h>
+#include <Metro.h>
 #include <Wire.h>
 #include <SPI.h>
 
@@ -35,7 +35,7 @@ void setup()
     previousTime = millis();
     loopStartTime = millis();
 
-    state = LOOP;
+    state->initialize();
 };
 
 void readSensors(){

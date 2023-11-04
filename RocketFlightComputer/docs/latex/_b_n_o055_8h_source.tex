@@ -1,0 +1,53 @@
+\doxysection{BNO055.\+h}
+\hypertarget{_b_n_o055_8h_source}{}\label{_b_n_o055_8h_source}\index{RocketFlightComputer/lib/BNO055/BNO055.h@{RocketFlightComputer/lib/BNO055/BNO055.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#include\ <Wire.h>}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <SPI.h>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <Adafruit\_Sensor.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <Adafruit\_BNO055.h>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <utility/imumaths.h>}}
+\DoxyCodeLine{00007\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_b_n_o055}{BNO055}}}
+\DoxyCodeLine{00008\ \{}
+\DoxyCodeLine{00009\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00010\ \ \ \ \ \textcolor{keywordtype}{int}\ pin;}
+\DoxyCodeLine{00011\ \ \ \ \ Adafruit\_BNO055\ bno;}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{class_b_n_o055}{BNO055}}(\textcolor{keywordtype}{int}\ num)}
+\DoxyCodeLine{00015\ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ pin\ =\ num;}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ bno\ =\ Adafruit\_BNO055(pin);}
+\DoxyCodeLine{00018\ \ \ \ \ \}}
+\DoxyCodeLine{00019\ \ \ \ \ Adafruit\_BNO055\ getbno();}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{void}\ initSensor()}
+\DoxyCodeLine{00021\ \ \ \ \ \{}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (getbno().begin())}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ Serial.println(\textcolor{stringliteral}{"{}BNO055\ found"{}});}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ Serial.println(\textcolor{stringliteral}{"{}BNO055\ not\ found"{}});}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (1)}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ \};}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{void}\ readSensor()}
+\DoxyCodeLine{00035\ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ imu::Quaternion\ quat\ =\ bno.getQuat();}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ Serial.println(\textcolor{stringliteral}{"{}qW:\ "{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ Serial.println(quat.w(),\ 4);}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ Serial.print(\textcolor{stringliteral}{"{}\ qX:\ "{}});}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ Serial.print(quat.y(),\ 4);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ Serial.print(\textcolor{stringliteral}{"{}\ qY:\ "{}});}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ Serial.print(quat.x(),\ 4);}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ Serial.print(\textcolor{stringliteral}{"{}\ qZ:\ "{}});}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ Serial.println(quat.z(),\ 4);}
+\DoxyCodeLine{00046\ \ \ \ \ \}}
+\DoxyCodeLine{00047\ \};}
+
+\end{DoxyCode}

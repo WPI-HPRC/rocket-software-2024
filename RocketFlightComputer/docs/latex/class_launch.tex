@@ -1,0 +1,31 @@
+\doxysection{Launch Class Reference}
+\hypertarget{class_launch}{}\label{class_launch}\index{Launch@{Launch}}
+Inheritance diagram for Launch\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_launch}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_state}{State}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries initialize} ()
+\begin{DoxyCompactList}\small\item\em Code to be run once when the state begins. \end{DoxyCompactList}\item 
+void {\bfseries loop} ()
+\begin{DoxyCompactList}\small\item\em Code to be run every iteration of the loop while the rocket is in this state. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_state}{State}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_state_a46cfdcce81846fa68f7cb1053195b2dd}{next\+State}} ()
+\begin{DoxyCompactList}\small\item\em Code run every iteration of the loop to determine the next state to transition to. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_state}{State}}}
+\begin{DoxyCompactItemize}
+\item 
+long long {\bfseries current\+Time} = 0
+\begin{DoxyCompactList}\small\item\em number of milliseconds since the initialize call \end{DoxyCompactList}\item 
+long long {\bfseries delta\+Time} = 0
+\begin{DoxyCompactList}\small\item\em number of milliseconds since the last loop call \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Rocket\+Flight\+Computer/src/states/Launch.\+h\item 
+Rocket\+Flight\+Computer/src/states/Launch.\+cpp\end{DoxyCompactItemize}

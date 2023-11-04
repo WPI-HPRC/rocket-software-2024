@@ -1,0 +1,30 @@
+\doxysection{Barometer.\+h}
+\hypertarget{_barometer_8h_source}{}\label{_barometer_8h_source}\index{RocketFlightComputer/lib/LPS25/Barometer.h@{RocketFlightComputer/lib/LPS25/Barometer.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Rayhan\ Semy\ and\ Amber\ Cronin}}
+\DoxyCodeLine{00002\ \textcolor{comment}{10/7/2023*/}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <Adafruit\_LPS2X.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00009\ \{}
+\DoxyCodeLine{00010\ \ \ \ \ sensors\_event\_t\ temp;}
+\DoxyCodeLine{00011\ \ \ \ \ sensors\_event\_t\ pressure;}
+\DoxyCodeLine{00012\ \}\ \mbox{\hyperlink{struct_l_p_s25__data}{LPS25\_data}};}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_barometer}{Barometer}}}
+\DoxyCodeLine{00016\ \{}
+\DoxyCodeLine{00017\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{class_barometer}{Barometer}}();}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{void}\ init(\textcolor{keywordtype}{int}\ sda,\ \textcolor{keywordtype}{int}\ scl);}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{void}\ readSensor(\mbox{\hyperlink{struct_l_p_s25__data}{LPS25\_data}}\ *data);}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00023\ \ \ \ \ Adafruit\_LPS25\ sensor;}
+\DoxyCodeLine{00024\ \};}
+
+\end{DoxyCode}

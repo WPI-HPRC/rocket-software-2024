@@ -1,0 +1,31 @@
+\doxysection{State.\+h}
+\hypertarget{_state_8h_source}{}\label{_state_8h_source}\index{RocketFlightComputer/src/states/State.h@{RocketFlightComputer/src/states/State.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ \_STATE\_CLASS\_IMPLS\_\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{private:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\ \ \ \ void\ initialize\_impl()\ override;\ \(\backslash\)}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\ \ \ \ void\ loop\_impl()\ override;\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\ \ \ \ State\ *nextState\_impl()\ override;}}
+\DoxyCodeLine{00010\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_state}{State}}}
+\DoxyCodeLine{00011\ \{}
+\DoxyCodeLine{00012\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_state_aa46304dca0481658fdedf26090551819}{initialize}}();}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_state_a873f183c5472f1187949a92939db689b}{loop}}();}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{class_state}{State}}\ *\mbox{\hyperlink{class_state_a46cfdcce81846fa68f7cb1053195b2dd}{nextState}}();}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_state}{\string~State}}()\ \{\}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{class_state_ae678d686fdfcfd7f9b120158ec323bf7}{currentTime}}\ =\ 0;}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{class_state_a003e116e66edbca1e4c7b4d9e9e5bb41}{deltaTime}}\ =\ 0;}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ startTime\ =\ 0;}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ lastLoopTime\ =\ 0;}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ initialize\_impl()\ =\ 0;}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ loop\_impl()\ =\ 0;}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_state}{State}}\ *nextState\_impl()\ =\ 0;}
+\DoxyCodeLine{00042\ \};}
+
+\end{DoxyCode}

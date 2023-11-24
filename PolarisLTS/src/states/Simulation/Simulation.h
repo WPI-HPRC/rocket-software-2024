@@ -6,5 +6,10 @@ class Simulation : public State {
 
     _STATE_CLASS_IMPLS_
     public:
-        Simulation();
+        Simulation(QuatStateEstimator estimator);
+    
+    private:
+
+    QuatStateEstimator * stateEstimator;
+
 };

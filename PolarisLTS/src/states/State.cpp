@@ -1,5 +1,5 @@
 #include "State.h"
-#include <Arduino.h>
+
 void State::initialize()
 {
     this->startTime = millis();

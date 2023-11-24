@@ -1,4 +1,9 @@
 #pragma once
+
+#include <Arduino.h>
+
+#include <ControlSystem/EKF/EKF.h>
+
 #define _STATE_CLASS_IMPLS_          \
 private:                             \
     void initialize_impl() override; \
@@ -25,7 +30,12 @@ public:
     State *nextState();
     virtual ~State() {}
 
-    char* name = "";
+    String name = "";
+
+    // Shared Variable
+    SensorFrame sensorData;
+
+    Eigen::Vector4f currentState;
 
 protected:
     //! @brief number of milliseconds since the initialize call

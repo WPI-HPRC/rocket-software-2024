@@ -8,4 +8,8 @@ class PreLaunch : public State
     _STATE_CLASS_IMPLS_
 public:
     PreLaunch();
+
+private:
+    Eigen::Vector4f calculateInitialOrientation();
+
 };

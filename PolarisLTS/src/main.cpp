@@ -7,6 +7,9 @@
 
 #include <states/State.h>
 #include <states/PreLaunch/PreLaunch.h>
+#include <ArduinoEigen.h>
+
+SensorFrame sensorFrame;
 
 constexpr static int LOOP_RATE = 40;
 
@@ -20,6 +23,8 @@ long previousTime;
 
 State *state = new PreLaunch();
 
+Sensorboard sensorBoard;
+
 void setup() {
 	Serial.begin(115200);
 
@@ -27,6 +32,14 @@ void setup() {
 
 	Wire.begin();
 	Wire.setClock(400000);
+
+	Serial.println("[Polaris] Initializing Sensor Board");
+	if(sensorBoard.setup()) {
+		Serial.println("[Polaris] Sensor Setup Complete!");
+	} else {
+		Serial.println("[Polaris] Sensor Setup Failed!");
+		while(1) {};
+	}
 
 	timer.reset();
 	previousTime = millis();
@@ -36,12 +49,19 @@ void setup() {
 };
 
 void readSensors() {
-
+	sensorBoard.readInertialSensors();
+	memcpy(&sensorFrame, &sensorBoard.Inertial_Baro_frame, sizeof(sensorBoard.Inertial_Baro_frame));
 };
 
 void loop() {
 	if(timer.check() == 1) {
+
+		readSensors();
+
+		state->sensorData = sensorFrame;
+
 		state->loop();
+		
 		State *nextState = state->nextState();
 
 		if(nextState != nullptr) {

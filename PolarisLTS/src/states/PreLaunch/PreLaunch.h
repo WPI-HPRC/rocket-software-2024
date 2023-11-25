@@ -10,6 +10,7 @@ public:
     PreLaunch();
 
 private:
-    Eigen::Vector4f calculateInitialOrientation();
+    // Eigen::Vector4f calculateInitialOrientation();
 
+    QuatStateEstimator * stateEstimator;
 };

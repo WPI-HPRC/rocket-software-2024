@@ -12,15 +12,13 @@
 #include "EKF.h"
 
 // Import Eigen Library
-#include <ArduinoEigen.h>
-
 /**
  * @brief Construct a new Quat State Estimator:: Quat State Estimator object
  * 
  * @param x0 Initial State
  * @param dt Timestep
  */
-QuatStateEstimator::QuatStateEstimator(Eigen::Vector4f x0, float dt) {
+QuatStateEstimator::QuatStateEstimator(const Eigen::Vector4f& x0, float dt) {
     this->x = x0;
     this->x_min = x;
 
@@ -93,7 +91,7 @@ Eigen::Vector4f QuatStateEstimator::onLoop(SensorFrame sensorPacket) {
 
 };
 
-Eigen::Vector4f QuatStateEstimator::predictionFunction(Eigen::Vector3f u) {
+Eigen::Vector4f QuatStateEstimator::predictionFunction(const Eigen::Vector3f& u) {
     float p = u(0); float q = u(1); float r = u(2);
 
     Eigen::Vector4f f_q;
@@ -107,7 +105,7 @@ Eigen::Vector4f QuatStateEstimator::predictionFunction(Eigen::Vector3f u) {
     return f_q;
 };
 
-Eigen::Matrix4f QuatStateEstimator::predictionJacobian(Eigen::Vector3f u) {
+Eigen::Matrix4f QuatStateEstimator::predictionJacobian(const Eigen::Vector3f& u) {
     float p = u(0); float q = u(1); float r = u(2);
 
     Eigen::Matrix4f A;

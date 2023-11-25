@@ -2,9 +2,6 @@
 #include <states/State.h>
 
 #include <states/Simulation/Simulation.h>
-#include <ArduinoEigen.h>
-
-QuatStateEstimator * stateEstimator;
 
 PreLaunch::PreLaunch() {
     this->name = "PreLaunch";
@@ -12,9 +9,10 @@ PreLaunch::PreLaunch() {
 
 void PreLaunch::initialize_impl() {
     // Obtain initial quaternion orientation
-    Eigen::Vector4f initialQuat = calculateInitialOrientation();
+    // Eigen::Vector4f initialQuat = calculateInitialOrientation();
+    Serial.println("Initializing Prelaunch");
 
-    stateEstimator = new QuatStateEstimator(initialQuat, 0.025);
+    stateEstimator = new QuatStateEstimator({1,0,0,0}, 0.025);
 
 }
 
@@ -32,21 +30,21 @@ State *PreLaunch::nextState_impl() {
     return nullptr;
 }
 
-Eigen::Vector4f PreLaunch::calculateInitialOrientation() {
-    // Convert sensor values to SI Units
-    float accelX = sensorData.ac_x * 9.81;
-    float accelY = sensorData.ac_y * 9.81;
-    float accelZ = sensorData.ac_z * 9.81;
+// Eigen::Vector4f PreLaunch::calculateInitialOrientation() {
+//     // Convert sensor values to SI Units
+//     float accelX = sensorData.ac_x * 9.81;
+//     float accelY = sensorData.ac_y * 9.81;
+//     float accelZ = sensorData.ac_z * 9.81;
 
-    float roll = atan2(-accelY, accelZ);
-    float pitch = atan2(accelX, sqrt(accelY*accelY* + accelZ*accelZ));
+//     float roll = atan2(-accelY, accelZ);
+//     float pitch = atan2(accelX, sqrt(accelY*accelY* + accelZ*accelZ));
 
-    Eigen::Quaternionf initialQuaternion = Eigen::AngleAxisf(roll, Eigen::Vector3f::UnitX()) *
-                                    Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitY()) *
-                                    Eigen::AngleAxisf(0.0f, Eigen::Vector3f::UnitZ());
+//     Eigen::Quaternionf initialQuaternion = Eigen::AngleAxisf(roll, Eigen::Vector3f::UnitX()) *
+//                                     Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitY()) *
+//                                     Eigen::AngleAxisf(0.0f, Eigen::Vector3f::UnitZ());
 
-    Serial.println("Quat");
+//     Serial.println("Quat");
 
-    return initialQuaternion.coeffs();
+//     return initialQuaternion.coeffs();
 
-};
+// };

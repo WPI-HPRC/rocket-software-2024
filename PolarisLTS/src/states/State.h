@@ -1,8 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-
-#include <ControlSystem/EKF/EKF.h>
+#include <ControlSystem/EKF/StateEstimator.h>
 
 #define _STATE_CLASS_IMPLS_          \
 private:                             \
@@ -35,7 +34,7 @@ public:
     // Shared Variable
     SensorFrame sensorData;
 
-    Eigen::Vector4f currentState;
+    BLA::Matrix<4,1> currentState = {1,0,0,0};
 
 protected:
     //! @brief number of milliseconds since the initialize call

@@ -12,7 +12,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoEigen.h>
+#include <ArduinoEigenDense.h>
 
 // Import Sensor Board Libraries
 #include <SensorBoardLibraries/SensorBoard.hpp>
@@ -24,13 +24,14 @@
 class QuatStateEstimator {
 
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     /**
      * @brief Construct a new Quat State Estimator:: Quat State Estimator object
      * 
      * @param x0 Initial State
      * @param dt Timestep
      */
-    QuatStateEstimator(Eigen::Vector4f x0, float dt);
+    QuatStateEstimator(const Eigen::Vector4f& x0, float dt);
 
     /**
      * @brief Called every loop to update vehicle state
@@ -48,7 +49,7 @@ private:
      * @param u Gyroscope data vector
      * @return Vector4f Integrated gyroscope predicted orientation
      */
-    Eigen::Vector4f predictionFunction(Eigen::Vector3f u);
+    Eigen::Vector4f predictionFunction(const Eigen::Vector3f& u);
     
     /**
      * @brief Performs jacobian of current prediction to obtain the covariance of the change
@@ -56,7 +57,7 @@ private:
      * @param u Gyroscope data vector 
      * @return Matrix4f Covariance of gyroscope dynamic model
      */
-    Eigen::Matrix4f predictionJacobian(Eigen::Vector3f u);
+    Eigen::Matrix4f predictionJacobian(const Eigen::Vector3f& u);
 
     /**
      * @brief Correction function applied to predicted orientation to "correct" or "verify" integrated readings weighting the validity of the sensors in the process

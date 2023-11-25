@@ -1,13 +1,16 @@
 #include <Arduino.h>
 #include <Metro.h>
-#include <typeinfo>
 
 #include <SPI.h>
 #include <Wire.h>
 
 #include <states/State.h>
 #include <states/PreLaunch/PreLaunch.h>
-#include <ArduinoEigen.h>
+
+// #include <TeensyDebug.h>
+// #pragma GCC optimize ("O0")
+
+#include <typeinfo>
 
 SensorFrame sensorFrame;
 
@@ -21,14 +24,15 @@ long loopStartTime;
 long loopTime;
 long previousTime;
 
-State *state = new PreLaunch();
+State * state;
 
 Sensorboard sensorBoard;
 
 void setup() {
 	Serial.begin(115200);
+	// debug.begin(SerialUSB1);
 
-	while(!Serial);
+	// halt_cpu();
 
 	Wire.begin();
 	Wire.setClock(400000);
@@ -44,6 +48,8 @@ void setup() {
 	timer.reset();
 	previousTime = millis();
 	loopStartTime = millis();
+
+	state = new PreLaunch();
 
 	state->initialize();
 };

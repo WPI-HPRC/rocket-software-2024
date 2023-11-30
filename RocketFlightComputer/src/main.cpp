@@ -15,12 +15,6 @@
 #define LOOP_RATE 100
 
 Metro timer = Metro(1000 / LOOP_RATE);
-int counter = 0;
-uint32_t timestamp;
-
-long loopStartTime;
-long loopTime;
-long previousTime;
 
 State *state = new PreLaunch();
 
@@ -32,14 +26,8 @@ void setup()
     Wire.setClock(400000);
 
     timer.reset();
-    previousTime = millis();
-    loopStartTime = millis();
 
     state->initialize();
-};
-
-void readSensors(){
-
 };
 
 void loop()
@@ -51,10 +39,9 @@ void loop()
         State *nextState = state->nextState();
         if (nextState != nullptr)
         {
+            delete state;
             state = nextState;
             state->initialize();
         }
-
-        counter++;
     }
 };

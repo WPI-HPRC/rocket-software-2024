@@ -1,6 +1,7 @@
 #pragma once
 #include <states/State.h>
 #include <Arduino.h>
+#include <Controls/EKF/KalmanFilter.h>
 
 #define MAX_PRELAUNCH_TIME 3000
 class PreLaunch : public State
@@ -10,7 +11,6 @@ public:
     PreLaunch();
 
 private:
-    // Eigen::Vector4f calculateInitialOrientation();
+    StateEstimator * ekf;
 
-    QuatStateEstimator * stateEstimator;
 };

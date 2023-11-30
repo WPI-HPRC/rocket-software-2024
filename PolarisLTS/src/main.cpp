@@ -14,15 +14,13 @@
 
 SensorFrame sensorFrame;
 
-constexpr static int LOOP_RATE = 40;
+constexpr static int LOOP_RATE = 400;
+
+unsigned long previousTime = 0;
+unsigned long currentTime = 0;
+uint32_t counter = 0;
 
 Metro timer = Metro(1000/ LOOP_RATE);
-int counter = 0;
-uint32_t timestamp;
-
-long loopStartTime;
-long loopTime;
-long previousTime;
 
 State * state;
 
@@ -45,13 +43,11 @@ void setup() {
 		while(1) {};
 	}
 
-	timer.reset();
-	previousTime = millis();
-	loopStartTime = millis();
-
 	state = new PreLaunch();
 
 	state->initialize();
+	currentTime = millis();
+	previousTime = millis();
 };
 
 void readSensors() {
@@ -60,28 +56,58 @@ void readSensors() {
 };
 
 void loop() {
-	if(timer.check() == 1) {
+	currentTime = millis();
 
+	if(timer.check() == 1) {
 		readSensors();
 
-		state->sensorData = sensorFrame;
+		memcpy(&state->sensorData, &sensorFrame, sizeof(sensorFrame));
 
 		state->loop();
-		
+
+		// Check for state transition each loop
 		State *nextState = state->nextState();
 
 		if(nextState != nullptr) {
 			Serial.print("State Change Detected: ");
-			// Serial.print(typeid(state).name());
 			Serial.print(state->name);
 			Serial.print(" -> ");
 			state = nextState;
 			Serial.println(state->name);
-			// Serial.println(typeid(state).name());
 
 			state->initialize();
 		};
 
+		Serial.println(currentTime - previousTime);
+
 		counter++;
+
+		previousTime = currentTime;
 	};
+
+	// if(timer.check() == 1) {
+	// 	loopTime = millis();
+	// 	Serial.println(loopTime - previousTime);
+	// 	readSensors();
+
+	// 	memcpy(&state->sensorData, &sensorFrame, sizeof(sensorFrame));
+
+	// 	state->loop();
+		
+	// 	State *nextState = state->nextState();
+
+	// 	if(nextState != nullptr) {
+	// 		Serial.print("State Change Detected: ");
+	// 		Serial.print(state->name);
+	// 		Serial.print(" -> ");
+	// 		state = nextState;
+	// 		Serial.println(state->name);
+
+	// 		state->initialize();
+	// 	};
+
+	// 	counter++;
+		
+	// 	previousTime = loopTime;
+	// };
 };

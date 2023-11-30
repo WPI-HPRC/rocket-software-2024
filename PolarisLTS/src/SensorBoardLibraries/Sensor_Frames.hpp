@@ -8,9 +8,9 @@ struct SensorFrame
     float gy_x; // Angular velocity in degrees/s
     float gy_y; // Angular velocity in degrees/s
     float gy_z; // Angular velocity in degrees/s 
-    uint32_t mag_x;
-    uint32_t mag_y;
-    uint32_t mag_z;
+    float mag_x;
+    float mag_y;
+    float mag_z;
     float Pressure; // Pressure in mBar
     float Temperature; // Temperature in degrees C
 };

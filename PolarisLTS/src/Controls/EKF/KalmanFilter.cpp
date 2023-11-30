@@ -1,0 +1,191 @@
+/**
+ * @file KalmanFilter.cpp
+ * @author Daniel Pearson (djpearson@wpi.edu)
+ * @brief This program contains an Extended Kalman Filter for predicting vehicle orientation as a quaternion, position and velocity.  The filter fuses data from the Accelerometer, Gyroscope and Magnetometer.  For more information contact Dan (djpearson@wpi.edu), Colette (cbscott@wpi.edu), or Nikhil (nrgangaram@wpi.edu).
+ * @version 1.0
+ * @date 2023-11-28
+ * 
+ * @copyright Copyright (c) 2023 Worcester Polytechnic Institute High Power Rocketry Club 2023
+ * 
+ */
+
+#include <Controls/EKF/KalmanFilter.h>
+
+StateEstimator::StateEstimator(const Eigen::Vector<float, 10>& x0, float dt) {
+    this->x = x0;
+    this->dt = dt;
+};
+
+Eigen::Vector<float, 10> StateEstimator::onLoop(SensorFrame sensorData) {
+
+    /* Read Data from Sensors and Convert to SI Units */
+    // Convert Accel values to m/s/s
+    sensorData.ac_x = sensorData.ac_x * g0;
+    sensorData.ac_y = sensorData.ac_y * g0;
+    sensorData.ac_z = sensorData.ac_z * g0;
+
+    // Convert gyro values from deg/s to rad/s
+    sensorData.gy_x = sensorData.gy_x * (PI / 180);
+    sensorData.gy_y = sensorData.gy_y * (PI / 180);
+    sensorData.gy_z = sensorData.gy_z * (PI / 180);
+    
+    // Convert Gauss to microTesla
+    sensorData.mag_x = sensorData.mag_x * 100;
+    sensorData.mag_y = sensorData.mag_y * 100;
+    sensorData.mag_z = sensorData.mag_z * 100;
+
+    Eigen::Vector<float, 6> u = {
+        sensorData.gy_x, sensorData.gy_y, sensorData.gy_z, sensorData.ac_x, sensorData.ac_y, sensorData.ac_z
+    };
+
+    x_min = predictionFunction(u);
+
+    Eigen::Matrix<float, 10, 10> A = predictionJacobian(u);
+
+    Eigen::Matrix<float, 10, 6> W = updateModelCovariance();
+
+    Eigen::Matrix<float, 10,10> Q = W * gyroAccelVar * W.transpose();
+
+    P_min = A * P * A.transpose() + Q;
+
+    Eigen::Vector<float, 3> magVector = {
+        sensorData.mag_x, sensorData.mag_y, sensorData.mag_z
+    };
+
+    magVector = softIronCal * (magVector - hardIronCal);
+
+    Eigen::Vector<float, 3> accelVector = {
+        sensorData.ac_x, sensorData.ac_y, sensorData.ac_z
+    };
+
+    magVector = magVector / magVector.norm();
+
+    accelVector = accelVector / accelVector.norm();
+
+    Eigen::Vector<float, 6> z = {
+        accelVector(0), accelVector(1), accelVector(2), magVector(0), magVector(1), magVector(2)
+    };
+
+    Eigen::Vector<float, 6> h = updateFunction(z);
+
+    Eigen::Matrix<float, 6,10> H = updateJacobian(z);
+
+    Serial.println("<----- State Vector ----->");
+    for(int i=0; i < x.rows(); i++) {
+        for(int j = 0; j < x.cols(); j++) {
+            Serial.print(String(x(i,j)) + "\t");
+        }
+        Serial.println("");
+    }
+
+    return this->x;
+};
+
+Eigen::Matrix<float, 3,3> StateEstimator::quatToRotation(Eigen::Vector<float, 4> q) {
+    q = q / q.norm();
+
+    float qw = q(0);
+    float qx = q(1);
+    float qy = q(2);
+    float qz = q(3);
+
+    Eigen::Matrix<float, 3,3> rotm {
+        {qw*qw + qx*qx - qy*qy - qz*qz, 2 * (qx*qy - qw*qz), 2 * (qx*qz + qw*qy)},
+        {2 * (qx*qy + qw*qz), qw*qw - qx*qx + qy*qy - qz*qz, 2 * (qy*qz - qw*qx)},
+        {2 * (qx*qz - qw*qy), 2 * (qw*qx + qy*qz), qw*qw - qx*qx - qy*qy + qz*qz}
+    };
+
+    return rotm;
+};
+
+Eigen::Vector<float, 10> StateEstimator::predictionFunction(const Eigen::Vector<float, 6>& u) {
+    float p = u(0), q = u(1), r = u(2);
+    
+    Eigen::Vector<float, 3> bodyAccel = {
+        u(3), u(4), u(5)
+    };
+
+    Eigen::Vector<float, 4> f_q = {
+        x(0) - (dt/2)*p*x(1) - (dt/2)*q*x(2) - (dt/2)*r*x(3),
+        x(1) + (dt/2)*p*x(0) - (dt/2)*q*x(3) + (dt/2)*r*x(2),
+        x(2) + (dt/2)*p*x(3) + (dt/2)*q*x(0) - (dt/2)*r*x(1),
+        x(3) - (dt/2)*p*x(2) + (dt/2)*q*x(1) + (dt/2)*r*x(0)
+    };
+
+    Eigen::Vector<float, 4> quat = {x(0), x(1), x(2), x(3)};
+
+    Eigen::Matrix<float, 3,3> rotm = quatToRotation(quat);
+
+    Eigen::Vector<float, 3> bodyGrav = rotm.transpose() * G_NED;
+
+    Eigen::Vector<float, 3> linearAccelBody = bodyAccel - bodyGrav;
+
+    Eigen::Vector<float, 3> accelNED = rotm.transpose() * linearAccelBody;
+
+    Eigen::Vector<float, 3> f_v = {
+        x(7) + accelNED(0) * dt,
+        x(8) + accelNED(1) * dt,
+        x(9) + accelNED(2) * dt
+    };
+
+    Eigen::Vector<float, 3> f_p = {
+        x(4) + f_v(0) * dt,
+        x(5) + f_v(1) * dt,
+        x(6) + f_v(2) * dt
+    };
+
+    f_q = f_q  / f_q.norm();
+
+    Eigen::Vector<float, 10> f = {
+        f_q(0),
+        f_q(1),
+        f_q(2),
+        f_q(3),
+        f_v(0),
+        f_v(1),
+        f_v(2),
+        f_p(0),
+        f_p(1),
+        f_p(2)
+    };
+    
+    return f;
+
+};
+
+Eigen::Matrix<float, 10, 10> StateEstimator::predictionJacobian(const Eigen::Vector<float, 6>& u) {
+    float p = u(0), q = u(1), r = u(2);
+
+    Eigen::Matrix<float, 10,10> A {
+        {1, -0.5f*dt*p, -0.5f*dt*q, -0.5f*dt*r, 0, 0, 0, 0, 0, 0},
+        {0.5f*dt*p, 1, 0.5f*dt*r, -0.5f*dt*q, 0, 0, 0, 0, 0, 0},
+        {0.5f*dt*q, -0.5f*dt*r, 1, 0.5f*dt*p, 0, 0, 0, 0, 0, 0},
+        {0.5f*dt*r, 0.5f*dt*q, -0.5f*dt*p, 1, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 1, 0, 0, dt, 0, 0},
+        {0, 0, 0, 0, 0, 1, 0, 0, dt, 0},
+        {0, 0, 0, 0, 0, 0, 1, 0, 0, dt},
+        {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    };
+
+    return A;
+};
+
+Eigen::Matrix<float, 10,6> StateEstimator::updateModelCovariance() {
+
+    Eigen::Matrix<float, 10, 6> W {
+        {-0.5f*x(1), -0.5f*x(2), -0.5f*x(3), 0, 0, 0},
+        {0.5f*x(0), -0.5f*x(3), 0.5f*x(2), 0, 0, 0},
+        {0.5f*x(3), 0.5f*x(0), -0.5f*x(1), 0, 0, 0},
+        {-0.5f*x(2), 0.5f*x(1), 0.5f*x(0), 0, 0, 0},
+        {0, 0, 0, x(4), 0, 0},
+        {0, 0, 0, 0, x(5), 0},
+        {0, 0, 0, 0, 0, x(6)},
+        {0, 0, 0, x(4), 0, 0},
+        {0, 0, 0, 0, x(5), 0},
+        {0, 0, 0, 0, 0, x(6)}
+    };
+
+    return W;
+}

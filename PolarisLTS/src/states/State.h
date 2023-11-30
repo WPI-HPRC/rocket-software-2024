@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ControlSystem/EKF/StateEstimator.h>
+#include <Controls/EKF/KalmanFilter.h>
+#include <ArduinoEigenDense.h>
 
 #define _STATE_CLASS_IMPLS_          \
 private:                             \
@@ -34,7 +35,7 @@ public:
     // Shared Variable
     SensorFrame sensorData;
 
-    BLA::Matrix<4,1> currentState = {1,0,0,0};
+    Eigen::Vector<float, 10> currentState;
 
 protected:
     //! @brief number of milliseconds since the initialize call

@@ -1,9 +1,9 @@
 #include "Simulation.h"
 #include <states/State.h>
 
-Simulation::Simulation(QuatStateEstimator estimator) {
+Simulation::Simulation(StateEstimator * stateEstimator) {
     this->name = "Simulation";
-    this->stateEstimator = &estimator;
+    this->ekf = stateEstimator;
 };
 
 void Simulation::initialize_impl() {
@@ -11,7 +11,8 @@ void Simulation::initialize_impl() {
 };
 
 void Simulation::loop_impl() {
-    this->currentState = stateEstimator->onLoop(sensorData);
+    this->currentState = ekf->onLoop(sensorData);
+    
 };
 
 State *Simulation::nextState_impl() {

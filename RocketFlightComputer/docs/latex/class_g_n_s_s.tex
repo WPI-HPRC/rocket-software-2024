@@ -1,0 +1,101 @@
+\doxysection{GNSS Class Reference}
+\hypertarget{class_g_n_s_s}{}\label{class_g_n_s_s}\index{GNSS@{GNSS}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+SFE\+\_\+\+UBLOX\+\_\+\+GNSS \mbox{\hyperlink{class_g_n_s_s_a490f7f5034b5bd99d8a21dd39d2e470d}{get\+GNSS}} ()
+\begin{DoxyCompactList}\small\item\em returns the \doxylink{class_g_n_s_s}{GNSS} object \end{DoxyCompactList}\item 
+\Hypertarget{class_g_n_s_s_a587525df6a589be75de4058fe7d25ce1}\label{class_g_n_s_s_a587525df6a589be75de4058fe7d25ce1} 
+void {\bfseries initialize} ()
+\begin{DoxyCompactList}\small\item\em initializes the \doxylink{class_g_n_s_s}{GNSS} to print to Serial Monitor \end{DoxyCompactList}\item 
+boolean \mbox{\hyperlink{class_g_n_s_s_a6bfdf87a66c4b2fe6ca16edd2fd31a79}{has\+Changed}} (double lat, double lon)
+\begin{DoxyCompactList}\small\item\em returns true if the latitude or longitude have changed since the last reading \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_g_n_s_s_a376634547d1bc7e01cd31e8e9c75c944}{output\+Data}} (int delay\+Time=250)
+\begin{DoxyCompactList}\small\item\em prints the following to the Serial Monitor\+: the latitude, longitude, and if either value has changed since the last reading \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{class_g_n_s_s_ad81da2a8e06cb006a8ac516a40f72e57}{get\+Latitude}} ()
+\begin{DoxyCompactList}\small\item\em Get the latitude value. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{class_g_n_s_s_af88f207d5b3a8fc53c7b1a10bb2d5d70}{get\+Longitude}} ()
+\begin{DoxyCompactList}\small\item\em Get the longitude value. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_g_n_s_s_a490f7f5034b5bd99d8a21dd39d2e470d}\label{class_g_n_s_s_a490f7f5034b5bd99d8a21dd39d2e470d} 
+\index{GNSS@{GNSS}!getGNSS@{getGNSS}}
+\index{getGNSS@{getGNSS}!GNSS@{GNSS}}
+\doxysubsubsection{\texorpdfstring{getGNSS()}{getGNSS()}}
+{\footnotesize\ttfamily SFE\+\_\+\+UBLOX\+\_\+\+GNSS GNSS\+::get\+GNSS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+returns the \doxylink{class_g_n_s_s}{GNSS} object 
+
+\begin{DoxyReturn}{Returns}
+SFE\+\_\+\+UBLOX\+\_\+\+GNSS object 
+\end{DoxyReturn}
+\Hypertarget{class_g_n_s_s_ad81da2a8e06cb006a8ac516a40f72e57}\label{class_g_n_s_s_ad81da2a8e06cb006a8ac516a40f72e57} 
+\index{GNSS@{GNSS}!getLatitude@{getLatitude}}
+\index{getLatitude@{getLatitude}!GNSS@{GNSS}}
+\doxysubsubsection{\texorpdfstring{getLatitude()}{getLatitude()}}
+{\footnotesize\ttfamily double GNSS\+::get\+Latitude (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the latitude value. 
+
+\begin{DoxyReturn}{Returns}
+the latitude value 
+\end{DoxyReturn}
+\Hypertarget{class_g_n_s_s_af88f207d5b3a8fc53c7b1a10bb2d5d70}\label{class_g_n_s_s_af88f207d5b3a8fc53c7b1a10bb2d5d70} 
+\index{GNSS@{GNSS}!getLongitude@{getLongitude}}
+\index{getLongitude@{getLongitude}!GNSS@{GNSS}}
+\doxysubsubsection{\texorpdfstring{getLongitude()}{getLongitude()}}
+{\footnotesize\ttfamily double GNSS\+::get\+Longitude (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the longitude value. 
+
+\begin{DoxyReturn}{Returns}
+the longitude value 
+\end{DoxyReturn}
+\Hypertarget{class_g_n_s_s_a6bfdf87a66c4b2fe6ca16edd2fd31a79}\label{class_g_n_s_s_a6bfdf87a66c4b2fe6ca16edd2fd31a79} 
+\index{GNSS@{GNSS}!hasChanged@{hasChanged}}
+\index{hasChanged@{hasChanged}!GNSS@{GNSS}}
+\doxysubsubsection{\texorpdfstring{hasChanged()}{hasChanged()}}
+{\footnotesize\ttfamily boolean GNSS\+::has\+Changed (\begin{DoxyParamCaption}\item[{double}]{lat,  }\item[{double}]{lon }\end{DoxyParamCaption})}
+
+
+
+returns true if the latitude or longitude have changed since the last reading 
+
+
+\begin{DoxyParams}{Parameters}
+{\em lat} & the current latitude \\
+\hline
+{\em lon} & the current longitude \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the latitude or longitude have changed since last reading 
+\end{DoxyReturn}
+\Hypertarget{class_g_n_s_s_a376634547d1bc7e01cd31e8e9c75c944}\label{class_g_n_s_s_a376634547d1bc7e01cd31e8e9c75c944} 
+\index{GNSS@{GNSS}!outputData@{outputData}}
+\index{outputData@{outputData}!GNSS@{GNSS}}
+\doxysubsubsection{\texorpdfstring{outputData()}{outputData()}}
+{\footnotesize\ttfamily void GNSS\+::output\+Data (\begin{DoxyParamCaption}\item[{int}]{delay\+Time = {\ttfamily 250} }\end{DoxyParamCaption})}
+
+
+
+prints the following to the Serial Monitor\+: the latitude, longitude, and if either value has changed since the last reading 
+
+
+\begin{DoxyParams}{Parameters}
+{\em delay\+Time} & the amount of delay between readings in milliseconds (OPTIONAL, DEFAULT 250) \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Rocket\+Flight\+Computer/lib/\+GPS/\mbox{\hyperlink{_g_n_s_s_8h}{GNSS.\+h}}\item 
+Rocket\+Flight\+Computer/lib/\+GPS/\mbox{\hyperlink{_g_n_s_s_8cpp}{GNSS.\+cpp}}\end{DoxyCompactItemize}

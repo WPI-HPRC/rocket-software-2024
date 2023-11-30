@@ -1,0 +1,25 @@
+\doxysection{GNSS.\+h}
+\hypertarget{_g_n_s_s_8h_source}{}\label{_g_n_s_s_8h_source}\index{RocketFlightComputer/lib/GPS/GNSS.h@{RocketFlightComputer/lib/GPS/GNSS.h}}
+\mbox{\hyperlink{_g_n_s_s_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <Wire.h>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <SparkFun\_u-\/blox\_GNSS\_v3.h>}}
+\DoxyCodeLine{00013\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_g_n_s_s}{GNSS}}}
+\DoxyCodeLine{00014\ \{}
+\DoxyCodeLine{00015\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00021\ \ \ \ \ SFE\_UBLOX\_GNSS\ \mbox{\hyperlink{class_g_n_s_s_a490f7f5034b5bd99d8a21dd39d2e470d}{getGNSS}}();}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_g_n_s_s_a587525df6a589be75de4058fe7d25ce1}{initialize}}();}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{boolean}\ \mbox{\hyperlink{class_g_n_s_s_a6bfdf87a66c4b2fe6ca16edd2fd31a79}{hasChanged}}(\textcolor{keywordtype}{double}\ lat,\ \textcolor{keywordtype}{double}\ lon);}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_g_n_s_s_a376634547d1bc7e01cd31e8e9c75c944}{outputData}}(\textcolor{keywordtype}{int}\ delayTime\ =\ 250);}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{class_g_n_s_s_ad81da2a8e06cb006a8ac516a40f72e57}{getLatitude}}();}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{class_g_n_s_s_af88f207d5b3a8fc53c7b1a10bb2d5d70}{getLongitude}}();}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00054\ \ \ \ \ SFE\_UBLOX\_GNSS\ \mbox{\hyperlink{class_g_n_s_s}{GNSS}};}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{double}\ prevLat;}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{double}\ prevLon;}
+\DoxyCodeLine{00057\ \};}
+
+\end{DoxyCode}

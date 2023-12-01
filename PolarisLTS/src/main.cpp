@@ -14,7 +14,7 @@
 
 SensorFrame sensorFrame;
 
-constexpr static int LOOP_RATE = 400;
+constexpr static int LOOP_RATE = 100;
 
 unsigned long previousTime = 0;
 unsigned long currentTime = 0;
@@ -84,30 +84,4 @@ void loop() {
 
 		previousTime = currentTime;
 	};
-
-	// if(timer.check() == 1) {
-	// 	loopTime = millis();
-	// 	Serial.println(loopTime - previousTime);
-	// 	readSensors();
-
-	// 	memcpy(&state->sensorData, &sensorFrame, sizeof(sensorFrame));
-
-	// 	state->loop();
-		
-	// 	State *nextState = state->nextState();
-
-	// 	if(nextState != nullptr) {
-	// 		Serial.print("State Change Detected: ");
-	// 		Serial.print(state->name);
-	// 		Serial.print(" -> ");
-	// 		state = nextState;
-	// 		Serial.println(state->name);
-
-	// 		state->initialize();
-	// 	};
-
-	// 	counter++;
-		
-	// 	previousTime = loopTime;
-	// };
 };

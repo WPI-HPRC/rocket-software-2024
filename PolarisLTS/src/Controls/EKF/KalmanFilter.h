@@ -58,18 +58,18 @@ class StateEstimator {
          */
         Eigen::Matrix<float, 10, 10> predictionJacobian(const Eigen::Vector<float, 6>& u);
 
-        Eigen::Vector<float, 6> updateFunction(Eigen::Vector<float, 6> y);
+        Eigen::Vector<float, 6> updateFunction(const Eigen::Vector<float, 6>& y);
 
-        Eigen::Matrix<float, 6,10> updateJacobian(Eigen::Vector<float,6> y);
+        Eigen::Matrix<float, 6,10> updateJacobian(const Eigen::Vector<float,6>& y);
 
         Eigen::Matrix<float, 10,6> updateModelCovariance();
 
         float dt = 0;
 
         /* Sensor Variance */
-        const float gyroVariance = 0.00489/sqrt(400); // [Rad/s]
-        const float magVariance = 0.008; // [T]
-        const float accelVariance = 0.00069/sqrt(400); // [m/s^2]
+        const float gyroVariance = 0.00489/sqrt(100); // [Rad/s] function of loop rate -100Hz
+        const float magVariance = 0.008; // [nT]
+        const float accelVariance = 0.00069/sqrt(100); // [m/s^2] function of loop rate - 100Hz
 
         /* Magnetometer Calibration Matrices */
         Eigen::Matrix<float, 3,3> softIronCal {

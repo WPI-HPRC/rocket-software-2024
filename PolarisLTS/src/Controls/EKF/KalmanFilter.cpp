@@ -28,7 +28,7 @@ Eigen::Vector<float, 10> StateEstimator::onLoop(SensorFrame sensorData) {
     sensorData.gy_x = sensorData.gy_x * (PI / 180);
     sensorData.gy_y = sensorData.gy_y * (PI / 180);
     sensorData.gy_z = sensorData.gy_z * (PI / 180);
-    
+
     // Convert Gauss to microTesla
     sensorData.mag_x = sensorData.mag_x * 100;
     sensorData.mag_y = sensorData.mag_y * 100;
@@ -69,6 +69,14 @@ Eigen::Vector<float, 10> StateEstimator::onLoop(SensorFrame sensorData) {
     Eigen::Vector<float, 6> h = updateFunction(z);
 
     Eigen::Matrix<float, 6,10> H = updateJacobian(z);
+
+    Eigen::Vector<float, 6> v = z - h;
+    Eigen::Matrix<float, 6,6> S = H * P_min * H.transpose() + R;
+    Eigen::Matrix<float, 10,6> K = P_min * H.transpose() * S.inverse();
+
+    x = x_min + K*v;
+
+    P = (Eigen::Matrix<float,10,10>::Identity() - K*H) * P_min;
 
     Serial.println("<----- State Vector ----->");
     for(int i=0; i < x.rows(); i++) {
@@ -121,6 +129,14 @@ Eigen::Vector<float, 10> StateEstimator::predictionFunction(const Eigen::Vector<
     Eigen::Vector<float, 3> linearAccelBody = bodyAccel - bodyGrav;
 
     Eigen::Vector<float, 3> accelNED = rotm.transpose() * linearAccelBody;
+
+    Serial.println("<----- Linear Accel NED ----->");
+    for(int i=0; i < accelNED.rows(); i++) {
+        for(int j = 0; j < accelNED.cols(); j++) {
+            Serial.print(String(accelNED(i,j)) + "\t");
+        }
+        Serial.println("");
+    }
 
     Eigen::Vector<float, 3> f_v = {
         x(7) + accelNED(0) * dt,
@@ -189,3 +205,65 @@ Eigen::Matrix<float, 10,6> StateEstimator::updateModelCovariance() {
 
     return W;
 }
+
+Eigen::Vector<float, 6> StateEstimator::updateFunction(const Eigen::Vector<float, 6>& y) {
+    Eigen::Vector<float, 3> r = {
+        cos(magneticInclination), 0, sin(magneticInclination)
+    };
+
+    r = r / r.norm();
+    
+    Eigen::Vector<float, 3> G = G_NED / G_NED.norm();
+
+    Eigen::Vector<float, 4> q = {x_min(0), x_min(1), x_min(2), x_min(3)};
+    q = q / q.norm();
+
+    Eigen::Matrix<float, 3,3> quatRotm = quatToRotation(q);
+
+    Eigen::Vector<float, 3> a_hat = quatRotm.transpose() * G;
+
+    Eigen::Vector<float, 3> m_hat = quatRotm.transpose() * r;
+
+    Eigen::Vector<float, 6> h = {
+        a_hat(0), a_hat(1), a_hat(2), m_hat(0), m_hat(1), m_hat(2)
+    };
+
+    return h;
+};
+
+Eigen::Matrix<float, 6,10> StateEstimator::updateJacobian(const Eigen::Vector<float,6>& y) {
+    Eigen::Vector<float, 3> r = {
+        cos(magneticInclination), 0, sin(magneticInclination)
+    };
+
+    r = r / r.norm();
+    
+    Eigen::Vector<float, 3> G = G_NED / G_NED.norm();
+
+    Eigen::Vector<float, 4> q = {x_min(0), x_min(1), x_min(2), x_min(3)};
+    q = q / q.norm();
+
+    float rx = r(0);
+    float ry = r(1);
+    float rz = r(2);
+    float gx = G(0);
+    float gy = G(1);
+    float gz = G(2);
+
+    float qw = q(0);
+    float qx = q(1);
+    float qy = q(2);
+    float qz = q(3);
+
+    Eigen::Matrix<float, 6,10> H {
+        {gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, -gx*qy+gy*qx-gz*qw,-gx*qz+gy*qw+gz*qx, 0, 0, 0, 0, 0, 0},
+        {-gx*qz+gy*qw+gz*qx, gx*qy-gy*qx+gz*qw, gx*qx+gy*qy+gz*qz,-gx*qw-gy*qz+gz*qy, 0, 0, 0, 0, 0, 0},
+        {gx*qy-gy*qx+gz*qw, gx*qz-gy*qw-gz*qx, gx*qw+gy*qz-gz*qy,gx*qx+gy*qy+gz*qz, 0, 0, 0, 0, 0, 0},
+        {rx*qw+ry*qz-rz*qy, rx*qy+ry*qy+rz*qz, -rx*qy+ry*qx-rz*qw,-rx*qz+ry*qw+rz*qx, 0, 0, 0, 0, 0, 0},
+        {-rx*qz+ry*qw+rz*qx, rx*qy-ry*qx+rz*qw, rx*qx+ry*qy+rz*qz,-rx*qw-ry*qz+rz*qy, 0, 0, 0, 0, 0, 0},
+        {rx*qy-ry*qx+rz*qw, rx*qz-ry*qw-rz*qx, rx*qw+ry*qz-rz*qy,rx*qx+ry*qy+rz*qz, 0, 0, 0, 0, 0, 0},
+    };
+
+    return H * 2.0f;
+
+};

@@ -56,8 +56,6 @@ void readSensors() {
 };
 
 void loop() {
-	currentTime = millis();
-
 	if(timer.check() == 1) {
 		readSensors();
 
@@ -77,11 +75,5 @@ void loop() {
 
 			state->initialize();
 		};
-
-		Serial.println(currentTime - previousTime);
-
-		counter++;
-
-		previousTime = currentTime;
 	};
 };

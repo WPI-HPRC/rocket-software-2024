@@ -74,17 +74,27 @@ Eigen::Vector<float, 10> StateEstimator::onLoop(SensorFrame sensorData) {
     Eigen::Matrix<float, 6,6> S = H * P_min * H.transpose() + R;
     Eigen::Matrix<float, 10,6> K = P_min * H.transpose() * S.inverse();
 
+    Eigen::Vector<float, 10> correctionVector = K*v;
+
     x = x_min + K*v;
 
     P = (Eigen::Matrix<float,10,10>::Identity() - K*H) * P_min;
 
-    Serial.println("<----- State Vector ----->");
-    for(int i=0; i < x.rows(); i++) {
-        for(int j = 0; j < x.cols(); j++) {
-            Serial.print(String(x(i,j)) + "\t");
+    Serial.println("<----- Dynamic Model Covariance ----->");
+    for(int i=0; i < correctionVector.rows(); i++) {
+        for(int j = 0; j < correctionVector.cols(); j++) {
+            Serial.print(String(correctionVector(i,j)) + "\t");
         }
         Serial.println("");
     }
+
+    // Serial.println("<----- State Vector ----->");
+    // for(int i=0; i < x.rows(); i++) {
+    //     for(int j = 0; j < x.cols(); j++) {
+    //         Serial.print(String(x(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // }
 
     return this->x;
 };
@@ -256,12 +266,12 @@ Eigen::Matrix<float, 6,10> StateEstimator::updateJacobian(const Eigen::Vector<fl
     float qz = q(3);
 
     Eigen::Matrix<float, 6,10> H {
-        {gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, -gx*qy+gy*qx-gz*qw,-gx*qz+gy*qw+gz*qx, 0, 0, 0, 0, 0, 0},
-        {-gx*qz+gy*qw+gz*qx, gx*qy-gy*qx+gz*qw, gx*qx+gy*qy+gz*qz,-gx*qw-gy*qz+gz*qy, 0, 0, 0, 0, 0, 0},
-        {gx*qy-gy*qx+gz*qw, gx*qz-gy*qw-gz*qx, gx*qw+gy*qz-gz*qy,gx*qx+gy*qy+gz*qz, 0, 0, 0, 0, 0, 0},
-        {rx*qw+ry*qz-rz*qy, rx*qy+ry*qy+rz*qz, -rx*qy+ry*qx-rz*qw,-rx*qz+ry*qw+rz*qx, 0, 0, 0, 0, 0, 0},
-        {-rx*qz+ry*qw+rz*qx, rx*qy-ry*qx+rz*qw, rx*qx+ry*qy+rz*qz,-rx*qw-ry*qz+rz*qy, 0, 0, 0, 0, 0, 0},
-        {rx*qy-ry*qx+rz*qw, rx*qz-ry*qw-rz*qx, rx*qw+ry*qz-rz*qy,rx*qx+ry*qy+rz*qz, 0, 0, 0, 0, 0, 0},
+        {gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, -gx*qy+gy*qx-gz*qw, -gx*qz+gy*qw+gz*qx, 0, 0, 0, 0, 0, 0},
+        {-gx*qz+gy*qw+gz*qx, gx*qy-gy*qx+gz*qw, gx*qx+gy*qy+gz*qz, -gx*qw-gy*qz+gz*qy, 0, 0, 0, 0, 0, 0},
+        {gx*qy-gy*qx+gz*qw, gx*qz-gy*qw-gz*qx, gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, 0, 0, 0, 0, 0, 0},
+        {rx*qw+ry*qz-rz*qy, rx*qy+ry*qy+rz*qz, -rx*qy+ry*qx-rz*qw, -rx*qz+ry*qw+rz*qx, 0, 0, 0, 0, 0, 0},
+        {-rx*qz+ry*qw+rz*qx, rx*qy-ry*qx+rz*qw, rx*qx+ry*qy+rz*qz, -rx*qw-ry*qz+rz*qy, 0, 0, 0, 0, 0, 0},
+        {rx*qy-ry*qx+rz*qw, rx*qz-ry*qw-rz*qx, rx*qw+ry*qz-rz*qy, rx*qx+ry*qy+rz*qz, 0, 0, 0, 0, 0, 0},
     };
 
     return H * 2.0f;

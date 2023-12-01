@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include <Controls/EKF/KalmanFilter.h>
-#include <ArduinoEigenDense.h>
+#include <ArduinoEigen.h>
 
 #define _STATE_CLASS_IMPLS_          \
 private:                             \

@@ -12,7 +12,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoEigenDense.h>
+#include <ArduinoEigen.h>
 
 #include <SensorBoardLibraries/SensorBoard.hpp>
 
@@ -68,7 +68,7 @@ class StateEstimator {
 
         /* Sensor Variance */
         const float gyroVariance = 0.00489/sqrt(100); // [Rad/s] function of loop rate -100Hz
-        const float magVariance = 0.008; // [nT]
+        const float magVariance = 0.08; // [nT]
         const float accelVariance = 0.00069/sqrt(100); // [m/s^2] function of loop rate - 100Hz
 
         /* Magnetometer Calibration Matrices */
@@ -86,7 +86,7 @@ class StateEstimator {
         Eigen::Matrix<float, 10,10> P = Eigen::Matrix<float, 10,10>::Identity();
         Eigen::Matrix<float, 10,10> P_min = Eigen::Matrix<float, 10,10>::Identity();
 
-        const Eigen::Matrix<float, 6,6> R {
+        Eigen::Matrix<float, 6,6> R {
             {accelVariance*accelVariance, 0, 0, 0, 0, 0},
             {0, accelVariance*accelVariance, 0, 0, 0, 0},
             {0, 0, accelVariance*accelVariance, 0, 0, 0},
@@ -95,7 +95,7 @@ class StateEstimator {
             {0, 0, 0, 0, 0, magVariance*magVariance},
         };
 
-        const Eigen::Matrix<float, 6,6> gyroAccelVar {
+        Eigen::Matrix<float, 6,6> gyroAccelVar {
             {gyroVariance*gyroVariance, 0, 0, 0, 0, 0},
             {0, gyroVariance*gyroVariance, 0, 0, 0, 0},
             {0, 0, gyroVariance*gyroVariance, 0, 0, 0},

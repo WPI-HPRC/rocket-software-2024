@@ -7,3 +7,7 @@ void Launch::loop_impl() {}
 State *Launch::nextState_impl() {
 	return nullptr;
 }
+
+StateId Launch::getId() {
+	return StateId::Launch;
+}

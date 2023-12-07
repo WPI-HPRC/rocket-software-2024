@@ -9,13 +9,8 @@
  */
 #include <Arduino.h>
 #include <Wire.h>
-#include <SparkFun_u-blox_GNSS_v3.h>
 #include <GNSS.h>
 
-SFE_UBLOX_GNSS GNSS::getGNSS()
-{
-    return GNSS;
-}
 /**
  * @brief initializes the GNSS to print to Serial Monitor
  */

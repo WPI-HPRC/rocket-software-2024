@@ -24,3 +24,7 @@ State *PreLaunch::nextState_impl()
 	}
 	return nullptr;
 }
+
+StateId PreLaunch::getId() {
+	return StateId::PreLaunch;
+}

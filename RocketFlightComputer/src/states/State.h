@@ -3,7 +3,18 @@
 private:                             \
 	void initialize_impl() override; \
 	void loop_impl() override;       \
-	State *nextState_impl() override;
+	State *nextState_impl() override; \
+public: \
+	StateId getId() override;
+
+enum class StateId {
+	PreLaunch,
+	Launch,
+	Coast,
+	DrogueDescent,
+	MainDescent,
+};
+
 /**
  * @brief Abstract class representing a rocket state.
  */
@@ -22,6 +33,11 @@ class State {
 		 * @return The pointer to the next state or nullptr if the state has not changed.
 		 */
 		State *nextState();
+		/**
+		 * @brief gets the id of this state (for sending messages and debugging)
+		 * @returns The StateId associated with this state
+		*/
+		virtual StateId getId() = 0;
 		virtual ~State() {}
 
 	protected:

@@ -10,3 +10,7 @@ void MainDescent::loop_impl() {}
 State *MainDescent::nextState_impl() {
 	return nullptr;
 }
+
+StateId MainDescent::getId() {
+	return StateId::MainDescent;
+}

@@ -9,16 +9,12 @@
  */
 #include <Arduino.h>
 #include <Wire.h>
+
 #include <SparkFun_u-blox_GNSS_v3.h>
+
 class GNSS
 {
 public:
-    /**
-     * @brief returns the GNSS object
-     *
-     * @return SFE_UBLOX_GNSS object
-     */
-    SFE_UBLOX_GNSS getGNSS();
     /**
      * @brief initializes the GNSS to print to Serial Monitor
      */
@@ -42,7 +38,7 @@ public:
      *
      * @return the latitude value
      */
-    double getLatitude();
+    virtual double getLatitude();
     /**
      * @brief Get the longitude value
      *

@@ -9,8 +9,8 @@
 #include <utility/imumaths.h>
 #include <Adafruit_LPS2X.h>
 
-#include <states/State.h>
-#include <states/PreLaunch.h>
+#include <State.h>
+#include <PreLaunch.h>
 
 #define LOOP_RATE 100
 

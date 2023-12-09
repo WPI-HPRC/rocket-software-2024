@@ -17,3 +17,4 @@ State *State::nextState()
 {
     return nextState_impl();
 }
+

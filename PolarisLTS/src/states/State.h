@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <Controls/EKF/KalmanFilter.h>
+#include <Controls/EKF/StateEstimator.h>
 #include <ArduinoEigen.h>
 
 #define _STATE_CLASS_IMPLS_          \
@@ -35,7 +35,50 @@ public:
     // Shared Variable
     SensorFrame sensorData;
 
-    Eigen::Vector<float, 10> currentState;
+    // Eigen::Vector<float, 10> currentState;
+    BLA::Matrix<4> currentState;
+
+    // struct {
+    //     float accelX = 0.0;
+    //     float accelY = 0.0;
+    //     float accelZ = 0.0;
+    //     float gyroX = 0.0;
+    //     float gyroY = 0.0;
+    //     float gyroZ = 0.0;
+    //     uint32_t magX = 0.0;
+    //     uint32_t magY = 0.0;
+    //     uint32_t magZ = 0.0;
+    //     float altitude = 0.0;
+    //     float pressure = 0.0;
+    //     float q = 0.0;
+    //     float i = 0.0;
+    //     float j = 0.0;
+    //     float k = 0.0;
+    //     uint32_t timestamp;
+    // } telemPacket;
+
+    struct TelemPacket {
+        float accelX;
+        float accelY;
+        float accelZ;
+        float gyroX;
+        float gyroY;
+        float gyroZ;
+        uint32_t magX;
+        uint32_t magY;
+        uint32_t magZ;
+        float altitude;
+        float pressure;
+        float q;
+        float i;
+        float j;
+        float k;
+        long timestamp;
+    };
+
+    TelemPacket telemPacket;
+
+    float pressureToAltitude(float pressure);
 
 protected:
     //! @brief number of milliseconds since the initialize call

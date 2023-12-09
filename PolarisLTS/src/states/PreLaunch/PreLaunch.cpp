@@ -11,9 +11,30 @@ void PreLaunch::initialize_impl() {
     // Obtain initial quaternion orientation
     Serial.println("Initializing Prelaunch");
 
-    Eigen::Vector<float, 10> x_0 = {1,0,0,0,0,0,0,0,0,0};
+    // Eigen::Vector<float, 10> x_0 = {1,0,0,0,0,0,0,0,0,0};
+    BLA::Matrix<4> x_0 = {1,0,0,0};
 
-    ekf = new StateEstimator(x_0, 0.01);
+    ekf = new QuatStateEstimator(x_0, 0.025);
+
+    telemPacket.accelX = sensorData.ac_x;
+    telemPacket.accelY = sensorData.ac_y;
+    telemPacket.accelZ = sensorData.ac_z;
+
+    telemPacket.gyroX = sensorData.gy_x;
+    telemPacket.gyroY = sensorData.gy_y;
+    telemPacket.gyroZ = sensorData.gy_z;
+
+    telemPacket.magX = sensorData.mag_x;
+    telemPacket.magY = sensorData.mag_y;
+    telemPacket.magZ = sensorData.mag_z;
+
+    telemPacket.pressure = sensorData.Pressure;
+    telemPacket.altitude = pressureToAltitude(sensorData.Pressure);
+    telemPacket.timestamp = millis();
+    telemPacket.q = x_0(0);
+    telemPacket.i = x_0(1);
+    telemPacket.j = x_0(2);
+    telemPacket.k = x_0(3);
 }
 
 void PreLaunch::loop_impl() {

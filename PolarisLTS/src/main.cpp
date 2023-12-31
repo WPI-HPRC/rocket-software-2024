@@ -18,7 +18,7 @@ SensorFrame sensorFrame;
 
 FlashChip flash = FlashChip();
 
-constexpr static int LOOP_RATE = 40;
+constexpr static int LOOP_RATE = 100;
 
 unsigned long previousTime = 0;
 unsigned long currentTime = 0;
@@ -50,9 +50,9 @@ void setup() {
 	state->initialize();
 
 	flash.init();
-	int startAddress = 0;
-	startAddress = flash.rememberAddress();
-	Serial.println("Starting Flash Chip At Address: " + String(startAddress));
+	// int startAddress = 0;
+	// startAddress = flash.rememberAddress();
+	// Serial.println("Starting Flash Chip At Address: " + String(startAddress));
 
 	currentTime = millis();
 	previousTime = millis();
@@ -75,9 +75,9 @@ void loop() {
 
 		String structString = String(state->telemPacket.accelX) + "," + String(state->telemPacket.accelY) + "," + String(state->telemPacket.accelZ) + "," + String(state->telemPacket.gyroX) + "," + String(state->telemPacket.gyroY) + "," + String(state->telemPacket.gyroZ) + "," + String(state->telemPacket.magX) + "," + String(state->telemPacket.magY) + "," + String(state->telemPacket.magZ) + "," + String(state->telemPacket.pressure) + "," + String(state->telemPacket.altitude) + "," + String(state->telemPacket.q) + "," + String(state->telemPacket.i) + "," + String(state->telemPacket.j) + "," + String(state->telemPacket.k) + "," + timestamp;
 
-		Serial.println(structString);
+		// Serial.println(structString);
 
-		flash.writeStruct(structString);
+		// flash.writeStruct(structString);
 
 		// Check for state transition each loop
 		State *nextState = state->nextState();

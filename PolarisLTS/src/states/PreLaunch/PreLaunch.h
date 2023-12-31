@@ -1,7 +1,7 @@
 #pragma once
 #include <states/State.h>
 #include <Arduino.h>
-#include <Controls/EKF/StateEstimator.h>
+#include <Controls/EKF/KalmanFilter.h>
 
 #define MAX_PRELAUNCH_TIME 3000
 class PreLaunch : public State
@@ -11,7 +11,6 @@ public:
     PreLaunch();
 
 private:
-    // Q8at * ekf;
-    QuatStateEstimator * ekf;
+    StateEstimator * ekf;
 
 };

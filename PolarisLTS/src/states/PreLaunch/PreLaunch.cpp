@@ -11,11 +11,15 @@ void PreLaunch::initialize_impl() {
     // Obtain initial quaternion orientation
     Serial.println("Initializing Prelaunch");
 
-    // Eigen::Vector<float, 10> x_0 = {1,0,0,0,0,0,0,0,0,0};
-    BLA::Matrix<4> x_0 = {1,0,0,0};
+    Eigen::Vector<float, 10> x_0 = {1,0,0,0,0,0,0,0,0,0};
+    // BLA::Matrix<4> x_0 = {1,0,0,0};
+    ekf = new StateEstimator(x_0, 0.01);
+}
 
-    ekf = new QuatStateEstimator(x_0, 0.025);
+void PreLaunch::loop_impl() {
 
+    Eigen::Vector<float, 10> x_0 = {1,0,0,0,0,0,0,0,0,0};
+    
     telemPacket.accelX = sensorData.ac_x;
     telemPacket.accelY = sensorData.ac_y;
     telemPacket.accelZ = sensorData.ac_z;
@@ -37,10 +41,6 @@ void PreLaunch::initialize_impl() {
     telemPacket.k = x_0(3);
 }
 
-void PreLaunch::loop_impl() {
-    // Read bno for example
-}
-
 //! @details If we are separating this from `Launch`, we need a time limit on this state or something
 State *PreLaunch::nextState_impl() {
     if (this->currentTime > MAX_PRELAUNCH_TIME)
@@ -50,7 +50,6 @@ State *PreLaunch::nextState_impl() {
     }
     return nullptr;
 }
-
 // BLA::Matrix<4> PreLaunch::calculateInitialOrientation() {
 //     // Convert sensor values to SI Units
 //     float accelX = sensorData.ac_x * 9.81;

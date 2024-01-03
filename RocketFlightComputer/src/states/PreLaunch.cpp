@@ -1,7 +1,7 @@
 #include "PreLaunch.h"
 #include "State.h"
 #include "Launch.h"
-
+#include "Debug.h"
 
 PreLaunch::PreLaunch() {
 }
@@ -18,6 +18,11 @@ void PreLaunch::loop_impl() {
 //! @details If we are separating this from `Launch`, we need a time limit on this state or something
 State *PreLaunch::nextState_impl()
 {
+
+	if(DEBUG_MODE) {
+		return new Debug();
+	}
+
 	if (this->currentTime > MAX_PRELAUNCH_TIME)
 	{
 		return new Launch();

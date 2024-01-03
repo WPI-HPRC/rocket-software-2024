@@ -4,6 +4,9 @@ private:                             \
 	void initialize_impl() override; \
 	void loop_impl() override;       \
 	State *nextState_impl() override;
+
+#include "Arduino.h"
+#include "../utility.hpp"
 /**
  * @brief Abstract class representing a rocket state.
  */
@@ -23,6 +26,27 @@ class State {
 		 */
 		State *nextState();
 		virtual ~State() {}
+
+		struct TelemPacket {
+			float accelX;
+			float accelY;
+			float accelZ;
+			float gyroX;
+			float gyroY;
+			float gyroZ;
+			uint32_t magX;
+			uint32_t magY;
+			uint32_t magZ;
+			float altitude;
+			float pressure;
+			float q;
+			float i;
+			float j;
+			float k;
+			float heading;
+			long timestamp;
+    	};	
+		TelemPacket telemPacket;
 
 	protected:
 		//! @brief number of milliseconds since the initialize call

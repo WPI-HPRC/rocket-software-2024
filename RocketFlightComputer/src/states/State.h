@@ -7,6 +7,7 @@ private:                             \
 
 #include "Arduino.h"
 #include "../utility.hpp"
+#include <ArduinoEigen.h>
 /**
  * @brief Abstract class representing a rocket state.
  */
@@ -47,6 +48,8 @@ class State {
 			long timestamp;
     	};	
 		TelemPacket telemPacket;
+
+		Eigen::Vector<float, 10> x_state;
 
 	protected:
 		//! @brief number of milliseconds since the initialize call

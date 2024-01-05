@@ -1,4 +1,7 @@
+#pragma once
+
 #define DEBUG_MODE true
+#define LOOP_RATE 40
 
 
 class Utility {

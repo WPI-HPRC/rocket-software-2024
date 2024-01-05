@@ -14,8 +14,6 @@
 #include <states/State.h>
 #include <states/PreLaunch.h>
 
-#define LOOP_RATE 100
-
 Metro timer = Metro(1000 / LOOP_RATE);
 
 // Start in pre-launch
@@ -61,25 +59,31 @@ void setup()
 
     // ICM20648 Configuration
     icm->setAccelRange(ICM20649_ACCEL_RANGE_16_G); // Set Accel +- 16G
-    icm->setGyroRange(ICM20649_GYRO_RANGE_2000_DPS); // Set Gyro +- 2000dps
-    icm->setAccelRateDivisor(4095);
-    icm->setGyroRateDivisor(255);
+    icm->setGyroRange(ICM20649_GYRO_RANGE_1000_DPS); // Set Gyro +- 2000dps
+
+    // uint8_t sys, gyro, accel, mag = 0;
+    // if(!bno->isFullyCalibrated()) {
+    //     bno->getCalibration(&sys, &gyro, &accel, &mag);
+    // };
+    // Serial.println("+=== BNO055 CALIBRATION ===+");
+    // Serial.print("System: "); Serial.println(sys);
+    // Serial.print("Gyro: "); Serial.println(gyro);
+    // Serial.print("Accel: "); Serial.println(accel);
+    // Serial.print("Mag: "); Serial.println(mag);
+    // Serial.print("CALIBRATION: Sys=");
+    // Serial.print(system, DEC);
+    // Serial.print(" Gyro=");
+    // Serial.print(gyro, DEC);
+    // Serial.print(" Accel=");
+    // Serial.print(accel, DEC);
+    // Serial.print(" Mag=");
+    // Serial.println(mag, DEC);
 
     Wire.begin();
     Wire.setClock(400000);
-
-    timer.reset();
-
     state->initialize();
 
-    uint8_t system, gyroCal, accelCal, magCal = 0;
-    bno->getCalibration(&system, &gyroCal, &accelCal, &magCal);
-
-    Serial.println("[BNO055] +=== CALIBRATION DATA ===+");
-    Serial.print("System Cal: "); Serial.println(system);
-    Serial.print("Gyro Cal: "); Serial.println(gyroCal);
-    Serial.print("Accel Cal: "); Serial.println(accelCal);
-    Serial.print("Mag Cal: "); Serial.println(magCal);
+    timer.reset();
 }
 
 void readsensors() {
@@ -95,40 +99,74 @@ void readsensors() {
     icm->getEvent(&icmAccelEvent, &icmGyroEvent, &icmTempEvent);
 
     //Create and register event handler for BNO055
-    sensors_event_t orientationEvent, linearAccelEvent, magnetometerEvent, bnoAccelEvent;
-    bno->getEvent(&orientationEvent, Adafruit_BNO055::VECTOR_EULER);
-    bno->getEvent(&linearAccelEvent, Adafruit_BNO055::VECTOR_LINEARACCEL);
+    // sensors_event_t orientationEvent, linearAccelEvent, magnetometerEvent, bnoAccelEvent;
+    sensors_event_t magnetometerEvent;
+    // bno->getEvent(&orientationEvent, Adafruit_BNO055::VECTOR_EULER);
+    // bno->getEvent(&linearAccelEvent, Adafruit_BNO055::VECTOR_LINEARACCEL);
     bno->getEvent(&magnetometerEvent, Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    bno->getEvent(&bnoAccelEvent, Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    // imu::Vector<3> magVector = bno->getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    // bno->getEvent(&bnoAccelEvent, Adafruit_BNO055::VECTOR_ACCELEROMETER);
 
     // Update state machine
-    telemBufferPacket.accelX = bnoAccelEvent.acceleration.x; // m/s/s
-    telemBufferPacket.accelY = bnoAccelEvent.acceleration.y; // m/s/s
-    telemBufferPacket.accelZ = bnoAccelEvent.acceleration.z; // m/s/s
+    telemBufferPacket.accelX = icmAccelEvent.acceleration.x; // [m/s/s]
+    telemBufferPacket.accelY = icmAccelEvent.acceleration.y; // [m/s/s]
+    telemBufferPacket.accelZ = icmAccelEvent.acceleration.z; // [m/s/s]
 
-    telemBufferPacket.gyroX = icmGyroEvent.gyro.x; // 
-    telemBufferPacket.gyroY = icmGyroEvent.gyro.y;
-    telemBufferPacket.gyroZ = icmGyroEvent.gyro.z;
+    telemBufferPacket.gyroX = icmGyroEvent.gyro.x; // [rad/s]
+    telemBufferPacket.gyroY = icmGyroEvent.gyro.y; // [rad/s]
+    telemBufferPacket.gyroZ = icmGyroEvent.gyro.z; // [rad/s]
 
-    telemBufferPacket.magX = magnetometerEvent.magnetic.x;
-    telemBufferPacket.magY = magnetometerEvent.magnetic.y;
-    telemBufferPacket.magZ = magnetometerEvent.magnetic.z;
+    telemBufferPacket.magX = magnetometerEvent.magnetic.x; // [µT]
+    telemBufferPacket.magY = magnetometerEvent.magnetic.y; // [µT]
+    telemBufferPacket.magZ = magnetometerEvent.magnetic.z; // [µT]
     telemBufferPacket.heading = magnetometerEvent.magnetic.heading;
 
     telemBufferPacket.pressure = lpsPressureEvent.pressure;
     telemBufferPacket.altitude = Utility::pressureToAltitude(telemBufferPacket.pressure);
 }
 
+float previousTime = 0;
+
 void loop()
 {
     if (timer.check() == 1)
     {
-
+        // Serial.println(millis() - previousTime);
+        previousTime = millis();
+        
         readsensors();
         memcpy(&state->telemPacket, &telemBufferPacket, sizeof(telemBufferPacket));
-    
-
         state->loop();
+
+        // Serial.print(state->telemPacket.accelX); Serial.print(",");
+        // Serial.print(state->telemPacket.accelY); Serial.print(",");
+        // Serial.print(state->telemPacket.accelZ); Serial.print(",");
+        // Serial.print(state->telemPacket.gyroX); Serial.print(",");
+        // Serial.print(state->telemPacket.gyroY); Serial.print(",");
+        // Serial.print(state->telemPacket.gyroZ); Serial.print(",");
+        // Serial.print(state->telemPacket.magX); Serial.print(",");
+        // Serial.print(state->telemPacket.magY); Serial.print(",");
+        // Serial.print(state->telemPacket.magZ); Serial.print(",");
+        // Serial.print(state->telemPacket.q); Serial.print(",");
+        // Serial.print(state->telemPacket.i); Serial.print(",");
+        // Serial.print(state->telemPacket.j); Serial.print(",");
+        // Serial.print(state->telemPacket.k); Serial.print(",");
+        // Serial.println(millis());
+
+        Serial.print("QUAT|");
+        Serial.print(state->x_state(0)); Serial.print(",");
+        Serial.print(state->x_state(1)); Serial.print(",");
+        Serial.print(state->x_state(2)); Serial.print(",");
+        Serial.println(state->x_state(3));
+
+        // Serial.println(state->telemPacket.heading);
+        
+//     // Serial.println(x(3));
+//     // Serial.print("ACC|");
+//     // Serial.print(sensorPacket.ac_x); Serial.print(",");
+//     // Serial.print(sensorPacket.ac_y); Serial.print(",");
+//     // Serial.println(sensorPacket.ac_z);
+
         State *nextState = state->nextState();
         if (nextState != nullptr)
         {

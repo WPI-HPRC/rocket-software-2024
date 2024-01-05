@@ -9,6 +9,8 @@ PreLaunch::PreLaunch() {
 void PreLaunch::initialize_impl() {
 	// Initialize sensors
 	// We **definitely** don't want to spin forever here, but it doesn't hurt to try multiple times if initializing fails at first
+	Eigen::Vector<float, 10> x_0 = {1,0,0,0,0,0,0,0,0,0};
+	ekf = new StateEstimator(x_0, 0.025);
 }
 
 void PreLaunch::loop_impl() {
@@ -20,7 +22,7 @@ State *PreLaunch::nextState_impl()
 {
 
 	if(DEBUG_MODE) {
-		return new Debug();
+		return new Debug(this->ekf);
 	}
 
 	if (this->currentTime > MAX_PRELAUNCH_TIME)

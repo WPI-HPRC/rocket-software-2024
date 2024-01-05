@@ -7,7 +7,6 @@
 class Utility {
 
     public:
-
     static float pressureToAltitude(float pressure) {
         // physical parameters for model
         const float pb = 101325;   // [Pa] pressure at sea level
@@ -18,7 +17,7 @@ class Utility {
         const float g0 = 9.80665;  // [m/s^2] Earth standard gravity
         const float M = 0.0289644; // [kg/mol] molar mass of Earth's air
 
-        // convert pressure from [mBar] to [Pa]
+        // convert pressure from [hPa] to [Pa]
         float pressure_Pa = pressure * 100;
 
         // compute altitude from formula

@@ -11,31 +11,39 @@ void Debug::initialize_impl() {
 }
 
 void Debug::loop_impl() {
-    this->x_state = ekf->onLoop(telemPacket);
+    this->x_state = ekf->onLoop(sensorPacket);
 
-    this->telemPacket.q = x_state(0);
-    this->telemPacket.i = x_state(1);
-    this->telemPacket.j = x_state(2);
-    this->telemPacket.k = x_state(3);
+    // Update Sensor Packet with EKF
+    this->sensorPacket.q = x_state(0);
+    this->sensorPacket.i = x_state(1);
+    this->sensorPacket.j = x_state(2);
+    this->sensorPacket.k = x_state(3);
+
+    Serial.println("+=== GPS ===+");
+    Serial.print("Latitude: "); Serial.println(sensorPacket.gpsLat);
+    Serial.print("Longitude: "); Serial.println(sensorPacket.gpsLong);
+    Serial.print("Altitude AGL: "); Serial.println(sensorPacket.gpsAltAGL);
+    Serial.print("Altitude MSL: "); Serial.println(sensorPacket.gpsAltMSL);
+
 	// Read bno for example
     // Serial.println("+=== Barometer ===+");
-    // Serial.print("Pressure: "); Serial.println(telemPacket.pressure);
-    // Serial.print("Altitude: "); Serial.println(telemPacket.altitude);
+    // Serial.print("Pressure: "); Serial.println(sensorPacket.pressure);
+    // Serial.print("Altitude: "); Serial.println(sensorPacket.altitude);
 
     // Serial.println("+=== Accelerometer ===+");
-    // Serial.print("Accel X: "); Serial.println(telemPacket.accelX);
-    // Serial.print("Accel Y: "); Serial.println(telemPacket.accelY);
-    // Serial.print("Accel Z: "); Serial.println(telemPacket.accelZ);
+    // Serial.print("Accel X: "); Serial.println(sensorPacket.accelX);
+    // Serial.print("Accel Y: "); Serial.println(sensorPacket.accelY);
+    // Serial.print("Accel Z: "); Serial.println(sensorPacket.accelZ);
 
     // Serial.println("+=== Gyroscope ===+");
-    // Serial.print("Gyro X: "); Serial.println(telemPacket.gyroX);
-    // Serial.print("Gyro Y: "); Serial.println(telemPacket.gyroY);
-    // Serial.print("Gyro Z: "); Serial.println(telemPacket.gyroZ);
+    // Serial.print("Gyro X: "); Serial.println(sensorPacket.gyroX);
+    // Serial.print("Gyro Y: "); Serial.println(sensorPacket.gyroY);
+    // Serial.print("Gyro Z: "); Serial.println(sensorPacket.gyroZ);
 
     // Serial.println("+=== Magnetometer ===+");
-    // Serial.print("Mag X: "); Serial.println(telemPacket.magX);
-    // Serial.print("Mag Y: "); Serial.println(telemPacket.magY);
-    // Serial.print("Mag Z: "); Serial.println(telemPacket.magZ);
+    // Serial.print("Mag X: "); Serial.println(sensorPacket.magX);
+    // Serial.print("Mag Y: "); Serial.println(sensorPacket.magY);
+    // Serial.print("Mag Z: "); Serial.println(sensorPacket.magZ);
 }
 
 //! @details If we are separating this from `Launch`, we need a time limit on this state or something

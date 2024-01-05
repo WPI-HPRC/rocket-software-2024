@@ -28,7 +28,8 @@ class State {
 		State *nextState();
 		virtual ~State() {}
 
-		struct TelemPacket {
+		struct SensorPacket {
+			// Raw Sensor Readings
 			float accelX;
 			float accelY;
 			float accelZ;
@@ -38,16 +39,26 @@ class State {
 			uint32_t magX;
 			uint32_t magY;
 			uint32_t magZ;
-			float altitude;
 			float pressure;
+
+			// Calculated Values
+			float altitude;
+
+			// State Estimator Outputs
 			float q;
 			float i;
 			float j;
 			float k;
-			float heading;
+
+			// GPS Inputs
+			float gpsLat;
+			float gpsLong;
+			float gpsAltMSL;
+			float gpsAltAGL;
+
 			long timestamp;
     	};	
-		TelemPacket telemPacket;
+		SensorPacket sensorPacket;
 
 		Eigen::Vector<float, 10> x_state;
 
@@ -56,6 +67,8 @@ class State {
 		long long currentTime = 0;
 		//! @brief number of milliseconds since the last loop call
 		long long deltaTime = 0;
+		//! @brief loop count since initialization
+		long long loopCount = 0;
 
 	private:
 		//! @brief number of milliseconds from boot to the initialize call

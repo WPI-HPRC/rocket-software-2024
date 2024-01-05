@@ -33,7 +33,7 @@ class StateEstimator {
          * @param dataPacket
          * @return Eigen::Vector<float, 10> Current state
          */
-        Eigen::Vector<float, 10> onLoop(State::TelemPacket dataPacket);
+        Eigen::Vector<float, 10> onLoop(State::SensorPacket dataPacket);
 
         /**
          * @brief Returns the rotation matrix from a quaternion

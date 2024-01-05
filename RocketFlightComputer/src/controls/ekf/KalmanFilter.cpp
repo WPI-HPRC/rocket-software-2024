@@ -16,7 +16,7 @@ StateEstimator::StateEstimator(const Eigen::Vector<float, 10>& x0, float dt) {
     this->dt = dt;
 };
 
-Eigen::Vector<float, 10> StateEstimator::onLoop(State::TelemPacket dataPacket) {
+Eigen::Vector<float, 10> StateEstimator::onLoop(State::SensorPacket dataPacket) {
     // Store sensor inputs for prediction step in "u" vector
     Eigen::Vector<float, 6> u = {
         dataPacket.gyroX, dataPacket.gyroY, dataPacket.gyroZ, dataPacket.accelX, dataPacket.accelY, dataPacket.accelZ
@@ -192,7 +192,7 @@ Eigen::Vector<float, 6> StateEstimator::updateFunction(const Eigen::Vector<float
     // };
 
     Eigen::Vector<float, 3> r = {
-        20.4755, -4.5403, 46.5543
+        20.4755, -4.5403, -46.5543
     }; // Magnetic field vector for 10314
 
     r = r / r.norm();

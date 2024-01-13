@@ -50,11 +50,17 @@ class State {
 			float j;
 			float k;
 
+			// Geocentric Position
+			float X;
+			float Y;
+			float Z;
+
 			// GPS Inputs
 			float gpsLat;
 			float gpsLong;
 			float gpsAltMSL;
 			float gpsAltAGL;
+			boolean gpsLock = false;
 
 			long timestamp;
     	};	

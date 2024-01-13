@@ -23,4 +23,9 @@ class Utility {
         // compute altitude from formula
         return hb + (Tb / Lb) * (pow((pressure_Pa / pb), (-R * Lb / (g0 * M))) - 1);
     };
+
+    // WGS84 Ellipsoid Model
+    constexpr static float a_earth = 6378137.0; // [m] Semi-major axis of Earth
+    constexpr static float b_earth = 6356752.3142; // [m] Semi-Minor axis of Earth
+    constexpr static float e_earth = 0.0818191908426; // Eccentricity of Earth
 };

@@ -16,6 +16,8 @@
 
 Metro timer = Metro(1000 / LOOP_RATE);
 
+long lastLoopTime = 0;
+
 // Start in pre-launch
 State * state = new PreLaunch();
 
@@ -24,7 +26,7 @@ Adafruit_LPS25 * baro; // 0x5D I2C ADDR
 Adafruit_ICM20649 * icm; // 0x68 I2C ADDR
 SFE_UBLOX_GNSS * gps; // 0x42 I2C ADDR
 
-State::SensorPacket telemBufferPacket;
+State::SensorPacket sensorPacket;
 
 void setup()
 {
@@ -73,7 +75,7 @@ void setup()
 
     // NEOM10S Configuration
     gps->setI2COutput(COM_TYPE_UBX);
-    gps->setNavigationFrequency(40);
+    gps->setNavigationFrequency(10);
     gps->setAutoPVT(true);
     gps->saveConfiguration();
 
@@ -109,43 +111,46 @@ void readsensors() {
     // bno->getEvent(&bnoAccelEvent, Adafruit_BNO055::VECTOR_ACCELEROMETER);
 
     // Update state machine
-    telemBufferPacket.accelX = icmAccelEvent.acceleration.x; // [m/s/s]
-    telemBufferPacket.accelY = icmAccelEvent.acceleration.y; // [m/s/s]
-    telemBufferPacket.accelZ = icmAccelEvent.acceleration.z; // [m/s/s]
+    sensorPacket.accelX = icmAccelEvent.acceleration.x; // [m/s/s]
+    sensorPacket.accelY = icmAccelEvent.acceleration.y; // [m/s/s]
+    sensorPacket.accelZ = icmAccelEvent.acceleration.z; // [m/s/s]
 
-    telemBufferPacket.gyroX = icmGyroEvent.gyro.x; // [rad/s]
-    telemBufferPacket.gyroY = icmGyroEvent.gyro.y; // [rad/s]
-    telemBufferPacket.gyroZ = icmGyroEvent.gyro.z; // [rad/s]
+    sensorPacket.gyroX = icmGyroEvent.gyro.x; // [rad/s]
+    sensorPacket.gyroY = icmGyroEvent.gyro.y; // [rad/s]
+    sensorPacket.gyroZ = icmGyroEvent.gyro.z; // [rad/s]
 
-    telemBufferPacket.magX = magnetometerEvent.magnetic.x; // [µT]
-    telemBufferPacket.magY = magnetometerEvent.magnetic.y; // [µT]
-    telemBufferPacket.magZ = magnetometerEvent.magnetic.z; // [µT]
+    sensorPacket.magX = magnetometerEvent.magnetic.x; // [µT]
+    sensorPacket.magY = magnetometerEvent.magnetic.y; // [µT]
+    sensorPacket.magZ = magnetometerEvent.magnetic.z; // [µT]
 
-    telemBufferPacket.pressure = lpsPressureEvent.pressure; // [hPa/mBar]
-    telemBufferPacket.altitude = Utility::pressureToAltitude(telemBufferPacket.pressure); // m
+    sensorPacket.pressure = lpsPressureEvent.pressure; // [hPa/mBar]
+    sensorPacket.altitude = Utility::pressureToAltitude(sensorPacket.pressure); // m
     
     // Check for GPS Data Availabilty
     if(gps->getPVT()) {
-        telemBufferPacket.gpsLat = gps->getLatitude() / pow(10,7); // [deg]
-        telemBufferPacket.gpsLong = gps->getLongitude() / pow(10,7); // [deg]
-        telemBufferPacket.gpsAltAGL = gps->getAltitude() / 1000; // [m]
-        telemBufferPacket.gpsAltMSL = gps->getAltitudeMSL() / 1000; // [m]
+        // GPS Lock Acquired
+        sensorPacket.gpsLock = gps->getGnssFixOk();
+    
+        sensorPacket.gpsLat = gps->getLatitude() / pow(10,7); // [deg]
+        sensorPacket.gpsLong = gps->getLongitude() / pow(10,7); // [deg]
+        sensorPacket.gpsAltAGL = gps->getAltitude() / 1000; // [m]
+        sensorPacket.gpsAltMSL = gps->getAltitudeMSL() / 1000; // [m]
     } else {
         return;
     };
 }
 
-float previousTime = 0;
-
 void loop()
 {
     if (timer.check() == 1)
     {
-        // Serial.println(millis() - previousTime);
-        previousTime = millis();
-        
+        // Serial.println(millis() - lastLoopTime);
+        lastLoopTime = millis();
+
+
+
         readsensors();
-        memcpy(&state->sensorPacket, &telemBufferPacket, sizeof(telemBufferPacket));
+        memcpy(&state->sensorPacket, &sensorPacket, sizeof(sensorPacket));
         state->loop();
 
         // Serial.print(state->sensorPacket.accelX); Serial.print(",");

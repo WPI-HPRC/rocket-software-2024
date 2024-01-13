@@ -3,6 +3,7 @@
 #include <SensorBoardLibraries\Magnetometer\Magnetometer_SB.h>
 #include "Config.h"
 #include "Sensor_Frames.hpp"
+// #include <libs/MMC5983/SparkFun_MMC5983MA_Arduino_Library.h>
 
 /*
     @author Samay Govani
@@ -13,6 +14,7 @@ class Sensorboard{
     private:
     MS5611 barometer = MS5611(Wire, BARO_I2C_ADDRESS); // Barometer
     ICM42688P imu = ICM42688P(Wire, IMU_I2C_ADDRESS); // IMU
+    // SFE_MMC5983MA mag;
     MMC5983MA mag = MMC5983MA(Wire, MAG_I2C_ADDRESS); // Magnetometer
     // MMC5983MA mag = MMC5983MA(Wire, MAG_I2C_ADDRESS); // Magnetometer
     // SFE_UBLOX_GNSS gps; // GPS
@@ -31,7 +33,10 @@ class Sensorboard{
     bool setup(){
         if (!imu.setup()) return false;
         if (!barometer.setup()) return false;
-        if(!mag.setup()) return false;
+        if (!mag.setup()) return false;
+        // if(!mag.begin()) return false;
+
+        // mag.softReset();
 
         return true;
     }
@@ -70,9 +75,30 @@ class Sensorboard{
         // Barometer
         barometer.calculatePressureAndTemperature(MS5611::processHighMidLowByte(Buffer[12],Buffer[13],Buffer[14]),MS5611::processHighMidLowByte(Buffer[15],Buffer[16],Buffer[17]),&Inertial_Baro_frame.Pressure,&Inertial_Baro_frame.Temperature);
 
-        Inertial_Baro_frame.mag_x = MagData[0];
-        Inertial_Baro_frame.mag_y = MagData[1];
-        Inertial_Baro_frame.mag_z = MagData[2];
+        // uint32_t magXRaw = mag.getMeasurementX();
+        // uint32_t magYRaw = mag.getMeasurementY();
+        // uint32_t magZRaw = mag.getMeasurementZ();
+
+        Inertial_Baro_frame.mag_x = MagData[0] - 133160.0;
+        Inertial_Baro_frame.mag_x /= 133160.0;
+
+        Inertial_Baro_frame.mag_y = MagData[1] - 131450.0;
+        Inertial_Baro_frame.mag_y /= 131450.0;
+
+        Inertial_Baro_frame.mag_z = MagData[2] - 133030.0;
+        Inertial_Baro_frame.mag_z /= 133030.0;
+
+        Inertial_Baro_frame.mag_x *= 8; // [Gauss]
+        Inertial_Baro_frame.mag_y *= 8; // [Gauss]
+        Inertial_Baro_frame.mag_z *= 8; // [Gauss]
+
+        // Inertial_Baro_frame.mag_x = mag.getMeasurementX();
+        // Inertial_Baro_frame.mag_y = mag.getMeasurementY();
+        // Inertial_Baro_frame.mag_z = mag.getMeasurementZ();
+
+        // Inertial_Baro_frame.mag_x = MagData[0];
+        // Inertial_Baro_frame.mag_y = MagData[1];
+        // Inertial_Baro_frame.mag_z = MagData[2];
 
         // mag.calculateCalibratedValues(MagData[0], MagData[1], MagData[2], &Inertial_Baro_frame.mag_x, &Inertial_Baro_frame.mag_y, &Inertial_Baro_frame.mag_z);
 

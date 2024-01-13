@@ -30,9 +30,9 @@ Eigen::Vector<float, 10> StateEstimator::onLoop(SensorFrame sensorData) {
     sensorData.gy_z = sensorData.gy_z * (PI / 180);
 
     // Convert Gauss to microTesla
-    sensorData.mag_x = sensorData.mag_x * 100;
-    sensorData.mag_y = sensorData.mag_y * 100;
-    sensorData.mag_z = sensorData.mag_z * 100;
+    sensorData.mag_x = sensorData.mag_x * 100000; // [nT]
+    sensorData.mag_y = sensorData.mag_y * 100000; // [nT]
+    sensorData.mag_z = sensorData.mag_z * 100000; // [nT]
 
     // Store sensor inputs for prediction step in "u" vector
     Eigen::Vector<float, 6> u = {
@@ -60,7 +60,7 @@ Eigen::Vector<float, 10> StateEstimator::onLoop(SensorFrame sensorData) {
 
     // Apply soft and hard iron calibrations to the magnetometer    
     // **WARNING** THIS WILL NEED TO BE RE-CALIBRATED FOR CHANGE IN PHYSICAL SYSTEM -- CHECK MATLAB REPO FOR MAG CAL
-    magVector = softIronCal * (magVector - hardIronCal);
+    // magVector = softIronCal * (magVector - hardIronCal);
 
     // Store the accelerometer readings in a vector
     Eigen::Vector<float, 3> accelVector = {
@@ -90,17 +90,52 @@ Eigen::Vector<float, 10> StateEstimator::onLoop(SensorFrame sensorData) {
 
     // Update the corrected (posteriori) state
     x = x_min + K*v;
+    // x = x_min;
+    // P = P_min;
 
     // Update the corrected error covariance
     P = (Eigen::Matrix<float,10,10>::Identity() - K*H) * P_min;
 
-    Serial.println("<----- State Vector ----->");
-    for(int i=0; i < x.rows(); i++) {
-        for(int j = 0; j < x.cols(); j++) {
-            Serial.print(String(x(i,j)) + "\t");
-        }
-        Serial.println("");
-    }
+    // Serial.println("<----- Innovation ----->");
+    // for(int i=0; i < v.rows(); i++) {
+    //     for(int j = 0; j < v.cols(); j++) {
+    //         Serial.print(String(v(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // }
+
+    // Serial.println("<----- State Vector ----->");
+    // for(int i=0; i < x.rows(); i++) {
+    //     for(int j = 0; j < x.cols(); j++) {
+    //         Serial.print(String(x(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // }
+
+    // Serial.print(sensorData.ac_x); Serial.print(",");
+    // Serial.print(sensorData.ac_y); Serial.print(",");
+    // Serial.print(sensorData.ac_z); Serial.print(",");
+    // Serial.print(sensorData.gy_x); Serial.print(",");
+    // Serial.print(sensorData.gy_y); Serial.print(",");
+    // Serial.print(sensorData.gy_z); Serial.print(",");
+    // Serial.print(sensorData.mag_x); Serial.print(",");
+    // Serial.print(sensorData.mag_y); Serial.print(",");
+    // Serial.print(sensorData.mag_z); Serial.println(",");
+    // Serial.print(x(0)); Serial.print(",");
+    // Serial.print(x(1)); Serial.print(",");
+    // Serial.print(x(2)); Serial.print(",");
+    // Serial.print(x(3)); Serial.print(",");
+    // Serial.println(millis());
+
+    Serial.print("QUAT|");
+    Serial.print(x(0)); Serial.print(",");
+    Serial.print(x(1)); Serial.print(",");
+    Serial.print(x(2)); Serial.print(",");
+    Serial.println(x(3));
+    // Serial.print("ACC|");
+    // Serial.print(sensorData.ac_x); Serial.print(",");
+    // Serial.print(sensorData.ac_y); Serial.print(",");
+    // Serial.println(sensorData.ac_z);
 
     return this->x;
 };
@@ -135,32 +170,40 @@ Eigen::Vector<float, 10> StateEstimator::predictionFunction(const Eigen::Vector<
         x(3) - (dt/2)*p*x(2) + (dt/2)*q*x(1) + (dt/2)*r*x(0)
     };
 
-    Eigen::Vector<float, 4> quat = {x(0), x(1), x(2), x(3)};
-    Eigen::Matrix<float, 3,3> rotm = quatToRotation(quat);
+    // Eigen::Vector<float, 4> quat = {x(0), x(1), x(2), x(3)};
+    // Eigen::Matrix<float, 3,3> rotm = quatToRotation(quat);
 
-    Eigen::Vector<float, 3> bodyGrav = rotm.transpose() * G_NED;
-    Eigen::Vector<float, 3> linearAccelBody = accelBody - bodyGrav;
-    Eigen::Vector<float, 3> accelNED = rotm.transpose() * linearAccelBody;
+    // Eigen::Vector<float, 3> bodyGrav = rotm.transpose() * G_NED;
+    // Eigen::Vector<float, 3> linearAccelBody = accelBody - bodyGrav;
+    // Eigen::Vector<float, 3> accelNED = rotm.transpose() * linearAccelBody;
 
-    Serial.println("<----- Linear Accel NED ----->");
-    for(int i=0; i < accelNED.rows(); i++) {
-        for(int j = 0; j < accelNED.cols(); j++) {
-            Serial.print(String(accelNED(i,j)) + "\t");
-        }
-        Serial.println("");
-    };
+    // Serial.println("<----- Linear Accel NED ----->");
+    // for(int i=0; i < accelNED.rows(); i++) {
+    //     for(int j = 0; j < accelNED.cols(); j++) {
+    //         Serial.print(String(accelNED(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // };
+
+    // Eigen::Vector<float, 3> f_p = {
+    //     x(4) + x(7)*dt + 0.5f*accelNED(0) * (dt*dt),
+    //     x(5) + x(8)*dt + 0.5f*accelNED(1) * (dt*dt),
+    //     x(6) + x(9)*dt + 0.5f*accelNED(2) * (dt*dt)
+    // };
 
     Eigen::Vector<float, 3> f_p = {
-        x(4) + x(7)*dt + 0.5f*accelNED(0) * (dt*dt),
-        x(5) + x(8)*dt + 0.5f*accelNED(1) * (dt*dt),
-        x(6) + x(9)*dt + 0.5f*accelNED(2) * (dt*dt)
+        0,0,0  
     };
 
     Eigen::Vector<float, 3> f_v = {
-        x(7) + accelNED(0) * dt,
-        x(8) + accelNED(1) * dt,
-        x(9) + accelNED(2) * dt
+        0,0,0  
     };
+
+    // Eigen::Vector<float, 3> f_v = {
+    //     x(7) + accelNED(0) * dt,
+    //     x(8) + accelNED(1) * dt,
+    //     x(9) + accelNED(2) * dt
+    // };
 
     f_q = f_q  / f_q.norm();
 
@@ -189,12 +232,12 @@ Eigen::Matrix<float, 10, 10> StateEstimator::predictionJacobian(const Eigen::Vec
         {0.5f*dt*p, 1, 0.5f*dt*r, -0.5f*dt*q, 0, 0, 0, 0, 0, 0},
         {0.5f*dt*q, -0.5f*dt*r, 1, 0.5f*dt*p, 0, 0, 0, 0, 0, 0},
         {0.5f*dt*r, 0.5f*dt*q, -0.5f*dt*p, 1, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 1, 0, 0, dt, 0, 0},
-        {0, 0, 0, 0, 0, 1, 0, 0, dt, 0},
-        {0, 0, 0, 0, 0, 0, 1, 0, 0, dt},
-        {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     };
 
     return A;
@@ -207,12 +250,12 @@ Eigen::Matrix<float, 10,6> StateEstimator::updateModelCovariance() {
         {0.5f*x(0), -0.5f*x(3), 0.5f*x(2), 0, 0, 0},
         {0.5f*x(3), 0.5f*x(0), -0.5f*x(1), 0, 0, 0},
         {-0.5f*x(2), 0.5f*x(1), 0.5f*x(0), 0, 0, 0},
-        {0, 0, 0, x(4), 0, 0},
-        {0, 0, 0, 0, x(5), 0},
-        {0, 0, 0, 0, 0, x(6)},
-        {0, 0, 0, x(4), 0, 0},
-        {0, 0, 0, 0, x(5), 0},
-        {0, 0, 0, 0, 0, x(6)}
+        {0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0}
     };
 
     return W;

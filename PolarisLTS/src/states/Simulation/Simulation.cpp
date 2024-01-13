@@ -32,6 +32,8 @@ void Simulation::loop_impl() {
     telemPacket.i = currentState(1);
     telemPacket.j = currentState(2);
     telemPacket.k = currentState(3);
+
+    // Serial.println(this->deltaTime);
     
 };
 

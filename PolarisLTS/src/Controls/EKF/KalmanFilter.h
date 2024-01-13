@@ -69,9 +69,9 @@ class StateEstimator {
         float dt = 0;
 
         /* Sensor Variance */
-        const float gyroVariance = 0.00489/sqrt(100); // [Rad/s] function of loop rate -100Hz
+        const float gyroVariance = 0.00489*sqrt(100); // [Rad/s] function of loop rate -100Hz
         const float magVariance = 0.08; // [microTesla]
-        const float accelVariance = 0.00069/sqrt(100); // [m/s^2] function of loop rate - 100Hz
+        const float accelVariance = 0.00069*sqrt(100); // [m/s^2] function of loop rate - 100Hz
 
         /* Magnetometer Calibration Matrices */
         Eigen::Matrix<float, 3,3> softIronCal {

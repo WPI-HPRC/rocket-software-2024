@@ -5,7 +5,7 @@
 class Coast : public State {
 	_STATE_CLASS_IMPLS_
 	public:
-		Coast(GNSS gnss);
+		Coast(GNSS* gnss);
 	private:
-	 GNSS gnss;
+	 GNSS* gnss;
 };

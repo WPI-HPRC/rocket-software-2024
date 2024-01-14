@@ -22,17 +22,9 @@ void foo_test() {
 
     GNSS& gnss = mock_gnss.get();
 
-    printf("%f\n", gnss.getLatitude());
-
-    State* state = new Coast(gnss);
+    State* state = new Coast(&gnss);
 
     state = state->nextState();
-
-    if (state == nullptr) {
-        printf("hi\n");
-    } else {
-        printf("bye\n");
-    }
 
     Verify(Method(mock_gnss,getLatitude)).Once();
     TEST_ASSERT(state != nullptr);

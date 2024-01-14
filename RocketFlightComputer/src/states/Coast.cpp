@@ -4,19 +4,18 @@
 #include "GNSS.h"
 #include <cstdio>
 
-Coast::Coast(GNSS gnss) {
+Coast::Coast(GNSS* gnss) {
 	this->gnss = gnss;
 }
 
 void Coast::initialize_impl() {
-	gnss.initialize();
+	gnss->initialize();
 }
 
 void Coast::loop_impl() {}
 
 State *Coast::nextState_impl() {
-	printf("next_state\n");
-	if (gnss.getLatitude() == 100) {
+	if (gnss->getLatitude() == 100) {
 	 return new Launch();
 	}
 	return nullptr;

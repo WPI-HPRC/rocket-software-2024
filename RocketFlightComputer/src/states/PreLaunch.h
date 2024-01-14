@@ -1,6 +1,6 @@
 #pragma once
 #include "State.h"
-#include <controls/ekf/KalmanFilter.h>
+
 //! @brief max number of milliseconds we can remain in the prelaunch (initialization) state
 #define MAX_PRELAUNCH_TIME 3000
 class PreLaunch : public State {
@@ -9,5 +9,7 @@ class PreLaunch : public State {
 		PreLaunch();
 
 	private:
-		StateEstimator * ekf;
+		// StateEstimator * ekf;
+		QuatStateEstimator * ekf;
+	
 };

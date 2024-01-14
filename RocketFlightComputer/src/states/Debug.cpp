@@ -1,7 +1,7 @@
 #include "Debug.h"
 #include "State.h"
 
-Debug::Debug(StateEstimator * ekf) {
+Debug::Debug(QuatStateEstimator * ekf) {
     this->ekf = ekf;
 }
 
@@ -24,6 +24,8 @@ void Debug::loop_impl() {
     Serial.print("Longitude: "); Serial.println(sensorPacket.gpsLong, 4);
     Serial.print("Altitude AGL: "); Serial.println(sensorPacket.gpsAltAGL, 4);
     Serial.print("Altitude MSL: "); Serial.println(sensorPacket.gpsAltMSL, 4);
+
+    Serial.println(this->deltaTime);
 
 	// Read bno for example
     // Serial.println("+=== Barometer ===+");

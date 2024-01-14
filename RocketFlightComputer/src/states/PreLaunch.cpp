@@ -33,8 +33,10 @@ void PreLaunch::loop_impl() {
 	Serial.print("Initial Position: <"); Serial.print(X_0,4); Serial.print(", "); Serial.print(Y_0,4); Serial.print(", "); Serial.print(Z_0,4); Serial.println(">");
 
 	// Intialize EKF
-	Eigen::Vector<float, 10> x_0 = {1,0,0,0, X_0, Y_0, Z_0, 0,0,0};
-	ekf = new StateEstimator(x_0, 0.025);
+	// Eigen::Vector<float, 10> x_0 = {1,0,0,0, X_0, Y_0, Z_0, 0,0,0};
+	BLA::Matrix<4> x_0 = {1,0,0,0};
+	ekf = new QuatStateEstimator(x_0, 0.025f);
+	// ekf = new StateEstimator(x_0, 0.025);
 }
 
 //! @details If we are separating this from `Launch`, we need a time limit on this state or something

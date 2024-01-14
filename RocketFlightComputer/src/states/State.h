@@ -8,6 +8,8 @@ private:                             \
 #include "Arduino.h"
 #include "../utility.hpp"
 #include <ArduinoEigen.h>
+#include <controls/ekf/StateEstimator.h>
+#include <BasicLinearAlgebra.h>
 /**
  * @brief Abstract class representing a rocket state.
  */
@@ -27,46 +29,10 @@ class State {
 		 */
 		State *nextState();
 		virtual ~State() {}
+		Utility::SensorPacket sensorPacket;
 
-		struct SensorPacket {
-			// Raw Sensor Readings
-			float accelX;
-			float accelY;
-			float accelZ;
-			float gyroX;
-			float gyroY;
-			float gyroZ;
-			uint32_t magX;
-			uint32_t magY;
-			uint32_t magZ;
-			float pressure;
-
-			// Calculated Values
-			float altitude;
-
-			// State Estimator Outputs
-			float q;
-			float i;
-			float j;
-			float k;
-
-			// Geocentric Position
-			float X;
-			float Y;
-			float Z;
-
-			// GPS Inputs
-			float gpsLat;
-			float gpsLong;
-			float gpsAltMSL;
-			float gpsAltAGL;
-			boolean gpsLock = false;
-
-			long timestamp;
-    	};	
-		SensorPacket sensorPacket;
-
-		Eigen::Vector<float, 10> x_state;
+		// Eigen::Vector<float, 10> x_state;
+		BLA::Matrix<4> x_state;
 
 	protected:
 		//! @brief number of milliseconds since the initialize call

@@ -26,7 +26,7 @@ Adafruit_LPS25 * baro; // 0x5D I2C ADDR
 Adafruit_ICM20649 * icm; // 0x68 I2C ADDR
 SFE_UBLOX_GNSS * gps; // 0x42 I2C ADDR
 
-State::SensorPacket sensorPacket;
+Utility::SensorPacket sensorPacket;
 
 void setup()
 {

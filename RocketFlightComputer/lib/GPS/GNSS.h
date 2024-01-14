@@ -7,6 +7,7 @@
  *
  * @copyright Copyright (c) 2023
  */
+#pragma once
 #include <Arduino.h>
 #include <Wire.h>
 
@@ -15,6 +16,7 @@
 class GNSS
 {
 public:
+    GNSS();
     /**
      * @brief initializes the GNSS to print to Serial Monitor
      */
@@ -47,7 +49,6 @@ public:
     double getLongitude();
 
 private:
-    SFE_UBLOX_GNSS GNSS;
     double prevLat;
     double prevLon;
 };

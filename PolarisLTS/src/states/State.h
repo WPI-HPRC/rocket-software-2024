@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 // #include <Controls/EKF/KalmanFilter.h>
-#include <ControlsOld/EKF/StateEstimator.h>
+#include <Controls/EKF/EKF.h>
 #include <ArduinoEigen.h>
 
 #define _STATE_CLASS_IMPLS_          \
@@ -35,9 +35,8 @@ public:
 
     // Shared Variable
     SensorFrame sensorData;
-
-    // Eigen::Vector<float, 10> currentState;
-    BLA::Matrix<4> currentState;
+    
+    BLA::Matrix<10> currentState;
 
     // struct {
     //     float accelX = 0.0;

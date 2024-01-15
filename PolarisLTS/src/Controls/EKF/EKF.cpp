@@ -1,4 +1,4 @@
-#include "StateEstimator.h"
+#include "EKF.h"
 
 /**
  * @brief Construct a new Quat State Estimator:: Quat State Estimator object
@@ -6,7 +6,7 @@
  * @param initialOrientation 
  * @param dt 
  */
-QuatStateEstimator::QuatStateEstimator(BLA::Matrix<4> initialOrientation, float dt) {
+StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt) {
     this->x = initialOrientation;
     this->x_min = initialOrientation;
     this->dt = dt;
@@ -18,7 +18,7 @@ QuatStateEstimator::QuatStateEstimator(BLA::Matrix<4> initialOrientation, float 
  * @param sensorPacket Sensor Frame
  * @return BLA::Matrix<4> State Vector
  */
-BLA::Matrix<4> QuatStateEstimator::onLoop(SensorFrame sensorPacket) {
+BLA::Matrix<10> StateEstimator::onLoop(SensorFrame sensorPacket) {
 
     /* Read Data from Sensors and Convert to SI Units */
     // Convert Accel values to m/s/s
@@ -45,26 +45,22 @@ BLA::Matrix<4> QuatStateEstimator::onLoop(SensorFrame sensorPacket) {
     x_min = measurementFunction(sensorPacket);
 
     // Take the jacobian to obtain the covariance of the prediction step
-    BLA::Matrix<4,4> A = measurementJacobian(sensorPacket);
+    BLA::Matrix<10,10> A = measurementJacobian(sensorPacket);
 
     // Update model covariance from previous state
-    BLA::Matrix<4,3> W = updateModelCovariance(sensorPacket);
+    BLA::Matrix<10,6> W = updateModelCovariance(sensorPacket);
 
     // Apply updated model covariance to process noise covariance matrix
-    Q = W * gyroVar * BLA::MatrixTranspose<BLA::Matrix<4,3>>(W);
+    BLA::Matrix<10,10> Q = W * gyroAccelVar * BLA::MatrixTranspose<BLA::Matrix<10,6>>(W);
 
     // Update Priori Error Covariance
-    P_min = A*P*BLA::MatrixTranspose<BLA::Matrix<4,4>>(A) + Q;
+    P_min = A*P*BLA::MatrixTranspose<BLA::Matrix<10,10>>(A) + Q;
 
     // Apply Soft and Hard Iron Calibration to magnetometer data
     // **IMPORTANT** THIS MAY NEED TO BE RE-CALIBRATED UPON POSITION CHANGE
     BLA::Matrix<3> magVector = {
         sensorPacket.mag_x, sensorPacket.mag_y, sensorPacket.mag_z
     };
-    
-    // Serial.println(String(magVector(0))+","+String(magVector(1))+","+String(magVector(2)));
-
-    // magVector = softIronCal * (magVector - hardIronCal);
 
     BLA::Matrix<3> accelVector = {sensorPacket.ac_x,sensorPacket.ac_y,sensorPacket.ac_z};
     // Normalize Accel and Mag for use in correction step
@@ -79,38 +75,50 @@ BLA::Matrix<4> QuatStateEstimator::onLoop(SensorFrame sensorPacket) {
     BLA::Matrix<6> h = updateFunction(sensorPacket);
 
     // Take the jacobian to obtain the covariance of the correction function
-    BLA::Matrix<6,4> H = updateJacobian(sensorPacket);
+    BLA::Matrix<6,10> H = updateJacobian(sensorPacket);
 
     // Compute the kalman gain from the magnetometer covariance readings
     BLA::Matrix<6> v = z - h;
-    BLA::Matrix<6,6> S = H * P_min * BLA::MatrixTranspose<BLA::Matrix<6,4>>(H) + R;
-    BLA::Matrix<4,6>  K = P_min * BLA::MatrixTranspose<BLA::Matrix<6,4>>(H) * BLA::Inverse(S);
+    BLA::Matrix<6,6> S = H * P_min * BLA::MatrixTranspose<BLA::Matrix<6,10>>(H) + R;
+    BLA::Matrix<10,6>  K = P_min * BLA::MatrixTranspose<BLA::Matrix<6,10>>(H) * BLA::Inverse(S);
 
     // Use our kalman gain and magnetometer readings to correct priori orientation
-    // x = x_min + K*v;
-    x = x_min;
+    x = x_min + K*v;
+    // x = x_min;
 
     // Update error covariance matrix
-    // P = (eye4 - K*H)*P_min;
-    P = P_min;
+    P = (eye10 - K*H)*P_min;
+    // P = P_min;
 
-    x = x / BLA::Norm(x);
-
-    // Serial.println("<----- H 1 ----->");
-    // for (int i = 0; i < H.Rows; i++) {
-    //     for (int j = 0; j < H.Cols; j++) {
-    //         Serial.print(String(H(i,j)) + "\t");
+    // Serial.println("<----- Prediction Covariance ----->");
+    // for (int i = 0; i < A.Rows; i++) {
+    //     for (int j = 0; j < A.Cols; j++) {
+    //         Serial.print(String(A(i,j)) + "\t");
     //     }
     //     Serial.println("");
     // }
 
-    // Serial.println("<----- State 1 ----->");
+    // Serial.println("<----- P_min 2 ----->");
+    // for (int i = 0; i < P_min.Rows; i++) {
+    //     for (int j = 0; j < P_min.Cols; j++) {
+    //         Serial.print(String(P_min(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // };
+
+    // Serial.println("<----- State 2 ----->");
     // for (int i = 0; i < x.Rows; i++) {
     //     for (int j = 0; j < x.Cols; j++) {
     //         Serial.print(String(x(i,j)) + "\t");
     //     }
     //     Serial.println("");
     // }
+
+    // float quatNorm = sqrt(x(0)*x(0) + x(1)*x(1) + x(2)*x(2) + x(3)*x(3));
+    // x(0) = x(0) / quatNorm;
+    // x(1) = x(1) / quatNorm;
+    // x(2) = x(2) / quatNorm;
+    // x(3) = x(3) / quatNorm;
 
     // Serial.print(sensorPacket.ac_x); Serial.print(",");
     // Serial.print(sensorPacket.ac_y); Serial.print(",");
@@ -127,40 +135,20 @@ BLA::Matrix<4> QuatStateEstimator::onLoop(SensorFrame sensorPacket) {
     // Serial.print(x(3)); Serial.print(",");
     // Serial.println(millis());
 
-    // Serial.print("QUAT|");
-    // Serial.print(x(0)); Serial.print(",");
-    // Serial.print(x(1)); Serial.print(",");
-    // Serial.print(x(2)); Serial.print(",");
-    // Serial.println(x(3));
-    // Serial.print("MAGV|");
-    // Serial.print(magVector(0)); Serial.print(",");
-    // Serial.print(magVector(1)); Serial.print(",");
-    // Serial.println(magVector(2));
+    Serial.print("QUAT|");
+    Serial.print(x(0)); Serial.print(",");
+    Serial.print(x(1)); Serial.print(",");
+    Serial.print(x(2)); Serial.print(",");
+    Serial.println(x(3));
     // Serial.print("ACC|");
     // Serial.print(sensorPacket.ac_x); Serial.print(",");
     // Serial.print(sensorPacket.ac_y); Serial.print(",");
     // Serial.println(sensorPacket.ac_z);
 
-    // Serial.println("<----- P_min 1 ----->");
-    // for (int i = 0; i < P_min.Rows; i++) {
-    //     for (int j = 0; j < P_min.Cols; j++) {
-    //         Serial.print(String(P_min(i,j)) + "\t");
-    //     }
-    //     Serial.println("");
-    // };
-
-    // Serial.println("<----- State 1 ----->");
-    // for (int i = 0; i < x.Rows; i++) {
-    //     for (int j = 0; j < x.Cols; j++) {
-    //         Serial.print(String(x(i,j)) + "\t");
-    //     }
-    //     Serial.println("");
-    // }
-
     return this->x;
 }
 
-BLA::Matrix<4> QuatStateEstimator::measurementFunction(SensorFrame sensorPacket) {
+BLA::Matrix<10> StateEstimator::measurementFunction(SensorFrame sensorPacket) {
     float p = sensorPacket.gy_x; float q = sensorPacket.gy_y; float r = sensorPacket.gy_z;
     // BLA::Matrix<3> bodyAccel = {sensorPacket.ac_x, sensorPacket.ac_y, sensorPacket.ac_z};
 
@@ -179,24 +167,25 @@ BLA::Matrix<4> QuatStateEstimator::measurementFunction(SensorFrame sensorPacket)
     //     Serial.println("");
     // }
 
-    BLA::Matrix<3> grav_T = {0, 0,-9.81};
+    // BLA::Matrix<4> gravNEDQuat = {0, 0, 0,-9.81};
 
     // BLA::Matrix<4> quatConj = {x(0), -x(1), -x(2), -x(3)};
 
     // BLA::Matrix<4> bodyGrav = quaternionMultiplication(quaternionMultiplication(x, gravNEDQuat), quatConj);
 
-    BLA::Matrix<3> accel_R = {sensorPacket.ac_x, sensorPacket.ac_y, sensorPacket.ac_z};
 
-    BLA::Matrix<3,3> rot = quat2rotm(x);
-
-    BLA::Matrix<3> g_a = BLA::MatrixTranspose<BLA::Matrix<3,3>>(rot) * grav_T;
-
-    BLA::Matrix<3> accel_a = accel_R - g_a;
+    // Serial.println("<----- Gravity in Body ----->");
+    // for (int i = 0; i < bodyGrav.Rows; i++) {
+    //     for (int j = 0; j < bodyGrav.Cols; j++) {
+    //         Serial.print(String(bodyGrav(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // }
 
     // Serial.println("<----- Accel in Body ----->");
-    // for (int i = 0; i < accel_a.Rows; i++) {
-    //     for (int j = 0; j < accel_a.Cols; j++) {
-    //         Serial.print(String(accel_a(i,j)) + "\t");
+    // for (int i = 0; i < bodyAccel.Rows; i++) {
+    //     for (int j = 0; j < bodyAccel.Cols; j++) {
+    //         Serial.print(String(bodyAccel(i,j)) + "\t");
     //     }
     //     Serial.println("");
     // }
@@ -204,25 +193,45 @@ BLA::Matrix<4> QuatStateEstimator::measurementFunction(SensorFrame sensorPacket)
     // Normalize Quaternion Function
     f_q = f_q / BLA::Norm(f_q);
 
-    BLA::Matrix<4> f = f_q;
+    BLA::Matrix<3> f_v = {0,0,0};
+    BLA::Matrix<3> f_p = {0,0,0};
+
+    BLA::Matrix<10> f = {
+        f_q(0),
+        f_q(1),
+        f_q(2),
+        f_q(3),
+        f_v(0),
+        f_v(1),
+        f_v(2),
+        f_p(0),
+        f_p(1),
+        f_p(2)
+    };
 
     return f;
 };
 
-BLA::Matrix<4,4> QuatStateEstimator::measurementJacobian(SensorFrame sensorPacket) {
+BLA::Matrix<10,10> StateEstimator::measurementJacobian(SensorFrame sensorPacket) {
     float p = sensorPacket.gy_x; float q = sensorPacket.gy_y; float r = sensorPacket.gy_z;
 
-    BLA::Matrix<4,4> A = {
-        1, -(dt/2)*p, -(dt/2)*q, -(dt/2)*r,
-        (dt/2)*p, 1, (dt/2)*r, -(dt/2)*q,
-        (dt/2)*q, -(dt/2)*r, 1, (dt/2)*p,
-        (dt/2)*r, (dt/2)*q, -(dt/2)*p, 1
+    BLA::Matrix<10,10> A = {
+        1, -(dt/2)*p, -(dt/2)*q, -(dt/2)*r, 0,0,0,0,0,0,
+        (dt/2)*p, 1, (dt/2)*r, -(dt/2)*q, 0,0,0,0,0,0,
+        (dt/2)*q, -(dt/2)*r, 1, (dt/2)*p, 0,0,0,0,0,0,
+        (dt/2)*r, (dt/2)*q, -(dt/2)*p, 1, 0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
     };
 
     return A;
 }
 
-BLA::Matrix<6> QuatStateEstimator::updateFunction(SensorFrame sensorPacket) {
+BLA::Matrix<6> StateEstimator::updateFunction(SensorFrame sensorPacket) {
     BLA::Matrix<3> r = {
         cos(inclination), 0, sin(inclination)
     };
@@ -259,7 +268,7 @@ BLA::Matrix<6> QuatStateEstimator::updateFunction(SensorFrame sensorPacket) {
 
 };
 
-BLA::Matrix<6,4> QuatStateEstimator::updateJacobian(SensorFrame sensorPacket) {
+BLA::Matrix<6,10> StateEstimator::updateJacobian(SensorFrame sensorPacket) {
     BLA::Matrix<3> r = {
         cos(inclination), 0, sin(inclination)
     }; // NED Mag vector
@@ -290,32 +299,55 @@ BLA::Matrix<6,4> QuatStateEstimator::updateJacobian(SensorFrame sensorPacket) {
     float qy = q(2);
     float qz = q(3);
 
-    BLA::Matrix<6,4> H = {
-        gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, -gx*qy+gy*qx-gz*qw, -gx*qz+gy*qw+gz*qx,
-        -gx*qz+gy*qw+gz*qx, gx*qy-gy*qx+gz*qw, gx*qx+gy*qy+gz*qz, -gx*qw-gy*qz+gz*qy, 
-        gx*qy-gy*qx+gz*qw, gx*qz-gy*qw-gz*qx, gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz,
-        rx*qw+ry*qz-rz*qy, rx*qy+ry*qy+rz*qz, -rx*qy+ry*qx-rz*qw, -rx*qz+ry*qw+rz*qx,
-        -rx*qz+ry*qw+rz*qx, rx*qy-ry*qx+rz*qw, rx*qx+ry*qy+rz*qz, -rx*qw-ry*qz+rz*qy, 
-        rx*qy-ry*qx+rz*qw, rx*qz-ry*qw-rz*qx, rx*qw+ry*qz-rz*qy, rx*qx+ry*qy+rz*qz
+    // float sigma1 = 2*rx*qx + 2*ry*qy + 2*rz*qz;
+    // float sigma2 = 2*rx*qw + 2*ry*qz - 2*rz*qy;
+    // float sigma3 = 2*ry*qw - 2*rx*qz + 2*rz*qx;
+    // float sigma4 = 2*rx*qy - 2*ry*qx + 2*rz*qw;
+    // float sigma5 = -2*gz*qz;
+    // float sigma6 = -2*gz*qx;
+    // float sigma7 = -2*gz*qw;
+
+    // BLA::Matrix<6,10> H = {
+    //     2*gz*qy, sigma5, 2*gz*qw, sigma6, 0,0,0,0,0,0,
+    //     sigma6, sigma7, sigma5, -2*gz*qy, 0,0,0,0,0,0,
+    //     sigma7, 2*gz*qx, 2*gz*qy, sigma5, 0,0,0,0,0,0,
+    //     sigma2, sigma1, 2*ry*qx-2*rx*qy-2*rz*qw, sigma3, 0,0,0,0,0,0,
+    //     sigma3, sigma4, sigma1, 2*rz*qy-2*ry*qz-2*rx*qw, 0,0,0,0,0,0,
+    //     sigma4, 2*rx*qz-2*ry*qw-2*rx*qx, sigma2, sigma1, 0,0,0,0,0,0,
+    // };
+
+    BLA::Matrix<6,10> H = {
+        gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, -gx*qy+gy*qx-gz*qw, -gx*qz+gy*qw+gz*qx, 0,0,0,0,0,0,
+        -gx*qz+gy*qw+gz*qx, gx*qy-gy*qx+gz*qw, gx*qx+gy*qy+gz*qz, -gx*qw-gy*qz+gz*qy, 0,0,0,0,0,0,
+        gx*qy-gy*qx+gz*qw, gx*qz-gy*qw-gz*qx, gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, 0,0,0,0,0,0,
+        rx*qw+ry*qz-rz*qy, rx*qy+ry*qy+rz*qz, -rx*qy+ry*qx-rz*qw, -rx*qz+ry*qw+rz*qx, 0,0,0,0,0,0,
+        -rx*qz+ry*qw+rz*qx, rx*qy-ry*qx+rz*qw, rx*qx+ry*qy+rz*qz, -rx*qw-ry*qz+rz*qy, 0,0,0,0,0,0,
+        rx*qy-ry*qx+rz*qw, rx*qz-ry*qw-rz*qx, rx*qw+ry*qz-rz*qy, rx*qx+ry*qy+rz*qz, 0,0,0,0,0,0,
     };
 
-    return H * 2.0f;
+    return H;
 
 };
 
-BLA::Matrix<4,3> QuatStateEstimator::updateModelCovariance(SensorFrame sensorPacket) {
+BLA::Matrix<10,6> StateEstimator::updateModelCovariance(SensorFrame sensorPacket) {
 
-    BLA::Matrix<4,3> W = {
-        -x(1), -x(2), -x(3),
-        x(0), -x(3), x(2),
-        x(3), x(0), -x(1),
-        -x(2), x(1), x(0)
+    BLA::Matrix<10,6> W = {
+        -x(1), -x(2), -x(3), 0, 0, 0,
+        x(0), -x(3), x(2), 0, 0, 0,
+        x(3), x(0), -x(1), 0, 0, 0,
+        -x(2), x(1), x(0), 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
     };
 
     return W * (dt/2);
 };
 
-BLA::Matrix<3,3> QuatStateEstimator::quat2rotm(BLA::Matrix<4> q) {
+BLA::Matrix<3,3> StateEstimator::quat2rotm(BLA::Matrix<4> q) {
     // q = q / BLA::Norm(q);
     
     float qw = q(0);
@@ -332,7 +364,7 @@ BLA::Matrix<3,3> QuatStateEstimator::quat2rotm(BLA::Matrix<4> q) {
     return rotm;
 };
 
-BLA::Matrix<4> QuatStateEstimator::quaternionMultiplication(BLA::Matrix<4> q1, BLA::Matrix<4> q2) {
+BLA::Matrix<4> StateEstimator::quaternionMultiplication(BLA::Matrix<4> q1, BLA::Matrix<4> q2) {
 
     float w1 = q1(0);
     float i1 = q1(1);

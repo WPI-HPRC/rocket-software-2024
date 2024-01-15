@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 #include <BasicLinearAlgebra.h>
-#include <SensorBoardLibraries/SensorBoard.hpp>
+#include <Controls/EKF/EKF.h>
 
 /**
  * @author @frostydev99 - Daniel Pearson
@@ -21,9 +21,9 @@ class QuatStateEstimator {
     constexpr static int initialLoopIters = 1000;
 
     // Input variance from sensor data sheet
-    const float gyroVariance = 0.00489/sqrt(40); // [Rad/s]
-    const float magVariance = 0.0008; // [T]
-    const float accelVariance = 0.00069/sqrt(40); // [m/s/s]
+    const float gyroVariance = 0.00489/sqrt(100); // [Rad/s]
+    const float magVariance = 0.0008; // [nT]
+    const float accelVariance = 0.00069/sqrt(100); // [m/s/s]
 
     float dt = 0.025;
 

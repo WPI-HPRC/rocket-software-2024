@@ -1,7 +1,7 @@
 #include "Simulation.h"
 #include <states/State.h>
 
-Simulation::Simulation(QuatStateEstimator * ekf) {
+Simulation::Simulation(StateEstimator * ekf) {
     this->name = "Simulation";
     this->ekf = ekf;
 };

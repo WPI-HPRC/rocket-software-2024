@@ -11,10 +11,8 @@ void PreLaunch::initialize_impl() {
     // Obtain initial quaternion orientation
     Serial.println("Initializing Prelaunch");
 
-    // Eigen::Vector<float, 10> x_0 = {1,0,0,0,0,0,0,0,0,0};
-    BLA::Matrix<4> x_0 = {1,0,0,0};
-    ekf = new QuatStateEstimator(x_0, 0.01);
-    // ekf = new StateEstimator(x_0, 0.01);
+    BLA::Matrix<10> x_0 = {1,0,0,0,0,0,0,0,0,0};
+    ekf = new StateEstimator(x_0, 0.01);
 }
 
 void PreLaunch::loop_impl() {

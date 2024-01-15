@@ -10,7 +10,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <GNSS.h>
-#include "Sensors.h"
 
 GNSS::GNSS() {}
 
@@ -20,7 +19,7 @@ GNSS::GNSS() {}
 void GNSS::initialize()
 {
     Wire.begin();
-    if (global_gnss.begin() == false)
+    if (gnss.begin() == false)
     {
         Serial.println(F("u-blox GNSS module not detected at default I2C address. Please check wiring. Freezing."));
         while (1)
@@ -60,7 +59,7 @@ void GNSS::outputData(int delayTime)
  */
 double GNSS::getLatitude()
 {
-    return global_gnss.getLatitude();
+    return gnss.getLatitude();
 }
 /**
  * @brief Get the longitude value
@@ -69,5 +68,5 @@ double GNSS::getLatitude()
  */
 double GNSS::getLongitude()
 {
-    return global_gnss.getLongitude();
+    return gnss.getLongitude();
 }

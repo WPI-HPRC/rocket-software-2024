@@ -49,6 +49,7 @@ public:
     double getLongitude();
 
 private:
+    SFE_UBLOX_GNSS gnss;
     double prevLat;
     double prevLon;
 };

@@ -1,3 +1,4 @@
+#pragma once
 #include "GNSS.h"
 #include "BNO055.h"
 #include "Barometer.h"

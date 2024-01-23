@@ -1,4 +1,6 @@
 #pragma once
+#include "Sensors.h"
+
 #define _STATE_CLASS_IMPLS_          \
 private:                             \
 	void initialize_impl() override; \
@@ -41,6 +43,8 @@ class State {
 		long long deltaTime = 0;
 		//! @brief loop count since initialization
 		long long loopCount = 0;
+		//! @brief "global" sensors object
+		struct Sensors *sensors;
 
 	private:
 		//! @brief number of milliseconds from boot to the initialize call

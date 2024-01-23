@@ -1,8 +1,9 @@
 #pragma once
 #include "State.h"
+#include "Sensors.h"
 
 class DrogueDescent : public State {
 	_STATE_CLASS_IMPLS_
 	public:
-		DrogueDescent();
+		DrogueDescent(struct Sensors *sensors);
 };

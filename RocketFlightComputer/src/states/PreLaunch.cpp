@@ -2,8 +2,10 @@
 #include "State.h"
 #include "Launch.h"
 #include "Debug.h"
+#include "Sensors.h"
 
-PreLaunch::PreLaunch() {
+PreLaunch::PreLaunch(struct Sensors *sensors) {
+	this->sensors = sensors;
 }
 
 void PreLaunch::initialize_impl() {
@@ -50,7 +52,7 @@ State *PreLaunch::nextState_impl()
 
 	if (this->currentTime > MAX_PRELAUNCH_TIME && sensorPacket.gpsLock)
 	{
-		return new Launch();
+		return new Launch(sensors);
 	}
 	return nullptr;
 }

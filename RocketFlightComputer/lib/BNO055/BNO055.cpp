@@ -12,6 +12,7 @@ BNO055::BNO055(int num)
     pin = num;
     bno = Adafruit_BNO055(pin);
 }
+
 Adafruit_BNO055 BNO055::getbno()
 {
     return bno;

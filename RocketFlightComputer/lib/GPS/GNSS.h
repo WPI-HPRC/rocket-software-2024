@@ -7,9 +7,11 @@
  *
  * @copyright Copyright (c) 2023
  */
+#pragma once
 #include <Arduino.h>
 #include <Wire.h>
 #include <SparkFun_u-blox_GNSS_v3.h>
+
 class GNSS
 {
 public:

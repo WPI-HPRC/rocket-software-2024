@@ -1,7 +1,10 @@
 #include "MainDescent.h"
 #include "State.h"
+#include "Sensors.h"
 
-MainDescent::MainDescent() {}
+MainDescent::MainDescent(struct Sensors *sensors) {
+	this->sensors = sensors;
+}
 
 void MainDescent::initialize_impl() {}
 

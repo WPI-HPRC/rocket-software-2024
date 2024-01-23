@@ -48,7 +48,7 @@ boolean GNSS::hasChanged(double lat, double lon)
  *
  * @param delayTime the amount of delay between readings in milliseconds (OPTIONAL, DEFAULT 250)
  */
-void GNSS::outputData(int delayTime = 250)
+void GNSS::outputData(int delayTime)
 {
     double lat = getLatitude();
     double lon = getLongitude();

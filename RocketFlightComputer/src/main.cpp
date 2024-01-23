@@ -15,20 +15,23 @@
 
 #include <states/State.h>
 #include <states/PreLaunch.h>
+
+#include <Barometer.h>
+#include <BNO055.h>
+#include <GNSS.h>
+
+#define LOOP_RATE 100
+
 Metro timer = Metro(1000 / LOOP_RATE);
 
-long lastLoopTime = 0;
-
-// Start in pre-launch
-State * state = new PreLaunch();
-
-Adafruit_BNO055 * bno; // 0x28 I2C ADDR
-Adafruit_LPS25 * baro; // 0x5D I2C ADDR
-// Adafruit_ICM20649 * icm; // 0x68 I2C ADDR
-ICM42688 * icm;
-SFE_UBLOX_GNSS * gps; // 0x42 I2C ADDR
-SFE_MMC5983MA * mag;
 Utility::SensorPacket sensorPacket;
+struct Sensors sensors = {
+    .barometer = new Barometer(),
+    .gnss = new GNSS(),
+    .bno055 = new BNO055(0), // idk what the number in the constructor is for
+};
+
+State *state = new PreLaunch(&sensors);
 
 void setup()
 {
@@ -40,12 +43,6 @@ void setup()
     Wire.begin();
     Wire.setClock(400000);
 
-    // bno = new Adafruit_BNO055(1, 0x40);
-    baro = new Adafruit_LPS25();
-    // icm = new Adafruit_ICM20649();
-    icm = new ICM42688(Wire, 0x68);
-    gps = new SFE_UBLOX_GNSS();
-    mag = new SFE_MMC5983MA();
 
     // if(!bno->begin()) {
     //     Serial.println("[Sensorboard] No BNO055 Detected");

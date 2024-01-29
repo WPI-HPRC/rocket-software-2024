@@ -2,9 +2,7 @@
 #include "State.h"
 #include "Sensors.h"
 
-Coast::Coast(struct Sensors *sensors) {
-	this->sensors = sensors;
-}
+Coast::Coast(struct Sensors *sensors) : State(sensors) {}
 
 void Coast::initialize_impl() {}
 

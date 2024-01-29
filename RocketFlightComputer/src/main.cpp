@@ -25,10 +25,11 @@
 Metro timer = Metro(1000 / LOOP_RATE);
 
 Utility::SensorPacket sensorPacket;
+
 struct Sensors sensors = {
-    .barometer = new Barometer(),
+    .barometer = new Barometer(0, 0),
     .gnss = new GNSS(),
-    .bno055 = new BNO055(0), // idk what the number in the constructor is for
+    .bno055 = new BNO055(0),
 };
 
 State *state = new PreLaunch(&sensors);

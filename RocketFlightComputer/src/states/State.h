@@ -37,6 +37,8 @@ class State {
 		BLA::Matrix<10> x_state;
 
 	protected:
+		//! @note Constructor to be called from subclasses to initialize the `sensors` object
+		State(struct Sensors *sensors);
 		//! @brief number of milliseconds since the initialize call
 		long long currentTime = 0;
 		//! @brief number of milliseconds since the last loop call

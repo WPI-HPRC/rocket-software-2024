@@ -2,9 +2,7 @@
 #include "DrogueDescent.h"
 #include "Sensors.h"
 
-DrogueDescent::DrogueDescent(struct Sensors *sensors) {
-	this->sensors = sensors;
-}
+DrogueDescent::DrogueDescent(struct Sensors *sensors) : State(sensors) {}
 
 void DrogueDescent::initialize_impl() {}
 

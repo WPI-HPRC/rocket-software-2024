@@ -1,6 +1,8 @@
 #include "State.h"
 #include <Arduino.h>
 
+State::State(struct Sensors *sensors) : sensors(sensors) {}
+
 void State::initialize() {
 	this->startTime = millis();
 	initialize_impl();

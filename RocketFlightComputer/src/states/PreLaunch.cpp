@@ -4,13 +4,9 @@
 #include "Debug.h"
 #include "Sensors.h"
 
-PreLaunch::PreLaunch(struct Sensors *sensors) {
-	this->sensors = sensors;
-}
+PreLaunch::PreLaunch(struct Sensors *sensors) : State(sensors) {}
 
-void PreLaunch::initialize_impl() {
-
-}
+void PreLaunch::initialize_impl() {}
 
 void PreLaunch::loop_impl() {
 	// Read bno for example
@@ -50,8 +46,7 @@ State *PreLaunch::nextState_impl()
 		return new Debug(this->ekf);
 	}
 
-	if (this->currentTime > MAX_PRELAUNCH_TIME && sensorPacket.gpsLock)
-	{
+	if (this->currentTime > MAX_PRELAUNCH_TIME && sensorPacket.gpsLock) {
 		return new Launch(sensors);
 	}
 	return nullptr;

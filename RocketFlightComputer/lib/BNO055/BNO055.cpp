@@ -1,19 +1,18 @@
 #include <Arduino.h>
-#include <Metro.h>
-#include <Wire.h>
-#include <SPI.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
 #include <BNO055.h>
 
-BNO055::BNO055(int num)
+BNO055::BNO055(int32_t sensorID)
 {
-    pin = num;
-    bno = Adafruit_BNO055(pin);
+    bno = Adafruit_BNO055(sensorID);
 }
 
-Adafruit_BNO055 BNO055::getbno()
-{
-    return bno;
+void BNO055::init() {
+    bno.begin(OPERATION_MODE_ACCGYRO); // TODO/FIXME: confirm that this is the correct mode
+}
+
+imu::Quaternion BNO055::read() {
+    return bno.getQuat();
 }

@@ -3,9 +3,7 @@
 #include "State.h"
 #include "Sensors.h"
 
-Recovery::Recovery(struct Sensors *sensors) {
-	this->sensors = sensors;
-}
+Recovery::Recovery(struct Sensors *sensors) : State(sensors) {}
 
 void Recovery::initialize_impl() {}
 

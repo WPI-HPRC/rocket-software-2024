@@ -8,7 +8,7 @@ private:                             \
 #include "Arduino.h"
 #include "../utility.hpp"
 #include <ArduinoEigen.h>
-#include <controls/ekf/StateEstimator.h>
+#include <controls/ekf/EKF.h>
 #include <BasicLinearAlgebra.h>
 /**
  * @brief Abstract class representing a rocket state.
@@ -32,7 +32,7 @@ class State {
 		Utility::SensorPacket sensorPacket;
 
 		// Eigen::Vector<float, 10> x_state;
-		BLA::Matrix<4> x_state;
+		BLA::Matrix<10> x_state;
 
 	protected:
 		//! @brief number of milliseconds since the initialize call

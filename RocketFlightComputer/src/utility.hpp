@@ -41,7 +41,7 @@ class Utility {
         float altitude;
 
         // State Estimator Outputs
-        float q;
+        float w;
         float i;
         float j;
         float k;
@@ -56,6 +56,7 @@ class Utility {
         float gpsLong;
         float gpsAltMSL;
         float gpsAltAGL;
+        uint8_t satellites;
         boolean gpsLock = false;
 
         long timestamp;

@@ -10,10 +10,11 @@
 #include <Adafruit_LPS2X.h>
 #include <Adafruit_ICM20X.h>
 #include <Adafruit_ICM20649.h>
+#include <SparkFun_MMC5983MA_Arduino_Library.h>
+#include <ICM42688.h>
 
 #include <states/State.h>
 #include <states/PreLaunch.h>
-
 Metro timer = Metro(1000 / LOOP_RATE);
 
 long lastLoopTime = 0;
@@ -23,9 +24,10 @@ State * state = new PreLaunch();
 
 Adafruit_BNO055 * bno; // 0x28 I2C ADDR
 Adafruit_LPS25 * baro; // 0x5D I2C ADDR
-Adafruit_ICM20649 * icm; // 0x68 I2C ADDR
+// Adafruit_ICM20649 * icm; // 0x68 I2C ADDR
+ICM42688 * icm;
 SFE_UBLOX_GNSS * gps; // 0x42 I2C ADDR
-
+SFE_MMC5983MA * mag;
 Utility::SensorPacket sensorPacket;
 
 void setup()
@@ -38,46 +40,62 @@ void setup()
     Wire.begin();
     Wire.setClock(400000);
 
-    bno = new Adafruit_BNO055(55, 0x28);
+    // bno = new Adafruit_BNO055(1, 0x40);
     baro = new Adafruit_LPS25();
-    icm = new Adafruit_ICM20649();
+    // icm = new Adafruit_ICM20649();
+    icm = new ICM42688(Wire, 0x68);
     gps = new SFE_UBLOX_GNSS();
+    mag = new SFE_MMC5983MA();
 
-    if(!bno->begin()) {
-        Serial.println("[Sensorboard] No BNO055 Detected");
-        while(1);
-    };
-    Serial.println("[Sensorboard] BNO055 IMU Detected");
+    // if(!bno->begin()) {
+    //     Serial.println("[Sensorboard] No BNO055 Detected");
+    // } else {
+    //     Serial.println("[Sensorboard] BNO055 IMU Detected");
+    // }
 
-    if(!baro->begin_I2C()) {
+    if(!baro->begin_I2C(0x5C)) {
         Serial.println("[Sensorboard] No LPS25 Detected");
-        while(1);
-    };
-    Serial.println("[Sensorboard] LPS25 Barometer Detected");
+    } else {
+        Serial.println("[Sensorboard] LPS25 Barometer Detected");
+    }
 
-    if(!icm->begin_I2C()) {
-        Serial.println("[Sensorboard] No ICM20649 IMU Detected");
-        while(1);
-    };
-    Serial.println("[Sensorboard] ICM20649 Detected");
+    if(!mag->begin()) {
+        Serial.println("[Sensorboard] No MMC5983 Detected");
+    } else {
+        Serial.println("[Sensorboard] MMC5983 Detected");
+    }
+
+    // if(icm->begin() < 0) {
+    //     Serial.println("[Sensorboard] No ICM42688 Detected");
+    // } else {
+    //     Serial.println("[Sensorboard] ICM42688 Detected");
+    // }
 
     if(!gps->begin()) {
         Serial.println("[Sensorboard] No NEOM10S Detected");
-    };
-    Serial.println("[Sensorboard] NEOM10S GPS Detected");
+    } else {
+        Serial.println("[Sensorboard] NEOM10S GPS Detected");
+    }
+    
 
     // LPS25 Configuration
-    baro->setDataRate(LPS25_RATE_25_HZ); // Set to 25Hz rate
+    baro->setDataRate(LPS25_RATE_12_5_HZ); // Set to 12.5Hz
 
-    // ICM20648 Configuration
-    icm->setAccelRange(ICM20649_ACCEL_RANGE_16_G); // Set Accel +- 16G
-    icm->setGyroRange(ICM20649_GYRO_RANGE_1000_DPS); // Set Gyro +- 2000dps
+    mag->softReset();
+
+    // ICM42688 Configuration
+    icm->setAccelFS(ICM42688::gpm16);
+    icm->setGyroFS(ICM42688::dps250);
+
+    icm->setAccelODR(ICM42688::odr100);
+    icm->setGyroODR(ICM42688::odr100);
+
+    delay(150);
 
     // NEOM10S Configuration
     gps->setI2COutput(COM_TYPE_UBX);
-    gps->setNavigationFrequency(10);
+    gps->setNavigationFrequency(20);
     gps->setAutoPVT(true);
-    gps->saveConfiguration();
 
     //Print GPS Configuration Information
 
@@ -97,61 +115,76 @@ void readsensors() {
     sensors_event_t lpsPressureEvent;
     baro->getEvent(&lpsPressureEvent, &lpsTempEvent);
 
-    //Create and register event handler for ICM20649
-    sensors_event_t icmAccelEvent;
-    sensors_event_t icmGyroEvent;
-    sensors_event_t icmTempEvent;
-    icm->getEvent(&icmAccelEvent, &icmGyroEvent, &icmTempEvent);
+    icm->getAGT();
 
-    //Create and register event handler for BNO055
-    sensors_event_t orientationEvent, magnetometerEvent;
-    bno->getEvent(&orientationEvent, Adafruit_BNO055::VECTOR_EULER);
-    // bno->getEvent(&linearAccelEvent, Adafruit_BNO055::VECTOR_LINEARACCEL);
-    bno->getEvent(&magnetometerEvent, Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    // bno->getEvent(&bnoAccelEvent, Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    sensorPacket.accelX = icm->accX();
+    sensorPacket.accelY = icm->accY();
+    sensorPacket.accelZ = icm->accZ();
 
-    // Update state machine
-    sensorPacket.accelX = icmAccelEvent.acceleration.x; // [m/s/s]
-    sensorPacket.accelY = icmAccelEvent.acceleration.y; // [m/s/s]
-    sensorPacket.accelZ = icmAccelEvent.acceleration.z; // [m/s/s]
+    sensorPacket.gyroX = icm->gyrX();
+    sensorPacket.gyroY = icm->gyrY();
+    sensorPacket.gyroZ = icm->gyrZ();
 
-    sensorPacket.gyroX = icmGyroEvent.gyro.x; // [rad/s]
-    sensorPacket.gyroY = icmGyroEvent.gyro.y; // [rad/s]
-    sensorPacket.gyroZ = icmGyroEvent.gyro.z; // [rad/s]
-
-    sensorPacket.magX = magnetometerEvent.magnetic.x; // [µT]
-    sensorPacket.magY = magnetometerEvent.magnetic.y; // [µT]
-    sensorPacket.magZ = magnetometerEvent.magnetic.z; // [µT]
+    sensorPacket.magX = mag->getMeasurementX();
+    sensorPacket.magY = mag->getMeasurementY();
+    sensorPacket.magZ = mag->getMeasurementZ();
 
     sensorPacket.pressure = lpsPressureEvent.pressure; // [hPa/mBar]
     sensorPacket.altitude = Utility::pressureToAltitude(sensorPacket.pressure); // m
     
     // Check for GPS Data Availabilty
-    if(gps->getPVT()) {
-        // GPS Lock Acquired
+    if(gps->getGnssFixOk()) {
         sensorPacket.gpsLock = gps->getGnssFixOk();
-    
         sensorPacket.gpsLat = gps->getLatitude() / pow(10,7); // [deg]
         sensorPacket.gpsLong = gps->getLongitude() / pow(10,7); // [deg]
         sensorPacket.gpsAltAGL = gps->getAltitude() / 1000; // [m]
         sensorPacket.gpsAltMSL = gps->getAltitudeMSL() / 1000; // [m]
-    } else {
-        return;
-    };
+        sensorPacket.satellites = gps->getSIV();
+
+        Serial.println(sensorPacket.gpsLat);
+        Serial.println("GNSS FIX OK");
+
+    }
+
+    Serial.println(gps->getLatitude());
+    // if(gps->getPVT()) {
+    //     // GPS Lock Acquired
+    //     sensorPacket.gpsLock = gps->getGnssFixOk();
+    
+    //     sensorPacket.gpsLat = gps->getLatitude() / pow(10,7); // [deg]
+    //     sensorPacket.gpsLong = gps->getLongitude() / pow(10,7); // [deg]
+    //     sensorPacket.gpsAltAGL = gps->getAltitude() / 1000; // [m]
+    //     sensorPacket.gpsAltMSL = gps->getAltitudeMSL() / 1000; // [m]
+    //     sensorPacket.satellites = gps->getSIV();
+    //     // Serial.println("Satelltites: "); Serial.println(gps->getSIV());
+        
+    // } else {
+    //     // Serial.print(gps->getHour()); Serial.print(":"); Serial.print(gps->getMinute()); Serial.print(":"); Serial.println(gps->getSecond());
+    //     // Serial.print(gps->getMonth()); Serial.print("/"); Serial.print(gps->getDay()); Serial.print("/"); Serial.println(gps->getYear());
+    //     // Serial.println(gps->getTimeOfWeek());
+    //     return;
+    // };
 }
 
 void loop()
 {
     if (timer.check() == 1)
     {
-        // Serial.println(millis() - lastLoopTime);
         lastLoopTime = millis();
-
-
 
         readsensors();
         memcpy(&state->sensorPacket, &sensorPacket, sizeof(sensorPacket));
         state->loop();
+
+        // Serial.println("<--- Accel --->");
+        // Serial.print("Accel X: "); Serial.println(sensorPacket.accelX);
+        // Serial.print("Accel Y: "); Serial.println(sensorPacket.accelY);
+        // Serial.print("Accel Z: "); Serial.println(sensorPacket.accelZ);
+
+        // Serial.println("<--- Gyro --->");
+        // Serial.print("Gyro X: "); Serial.println(sensorPacket.gyroX);
+        // Serial.print("Gyro Y: "); Serial.println(sensorPacket.gyroY);
+        // Serial.print("Gyro Z: "); Serial.println(sensorPacket.gyroZ);
 
         // Serial.print(state->sensorPacket.accelX); Serial.print(",");
         // Serial.print(state->sensorPacket.accelY); Serial.print(",");
@@ -162,7 +195,8 @@ void loop()
         // Serial.print(state->sensorPacket.magX); Serial.print(",");
         // Serial.print(state->sensorPacket.magY); Serial.print(",");
         // Serial.print(state->sensorPacket.magZ); Serial.print(",");
-        // Serial.print(state->sensorPacket.q); Serial.print(",");
+        // Serial.print(state->sensorPacket.altitude); Serial.print(",");
+        // Serial.print(state->sensorPacket.w); Serial.print(",");
         // Serial.print(state->sensorPacket.i); Serial.print(",");
         // Serial.print(state->sensorPacket.j); Serial.print(",");
         // Serial.print(state->sensorPacket.k); Serial.print(",");

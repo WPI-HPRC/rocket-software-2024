@@ -9,7 +9,6 @@ class PreLaunch : public State {
 		PreLaunch();
 
 	private:
-		// StateEstimator * ekf;
-		QuatStateEstimator * ekf;
+		StateEstimator * ekf;
 	
 };

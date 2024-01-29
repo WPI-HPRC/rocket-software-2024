@@ -4,9 +4,9 @@
 class Debug : public State {
 	_STATE_CLASS_IMPLS_
 	public:
-		Debug(QuatStateEstimator * ekf);
+		Debug(StateEstimator * ekf);
 
     private:
 
-        QuatStateEstimator * ekf;
+        StateEstimator * ekf;
 };

@@ -10,6 +10,7 @@ void State::loop() {
 	long long now = millis();
 	this->currentTime = now - this->startTime;
 	this->deltaTime = now - this->lastLoopTime;
+	this->loopCount++;
 	loop_impl();
 	this->lastLoopTime = millis();
 }

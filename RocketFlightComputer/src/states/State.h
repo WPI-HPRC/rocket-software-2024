@@ -4,6 +4,12 @@ private:                             \
 	void initialize_impl() override; \
 	void loop_impl() override;       \
 	State *nextState_impl() override;
+
+#include "Arduino.h"
+#include "../utility.hpp"
+#include <ArduinoEigen.h>
+#include <controls/ekf/StateEstimator.h>
+#include <BasicLinearAlgebra.h>
 /**
  * @brief Abstract class representing a rocket state.
  */
@@ -23,12 +29,18 @@ class State {
 		 */
 		State *nextState();
 		virtual ~State() {}
+		Utility::SensorPacket sensorPacket;
+
+		// Eigen::Vector<float, 10> x_state;
+		BLA::Matrix<4> x_state;
 
 	protected:
 		//! @brief number of milliseconds since the initialize call
 		long long currentTime = 0;
 		//! @brief number of milliseconds since the last loop call
 		long long deltaTime = 0;
+		//! @brief loop count since initialization
+		long long loopCount = 0;
 
 	private:
 		//! @brief number of milliseconds from boot to the initialize call

@@ -4,3 +4,6 @@
 **/.vscode/launch.json
 **/.vscode/ipch
 **/compile_commands.json
+PolarisLTS/.vscode/settings.json
+PolarisLTS/.vscode/extensions.json
+RocketFlightComputer/.vscode/settings.json

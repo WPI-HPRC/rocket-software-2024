@@ -13,25 +13,27 @@
 
 GNSS::GNSS() {}
 
-void GNSS::init()
-{
-    gnss.begin();
-    Serial.println(F("GNSS Initiallized"));
+bool GNSS::init() {
+    if (!this->gnss.begin()) {
+        return false;
+    }
+    this->gnss.setI2COutput(COM_TYPE_UBX);
+    this->gnss.setNavigationFrequency(20);
+    this->gnss.setAutoPVT(true);
+
+    return true;
 }
 
-void GNSS::outputData()
-{
+void GNSS::outputData() {
     double lat = getLatitude();
     double lon = getLongitude();
     Serial.println("Latitude: " + String(lat) + ". Longitude: " + String(lon));
 }
 
-double GNSS::getLatitude()
-{
+double GNSS::getLatitude() {
     return gnss.getLatitude();
 }
 
-double GNSS::getLongitude()
-{
+double GNSS::getLongitude() {
     return gnss.getLongitude();
 }

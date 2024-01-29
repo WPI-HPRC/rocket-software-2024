@@ -12,11 +12,10 @@ typedef struct
 } LPS25_data;
 
 
-class Barometer
-{
+class Barometer {
 public:
-    Barometer(int sda, int scl);
-    void init();
+    Barometer();
+    bool init();
     LPS25_data read();
 
 private:

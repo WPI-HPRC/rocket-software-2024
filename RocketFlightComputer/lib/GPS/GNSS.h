@@ -18,7 +18,7 @@ public:
     /**
      * @brief initializes the internal gnss
      */
-    void init();
+    bool init();
     /**
      * @brief prints the following to the Serial Monitor: the latitude, longitude, and if either value has changed since the last reading
      *

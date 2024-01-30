@@ -2,13 +2,11 @@
 #include "State.h"
 #include "Launch.h"
 #include "Debug.h"
+#include "Sensors.h"
 
-PreLaunch::PreLaunch() {
-}
+PreLaunch::PreLaunch(struct Sensors *sensors) : State(sensors) {}
 
-void PreLaunch::initialize_impl() {
-
-}
+void PreLaunch::initialize_impl() {}
 
 void PreLaunch::loop_impl() {
 	// Read bno for example
@@ -45,12 +43,11 @@ State *PreLaunch::nextState_impl()
 
 	// DO NOT MOVE TO NEXT STATE UNTIL GPS LOCK IS ACQUIRED
 	if(DEBUG_MODE && sensorPacket.gpsLock) {
-		return new Debug(this->ekf);
+		return new Debug(this->sensors, this->ekf);
 	}
 
-	if (this->currentTime > MAX_PRELAUNCH_TIME && sensorPacket.gpsLock)
-	{
-		return new Launch();
+	if (this->currentTime > MAX_PRELAUNCH_TIME && sensorPacket.gpsLock) {
+		return new Launch(sensors);
 	}
 	return nullptr;
 }

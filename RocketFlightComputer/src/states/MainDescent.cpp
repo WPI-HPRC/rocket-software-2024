@@ -1,7 +1,8 @@
 #include "MainDescent.h"
 #include "State.h"
+#include "Sensors.h"
 
-MainDescent::MainDescent() {}
+MainDescent::MainDescent(struct Sensors *sensors) : State(sensors) {}
 
 void MainDescent::initialize_impl() {}
 

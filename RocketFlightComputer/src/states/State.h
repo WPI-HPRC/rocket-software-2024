@@ -1,4 +1,6 @@
 #pragma once
+#include "Sensors.h"
+
 #define _STATE_CLASS_IMPLS_          \
 private:                             \
 	void initialize_impl() override; \
@@ -29,18 +31,24 @@ class State {
 		 */
 		State *nextState();
 		virtual ~State() {}
+
+		// FIXME: I think these should be protected
 		Utility::SensorPacket sensorPacket;
 
 		// Eigen::Vector<float, 10> x_state;
 		BLA::Matrix<10> x_state;
 
 	protected:
+		//! @note Constructor to be called from subclasses to initialize the `sensors` object
+		State(struct Sensors *sensors);
 		//! @brief number of milliseconds since the initialize call
 		long long currentTime = 0;
 		//! @brief number of milliseconds since the last loop call
 		long long deltaTime = 0;
 		//! @brief loop count since initialization
 		long long loopCount = 0;
+		//! @brief "global" sensors object
+		struct Sensors *sensors;
 
 	private:
 		//! @brief number of milliseconds from boot to the initialize call

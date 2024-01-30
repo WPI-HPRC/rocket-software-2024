@@ -2,8 +2,8 @@
 #include "State.h"
 #include "Sensors.h"
 
-class Launch : public State {
+class Recovery : public State {
 	_STATE_CLASS_IMPLS_
 	public:
-		Launch(struct Sensors *sensors);
+		Recovery(struct Sensors *sensors);
 };

@@ -1,7 +1,7 @@
 #include "Debug.h"
 #include "State.h"
 
-Debug::Debug(StateEstimator * ekf) {
+Debug::Debug(struct Sensors *sensors, StateEstimator * ekf) : State(sensors) {
     this->ekf = ekf;
 }
 

@@ -43,7 +43,7 @@ State *PreLaunch::nextState_impl()
 
 	// DO NOT MOVE TO NEXT STATE UNTIL GPS LOCK IS ACQUIRED
 	if(DEBUG_MODE && sensorPacket.gpsLock) {
-		return new Debug(this->ekf);
+		return new Debug(this->sensors, this->ekf);
 	}
 
 	if (this->currentTime > MAX_PRELAUNCH_TIME && sensorPacket.gpsLock) {

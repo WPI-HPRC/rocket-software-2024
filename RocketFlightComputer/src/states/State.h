@@ -31,6 +31,8 @@ class State {
 		 */
 		State *nextState();
 		virtual ~State() {}
+
+		// FIXME: I think these should be protected
 		Utility::SensorPacket sensorPacket;
 
 		// Eigen::Vector<float, 10> x_state;

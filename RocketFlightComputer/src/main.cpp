@@ -6,7 +6,6 @@
 #include <SparkFun_u-blox_GNSS_v3.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
-#include <utility/imumaths.h>
 #include <Adafruit_LPS2X.h>
 #include <SparkFun_MMC5983MA_Arduino_Library.h>
 #include <ICM42688.h>
@@ -23,8 +22,6 @@
 #define LOOP_RATE 100
 
 Metro timer = Metro(1000 / LOOP_RATE);
-
-Utility::SensorPacket sensorPacket;
 
 struct Sensors sensors;
 
@@ -92,63 +89,6 @@ void setup()
 
     timer.reset();
 }
-
-// void readsensors() {
-//     //Create and register event handler for LPS25
-//     sensors_event_t lpsTempEvent;
-//     sensors_event_t lpsPressureEvent;
-//     baro->getEvent(&lpsPressureEvent, &lpsTempEvent);
-
-//     icm->getAGT();
-
-//     sensorPacket.accelX = icm->accX();
-//     sensorPacket.accelY = icm->accY();
-//     sensorPacket.accelZ = icm->accZ();
-
-//     sensorPacket.gyroX = icm->gyrX();
-//     sensorPacket.gyroY = icm->gyrY();
-//     sensorPacket.gyroZ = icm->gyrZ();
-
-//     sensorPacket.magX = mag->getMeasurementX();
-//     sensorPacket.magY = mag->getMeasurementY();
-//     sensorPacket.magZ = mag->getMeasurementZ();
-
-//     sensorPacket.pressure = lpsPressureEvent.pressure; // [hPa/mBar]
-//     sensorPacket.altitude = Utility::pressureToAltitude(sensorPacket.pressure); // m
-    
-//     // Check for GPS Data Availabilty
-//     if(gps->getGnssFixOk()) {
-//         sensorPacket.gpsLock = gps->getGnssFixOk();
-//         sensorPacket.gpsLat = gps->getLatitude() / pow(10,7); // [deg]
-//         sensorPacket.gpsLong = gps->getLongitude() / pow(10,7); // [deg]
-//         sensorPacket.gpsAltAGL = gps->getAltitude() / 1000; // [m]
-//         sensorPacket.gpsAltMSL = gps->getAltitudeMSL() / 1000; // [m]
-//         sensorPacket.satellites = gps->getSIV();
-
-//         Serial.println(sensorPacket.gpsLat);
-//         Serial.println("GNSS FIX OK");
-
-//     }
-
-//     Serial.println(gps->getLatitude());
-//     // if(gps->getPVT()) {
-//     //     // GPS Lock Acquired
-//     //     sensorPacket.gpsLock = gps->getGnssFixOk();
-    
-//     //     sensorPacket.gpsLat = gps->getLatitude() / pow(10,7); // [deg]
-//     //     sensorPacket.gpsLong = gps->getLongitude() / pow(10,7); // [deg]
-//     //     sensorPacket.gpsAltAGL = gps->getAltitude() / 1000; // [m]
-//     //     sensorPacket.gpsAltMSL = gps->getAltitudeMSL() / 1000; // [m]
-//     //     sensorPacket.satellites = gps->getSIV();
-//     //     // Serial.println("Satelltites: "); Serial.println(gps->getSIV());
-        
-//     // } else {
-//     //     // Serial.print(gps->getHour()); Serial.print(":"); Serial.print(gps->getMinute()); Serial.print(":"); Serial.println(gps->getSecond());
-//     //     // Serial.print(gps->getMonth()); Serial.print("/"); Serial.print(gps->getDay()); Serial.print("/"); Serial.println(gps->getYear());
-//     //     // Serial.println(gps->getTimeOfWeek());
-//     //     return;
-//     // };
-// }
 
 void loop()
 {

@@ -13,6 +13,7 @@ void State::loop() {
 	this->currentTime = now - this->startTime;
 	this->deltaTime = now - this->lastLoopTime;
 	this->loopCount++;
+	this->sensorPacket = this->sensors->readSensors();
 	loop_impl();
 	this->lastLoopTime = millis();
 }

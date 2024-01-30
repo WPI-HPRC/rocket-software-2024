@@ -4,6 +4,7 @@
 #include "Barometer.h"
 #include "Magnetometer.h"
 #include "Accelerometer.h"
+#include "utility.hpp"
 
 struct Sensors {
     Barometer *barometer;
@@ -11,4 +12,6 @@ struct Sensors {
     BNO055 *bno055;
     Magnetometer *mag;
     Accelerometer *acc;
+
+    Utility::SensorPacket readSensors();    
 };

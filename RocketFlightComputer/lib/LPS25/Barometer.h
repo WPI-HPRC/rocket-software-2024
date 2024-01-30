@@ -15,7 +15,7 @@ typedef struct
 class Barometer {
 public:
     Barometer();
-    bool init();
+    bool init(int addr);
     LPS25_data read();
 
 private:

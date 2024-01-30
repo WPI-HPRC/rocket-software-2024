@@ -7,4 +7,4 @@ class Magnetometer {
     bool init();
   private:
     SFE_MMC5983MA mag;
-}
+};

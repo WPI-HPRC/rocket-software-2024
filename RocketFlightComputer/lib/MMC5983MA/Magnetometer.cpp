@@ -3,7 +3,7 @@
 Magnetometer::Magnetometer() : mag() {}
 
 bool Magnetometer::init() {
-  if (!this->mag.init()) {
+  if (!this->mag.begin()) {
     return false;
   }
 

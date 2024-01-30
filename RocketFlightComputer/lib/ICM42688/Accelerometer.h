@@ -6,5 +6,5 @@ class Accelerometer {
     Accelerometer(int addr);
     void init();
   private:
-    ICM2688 icm2688;
+    ICM42688 icm2688;
 };

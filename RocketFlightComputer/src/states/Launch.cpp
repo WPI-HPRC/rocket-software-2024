@@ -19,12 +19,15 @@ void Launch::loop_impl() {
 		if (motorBurnoutDetect())
 		{
 			state_start = millis();
-			avionicsState = COAST;
-			break;
 		}
 	}
 }
 
 State *Launch::nextState_impl() {
+	// TODO: Figure out and implement the conditions for switch to Coast state
+	// Switch to Coast when the conditions are right
+	if (0) {
+		return new Coast(sensors)
+	}
 	return nullptr;
 }

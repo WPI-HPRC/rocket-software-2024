@@ -1,12 +1,7 @@
 #include "Abort.h"
 #include "State.h"
 
-Abort::Abort(FlashChip &flash, Utility::SensorPacket &sensorPacket, String &structString)
-{
-    this->flash = flash;
-    this->sensorPacket = sensorPacket;
-    this->structString = structString;
-}
+Abort::Abort(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
 
 void Abort::initialize_impl() {}
 

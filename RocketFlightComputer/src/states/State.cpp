@@ -14,6 +14,7 @@ void State::loop() {
 	this->deltaTime = now - this->lastLoopTime;
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
+    Utility::logData(this->flash, this->sensorPacket);
 	loop_impl();
 	this->lastLoopTime = millis();
 }

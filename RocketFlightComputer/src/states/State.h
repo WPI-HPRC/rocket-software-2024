@@ -12,6 +12,7 @@ private:                             \
 #include <ArduinoEigen.h>
 #include <controls/ekf/EKF.h>
 #include <BasicLinearAlgebra.h>
+#include <lib/Flash/Flash.h>
 /**
  * @brief Abstract class representing a rocket state.
  */
@@ -58,4 +59,5 @@ class State {
 		virtual void initialize_impl() = 0;
 		virtual void loop_impl() = 0;
 		virtual State *nextState_impl() = 0;
+        FlashChip flash = new FlashChip();
 };

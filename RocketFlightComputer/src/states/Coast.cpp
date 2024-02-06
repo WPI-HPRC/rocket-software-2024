@@ -1,7 +1,7 @@
 #include "Coast.h"
 
 #include "DrogueDescent.h"
-// #include "Abort.h" <- needed as failsafe
+#include "Abort.h" <- needed as failsafe
 #include "State.h"
 
 Coast::Coast() {}
@@ -34,7 +34,7 @@ void Coast::loop_impl() {
 //! @details max 8 seconds until deploy
 State *Coast::nextState_impl() {
     if (this->acceleration > 10) {
-        // return new Abort();
+        return new Abort();
     }
     if (this->currentTime > MAX_COAST_TIME || apogeePassed) {
         return new DrogueDescent();

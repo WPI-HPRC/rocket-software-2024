@@ -2,7 +2,7 @@
 #include "State.h"
 #include "Sensors.h"
 
-#define MAX_LAUNCH_TIME 3000
+#define MIN_LAUNCH_TIME 3000 // TODO: check with OpenRocket sim
 
 class Launch : public State
 {
@@ -12,4 +12,6 @@ public:
 
 private:
     bool motorBurnout = false;
+    float transitionBufAcc[10] = {0};
+    int transitionBufIndAcc = 0;
 };

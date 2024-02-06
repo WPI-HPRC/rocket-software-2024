@@ -8,3 +8,5 @@ PolarisLTS/.vscode/settings.json
 PolarisLTS/.vscode/extensions.json
 RocketFlightComputer/.vscode/settings.json
 **/.cache/
+
+**/.vscode

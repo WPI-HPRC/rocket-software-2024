@@ -5,5 +5,5 @@
 class MainDescent : public State {
 	_STATE_CLASS_IMPLS_
 	public:
-		MainDescent(struct Sensors *sensors);
+		MainDescent(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip);
 };

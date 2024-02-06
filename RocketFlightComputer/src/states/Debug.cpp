@@ -19,13 +19,13 @@ void Debug::loop_impl() {
     this->sensorPacket.j = x_state(2);
     this->sensorPacket.k = x_state(3);
 
-    Serial.println("+=== GPS ===+");
-    Serial.print("Latitude: "); Serial.println(sensorPacket.gpsLat, 4);
-    Serial.print("Longitude: "); Serial.println(sensorPacket.gpsLong, 4);
-    Serial.print("Altitude AGL: "); Serial.println(sensorPacket.gpsAltAGL, 4);
-    Serial.print("Altitude MSL: "); Serial.println(sensorPacket.gpsAltMSL, 4);
+    // Serial.println(this->deltaTime);
 
-    Serial.println(this->deltaTime);
+    // Serial.println("+=== GPS ===+");
+    // Serial.print("Latitude: "); Serial.println(sensorPacket.gpsLat, 4);
+    // Serial.print("Longitude: "); Serial.println(sensorPacket.gpsLong, 4);
+    // Serial.print("Altitude AGL: "); Serial.println(sensorPacket.gpsAltAGL, 4);
+    // Serial.print("Altitude MSL: "); Serial.println(sensorPacket.gpsAltMSL, 4);
 
 	// Read bno for example
     // Serial.println("+=== Barometer ===+");

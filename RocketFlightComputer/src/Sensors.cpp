@@ -13,7 +13,7 @@ Utility::SensorPacket Sensors::readSensors() {
   sensorPacket.pressure = barometerData.pressure; // [hPa/mBar]
   sensorPacket.altitude = Utility::pressureToAltitude(barometerData.pressure); // m
 
-  ICM_data accelerometerData = this->acc->read();  
+  ICM_data accelerometerData = this->acc->read();
 
   sensorPacket.accelX = accelerometerData.accX;
   sensorPacket.accelY = accelerometerData.accY;
@@ -29,23 +29,16 @@ Utility::SensorPacket Sensors::readSensors() {
   sensorPacket.magY = magnetometerData.y;
   sensorPacket.magZ = magnetometerData.z;
 
-
   // FIXME/TODO: Implement the commented out methods on our GNSS wrapper and fix these lines
   // Check for GPS Data Availabilty
   // if(gps->getGnssFixOk()) {
       // sensorPacket.gpsLock = gps->getGnssFixOk();
-      sensorPacket.gpsLat = this->gnss->getLatitude() / pow(10,7); // [deg]
-      sensorPacket.gpsLong = this->gnss->getLongitude() / pow(10,7); // [deg]
-      // sensorPacket.gpsAltAGL = gps->getAltitude() / 1000; // [m]
-      // sensorPacket.gpsAltMSL = gps->getAltitudeMSL() / 1000; // [m]
-      // sensorPacket.satellites = gps->getSIV();
-
-      Serial.println(sensorPacket.gpsLat);
-      Serial.println("GNSS FIX OK");
+      // sensorPacket.gpsLat = this->gnss->getLatitude() / pow(10,7); // [deg]
+      // sensorPacket.gpsLong = this->gnss->getLongitude() / pow(10,7); // [deg]
+      // sensorPacket.satellites = this->gnss->getSatellites();
+      
 
   // }
-
-  Serial.println(this->gnss->getLatitude());
   // if(gps->getPVT()) {
   //     // GPS Lock Acquired
   //     sensorPacket.gpsLock = gps->getGnssFixOk();

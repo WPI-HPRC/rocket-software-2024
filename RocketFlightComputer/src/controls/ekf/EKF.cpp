@@ -29,11 +29,10 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
     sensorPacket.gyroX = sensorPacket.gyroX * (PI / 180);
     sensorPacket.gyroY = sensorPacket.gyroY * (PI / 180);
     sensorPacket.gyroZ = sensorPacket.gyroZ * (PI / 180);
-
     // Convert Gauss to microTesla
-    sensorPacket.magX = sensorPacket.magX * 100000;
-    sensorPacket.magY = sensorPacket.magY * 100000;
-    sensorPacket.magZ = sensorPacket.magZ * 100000;
+    // sensorPacket.magX = ((sensorPacket.magX - 134920) / 134920) * 800000000;
+    // sensorPacket.magY = ((sensorPacket.magY - 131820) / 131820) * 800000000;
+    // sensorPacket.magZ = ((sensorPacket.magZ - 139070) / 139070) * 800000000;
 
     /* PREDICTION STEP 
     x_min = f(x,dt)
@@ -61,6 +60,10 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
     BLA::Matrix<3> magVector = {
         sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ
     };
+
+    magVector = BLA::Inverse(magSoftIron) * magVector;
+
+    magVector = magVector - hardIronCal;
 
     BLA::Matrix<3> accelVector = {sensorPacket.accelX,sensorPacket.accelX,sensorPacket.accelZ};
     // Normalize Accel and Mag for use in correction step
@@ -90,45 +93,22 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
     P = (eye10 - K*H)*P_min;
     // P = P_min;
 
-    // Serial.println("<----- Prediction Covariance ----->");
-    // for (int i = 0; i < A.Rows; i++) {
-    //     for (int j = 0; j < A.Cols; j++) {
-    //         Serial.print(String(A(i,j)) + "\t");
-    //     }
-    //     Serial.println("");
-    // }
+    float quatNorm = sqrt(x(0)*x(0) + x(1)*x(1) + x(2)*x(2) + x(3)*x(3));
+    x(0) = x(0) / quatNorm;
+    x(1) = x(1) / quatNorm;
+    x(2) = x(2) / quatNorm;
+    x(3) = x(3) / quatNorm;
 
-    // Serial.println("<----- P_min 2 ----->");
-    // for (int i = 0; i < P_min.Rows; i++) {
-    //     for (int j = 0; j < P_min.Cols; j++) {
-    //         Serial.print(String(P_min(i,j)) + "\t");
-    //     }
-    //     Serial.println("");
-    // };
-
-    // Serial.println("<----- State 2 ----->");
-    // for (int i = 0; i < x.Rows; i++) {
-    //     for (int j = 0; j < x.Cols; j++) {
-    //         Serial.print(String(x(i,j)) + "\t");
-    //     }
-    //     Serial.println("");
-    // }
-
-    // float quatNorm = sqrt(x(0)*x(0) + x(1)*x(1) + x(2)*x(2) + x(3)*x(3));
-    // x(0) = x(0) / quatNorm;
-    // x(1) = x(1) / quatNorm;
-    // x(2) = x(2) / quatNorm;
-    // x(3) = x(3) / quatNorm;
-
-    // Serial.print(sensorPacket.ac_x); Serial.print(",");
-    // Serial.print(sensorPacket.ac_y); Serial.print(",");
-    // Serial.print(sensorPacket.ac_z); Serial.print(",");
-    // Serial.print(sensorPacket.gy_x); Serial.print(",");
-    // Serial.print(sensorPacket.gy_y); Serial.print(",");
-    // Serial.print(sensorPacket.gy_z); Serial.print(",");
-    // Serial.print(sensorPacket.mag_x); Serial.print(",");
-    // Serial.print(sensorPacket.mag_y); Serial.print(",");
-    // Serial.print(sensorPacket.mag_z); Serial.print(",");
+    // Debug Printout to Data Logger
+    // Serial.print(sensorPacket.accelX); Serial.print(",");
+    // Serial.print(sensorPacket.accelY); Serial.print(",");
+    // Serial.print(sensorPacket.accelZ); Serial.print(",");
+    // Serial.print(sensorPacket.gyroX); Serial.print(",");
+    // Serial.print(sensorPacket.gyroY); Serial.print(",");
+    // Serial.print(sensorPacket.gyroZ); Serial.print(",");
+    // Serial.print(magVector(0)); Serial.print(",");
+    // Serial.print(magVector(1)); Serial.print(",");
+    // Serial.print(magVector(2)); Serial.print(",");
     // Serial.print(x(0)); Serial.print(",");
     // Serial.print(x(1)); Serial.print(",");
     // Serial.print(x(2)); Serial.print(",");

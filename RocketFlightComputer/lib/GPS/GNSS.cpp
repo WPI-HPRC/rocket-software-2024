@@ -17,9 +17,11 @@ bool GNSS::init() {
     if (!this->gnss.begin()) {
         return false;
     }
+
     this->gnss.setI2COutput(COM_TYPE_UBX);
-    this->gnss.setNavigationFrequency(20);
+    this->gnss.setNavigationFrequency(40);
     this->gnss.setAutoPVT(true);
+    this->gnss.saveConfiguration();
 
     return true;
 }
@@ -34,6 +36,14 @@ double GNSS::getLatitude() {
     return gnss.getLatitude();
 }
 
-double GNSS::getLongitude() {
+double GNSS::getLongitude() {   
     return gnss.getLongitude();
+}
+
+uint8_t GNSS::getSatellites() {
+    return gnss.getSIV();
+}
+
+sfe_ublox_antenna_status_e GNSS::checkAntenna() {
+    return gnss.getAntennaStatus();
 }

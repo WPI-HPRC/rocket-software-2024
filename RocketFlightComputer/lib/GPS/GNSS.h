@@ -38,6 +38,15 @@ public:
      */
     double getLongitude();
 
+    /**
+     * @brief Get the number of satellites in view
+     * 
+     * @return uint8_t 
+     */
+    uint8_t getSatellites();
+
+    sfe_ublox_antenna_status_e checkAntenna();
+
 private:
     SFE_UBLOX_GNSS gnss;
 };

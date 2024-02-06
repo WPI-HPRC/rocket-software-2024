@@ -13,7 +13,7 @@ typedef struct {
 class Accelerometer {
   public:
     Accelerometer(int addr);
-    void init();
+    bool init();
     ICM_data read();
   private:
     ICM42688 icm2688;

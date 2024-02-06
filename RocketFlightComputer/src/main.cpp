@@ -19,8 +19,6 @@
 #include <Accelerometer.h>
 #include <Magnetometer.h>
 
-#define LOOP_RATE 100
-
 Metro timer = Metro(1000 / LOOP_RATE);
 
 struct Sensors sensors;
@@ -40,16 +38,16 @@ void setup()
     sensors = {
         .barometer = new Barometer(),
         .gnss = new GNSS(),
-        .bno055 = new BNO055(0), // Unused?
+        .bno055 = new BNO055(0),
         .mag = new Magnetometer(),
         .acc = new Accelerometer(0x68),
     };
 
-    // if(!bno->begin()) {
-    //     Serial.println("[Sensorboard] No BNO055 Detected");
-    // } else {
-    //     Serial.println("[Sensorboard] BNO055 IMU Detected");
-    // }
+    if(!sensors.bno055->init()) {
+        Serial.println("[Sensorboard] No BNO055 Detected");
+    } else {
+        Serial.println("[Sensorboard] BNO055 IMU Detected");
+    }
 
     if(!sensors.barometer->init(0x5C)) {
         Serial.println("[Sensorboard] No LPS25 Detected");
@@ -63,32 +61,24 @@ void setup()
         Serial.println("[Sensorboard] MMC5983 Detected");
     }
 
-    // if(icm->begin() < 0) {
-    //     Serial.println("[Sensorboard] No ICM42688 Detected");
-    // } else {
-    //     Serial.println("[Sensorboard] ICM42688 Detected");
-    // }
+    if(!sensors.acc->init()) {
+        Serial.println("[Sensorboard] No ICM42688 Detected");
+    } else {
+        Serial.println("[Sensorboard] ICM42688 Detected");
+    }
 
     if(!sensors.gnss->init()) {
         Serial.println("[Sensorboard] No NEOM10S Detected");
     } else {
         Serial.println("[Sensorboard] NEOM10S GPS Detected");
     }
-    
-
-    delay(150);
-
-    //Print GPS Configuration Information
-
-    // Serial.println("+=== GNSS SYSTEM ===+");
-    // Serial.print("Module: "); Serial.println(gps->getModuleName());
-    // Serial.print("Protocol Version: "); Serial.print(gps->getProtocolVersionHigh());
-    // Serial.print("."); Serial.println(gps->getProtocolVersionLow());
 
     state->initialize();
 
     timer.reset();
 }
+
+uint32_t previousTime = 0;
 
 void loop()
 {
@@ -97,6 +87,9 @@ void loop()
         // readsensors();
         // memcpy(&state->sensorPacket, &sensorPacket, sizeof(sensorPacket));
         state->loop();
+
+        Serial.print("Dt: "); Serial.println(millis() - previousTime);
+        previousTime = millis();
 
         // Serial.println("<--- Accel --->");
         // Serial.print("Accel X: "); Serial.println(sensorPacket.accelX);
@@ -134,9 +127,6 @@ void loop()
         // Serial.print(state->x_state(2)); Serial.print(",");
         // Serial.println(state->x_state(3));
 
-        // Serial.println(state->telemPacket.heading);
-        
-//     // Serial.println(x(3));
 //     // Serial.print("ACC|");
 //     // Serial.print(sensorPacket.ac_x); Serial.print(",");
 //     // Serial.print(sensorPacket.ac_y); Serial.print(",");

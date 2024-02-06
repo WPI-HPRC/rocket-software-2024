@@ -16,5 +16,6 @@
         "initializer_list": "cpp",
         "new": "cpp",
         "cmath": "cpp"
-    }
+    },
+    "stm32-for-vscode.makePath": false
 }

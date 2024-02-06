@@ -32,9 +32,9 @@ class Utility {
         float gyroX;
         float gyroY;
         float gyroZ;
-        uint32_t magX;
-        uint32_t magY;
-        uint32_t magZ;
+        float magX;
+        float magY;
+        float magZ;
         float pressure;
 
         // Calculated Values

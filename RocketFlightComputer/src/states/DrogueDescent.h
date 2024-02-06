@@ -5,5 +5,5 @@
 class DrogueDescent : public State {
 	_STATE_CLASS_IMPLS_
 	public:
-		DrogueDescent(struct Sensors *sensors);
+		DrogueDescent(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip);
 };

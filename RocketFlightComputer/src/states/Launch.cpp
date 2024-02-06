@@ -2,7 +2,7 @@
 #include "Launch.h"
 #include "Sensors.h"
 
-Launch::Launch(struct Sensors *sensors) : State(sensors) {}
+Launch::Launch(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
 
 void Launch::initialize_impl() {}
 

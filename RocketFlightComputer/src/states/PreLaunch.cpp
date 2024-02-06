@@ -4,7 +4,7 @@
 #include "Debug.h"
 #include "Sensors.h"
 
-PreLaunch::PreLaunch(struct Sensors *sensors) : State(sensors) {}
+PreLaunch::PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
 
 float PreLaunch::avgAccelZ() {
 	float sum = 0;

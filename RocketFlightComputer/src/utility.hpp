@@ -3,11 +3,12 @@
 #define DEBUG_MODE true
 #define LOOP_RATE 40
 
+class Utility
+{
 
-class Utility {
-
-    public:
-    static float pressureToAltitude(float pressure) {
+public:
+    static float pressureToAltitude(float pressure)
+    {
         // physical parameters for model
         const float pb = 101325;   // [Pa] pressure at sea level
         const float Tb = 288.15;   // [K] temperature at seal level
@@ -24,7 +25,8 @@ class Utility {
         return hb + (Tb / Lb) * (pow((pressure_Pa / pb), (-R * Lb / (g0 * M))) - 1);
     };
 
-    struct SensorPacket {
+    struct SensorPacket
+    {
         // Raw Sensor Readings
         float accelX;
         float accelY;
@@ -60,10 +62,39 @@ class Utility {
         boolean gpsLock = false;
 
         long timestamp;
-    };	
+    };
+
+    static void logData(FlashChip &flash, SensorPacket &sensorPacket, String &structString)
+    {
+        String structString = String(sensorPacket.accelX) + "," +
+                              String(sensorPacket.accelY) + "," +
+                              String(sensorPacket.accelZ) + "," +
+                              String(sensorPacket.gyroX) + "," +
+                              String(sensorPacket.gyroY) + "," +
+                              String(sensorPacket.gyroZ) + "," +
+                              String(sensorPacket.magX) + "," +
+                              String(sensorPacket.magY) + "," +
+                              String(sensorPacket.magZ) + "," +
+                              String(sensorPacket.pressure) + "," +
+                              String(sensorPacket.altitude) + "," +
+                              String(sensorPacket.q) + "," +
+                              String(sensorPacket.i) + "," +
+                              String(sensorPacket.j) + "," +
+                              String(sensorPacket.k) + "," +
+                              String(sensorPacket.X) + "," +
+                              String(sensorPacket.Y) + "," +
+                              String(sensorPacket.Z) + "," +
+                              String(sensorPacket.gpsLat) + "," +
+                              String(sensorPacket.gpsLong) + "," +
+                              String(sensorPacket.gpsAltMSL) + "," +
+                              String(sensorPacket.gpsAltAGL) + "," +
+                              String(sensorPacket.gpsLock) + "," +
+                              String(sensorPacket.timestamp);
+        flash.writeStruct(structString);
+    }
 
     // WGS84 Ellipsoid Model
-    constexpr static float a_earth = 6378137.0; // [m] Semi-major axis of Earth
-    constexpr static float b_earth = 6356752.3142; // [m] Semi-Minor axis of Earth
+    constexpr static float a_earth = 6378137.0;       // [m] Semi-major axis of Earth
+    constexpr static float b_earth = 6356752.3142;    // [m] Semi-Minor axis of Earth
     constexpr static float e_earth = 0.0818191908426; // Eccentricity of Earth
 };

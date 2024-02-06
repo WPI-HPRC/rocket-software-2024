@@ -1,8 +1,8 @@
 #include "State.h"
 #include "DrogueDescent.h"
+#include "Sensors.h"
 
-
-DrogueDescent::DrogueDescent() {}
+DrogueDescent::DrogueDescent(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
 
 void DrogueDescent::initialize_impl() {}
 

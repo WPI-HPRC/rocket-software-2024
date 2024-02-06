@@ -1,7 +1,7 @@
 #include "Debug.h"
 #include "State.h"
 
-Debug::Debug(QuatStateEstimator * ekf) {
+Debug::Debug(struct Sensors *sensors, StateEstimator * ekf) : State(sensors) {
     this->ekf = ekf;
 }
 
@@ -14,7 +14,7 @@ void Debug::loop_impl() {
     this->x_state = ekf->onLoop(sensorPacket);
 
     // Update Sensor Packet with EKF
-    this->sensorPacket.q = x_state(0);
+    this->sensorPacket.w = x_state(0);
     this->sensorPacket.i = x_state(1);
     this->sensorPacket.j = x_state(2);
     this->sensorPacket.k = x_state(3);

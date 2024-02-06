@@ -1,10 +1,8 @@
 #include "Coast.h"
-
-#include "DrogueDescent.h"
-#include "Abort.h" <- needed as failsafe
 #include "State.h"
+#include "Sensors.h"
 
-Coast::Coast() {}
+Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
 
 void Coast::initialize_impl() {}
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <Flash.h>
 
 #define DEBUG_MODE true
 #define LOOP_RATE 40
@@ -64,7 +65,7 @@ public:
         long timestamp;
     };
 
-    static void logData(FlashChip &flash, SensorPacket &sensorPacket, String &structString)
+    static void logData(FlashChip *flash, SensorPacket sensorPacket)
     {
         String structString = String(sensorPacket.accelX) + "," +
                               String(sensorPacket.accelY) + "," +
@@ -77,7 +78,7 @@ public:
                               String(sensorPacket.magZ) + "," +
                               String(sensorPacket.pressure) + "," +
                               String(sensorPacket.altitude) + "," +
-                              String(sensorPacket.q) + "," +
+                              String(sensorPacket.w) + "," +
                               String(sensorPacket.i) + "," +
                               String(sensorPacket.j) + "," +
                               String(sensorPacket.k) + "," +
@@ -89,8 +90,9 @@ public:
                               String(sensorPacket.gpsAltMSL) + "," +
                               String(sensorPacket.gpsAltAGL) + "," +
                               String(sensorPacket.gpsLock) + "," +
+                              String(sensorPacket.satellites) + "," +
                               String(sensorPacket.timestamp);
-        flash.writeStruct(structString);
+        flash->writeStruct(structString);
     }
 
     // WGS84 Ellipsoid Model

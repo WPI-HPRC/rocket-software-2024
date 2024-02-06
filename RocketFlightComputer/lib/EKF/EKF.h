@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 #include <BasicLinearAlgebra.h>
-#include <utility.hpp>
+#include "../../src/utility.hpp"
 
 /**
  * @author @frostydev99 - Daniel Pearson

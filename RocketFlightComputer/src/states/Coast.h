@@ -3,6 +3,7 @@
 #include "Sensors.h"
 
 #define MAX_COAST_TIME 30000
+
 class Coast : public State
 {
     _STATE_CLASS_IMPLS_
@@ -11,4 +12,7 @@ public:
 
 private:
     boolean apogeePassed = false;
+    float transitionBufVelVert[10] = {0};
+    int transitionBufIndVelVert = 0;
+    float lastAltitude = 0;
 };

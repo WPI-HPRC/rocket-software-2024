@@ -30,13 +30,21 @@ public:
      *
      * @return the latitude value
      */
-    double getLatitude();
+    float getLatitude();
     /**
      * @brief Get the longitude value
      *
      * @return the longitude value
      */
-    double getLongitude();
+    float getLongitude();
+
+    /**
+     * @brief Get the status of the GPS Lock
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool getLockStatus();
 
     /**
      * @brief Get the number of satellites in view
@@ -45,7 +53,26 @@ public:
      */
     uint8_t getSatellites();
 
-    sfe_ublox_antenna_status_e checkAntenna();
+    /**
+     * @brief Get Altitude AGL
+     * 
+     * @return float 
+     */
+    float getAltAGL();
+
+    /**
+     * @brief Get the Altitude MSL
+     * 
+     * @return float 
+     */
+    float getAltMSL();
+
+    /**
+     * @brief Get the current time as a string
+     * 
+     * @return char* Time
+     */
+    String getTime();
 
 private:
     SFE_UBLOX_GNSS gnss;

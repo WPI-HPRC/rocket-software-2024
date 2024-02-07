@@ -25,37 +25,28 @@ Utility::SensorPacket Sensors::readSensors() {
 
   MMC_data magnetometerData = this->mag->read();
 
-  sensorPacket.magX = magnetometerData.x;
-  sensorPacket.magY = magnetometerData.y;
-  sensorPacket.magZ = magnetometerData.z;
+  sensorPacket.magX = magnetometerData.x - 134960.0;
+  sensorPacket.magY /= 134960.0;
+  sensorPacket.magZ = magnetometerData.y - 132340.0;
+  sensorPacket.magX /= 132340.0;
+  sensorPacket.magY = magnetometerData.z - 138560.0;
+  sensorPacket.magZ /= 138560.0;
 
-  // FIXME/TODO: Implement the commented out methods on our GNSS wrapper and fix these lines
-  // Check for GPS Data Availabilty
-  // if(gps->getGnssFixOk()) {
-      // sensorPacket.gpsLock = gps->getGnssFixOk();
-      // sensorPacket.gpsLat = this->gnss->getLatitude() / pow(10,7); // [deg]
-      // sensorPacket.gpsLong = this->gnss->getLongitude() / pow(10,7); // [deg]
-      // sensorPacket.satellites = this->gnss->getSatellites();
-      
+  sensorPacket.magX *= 8; // [Gauss]-
+  sensorPacket.magY *= 8; // [Gauss]
+  sensorPacket.magZ *= 8; // [Gauss]
 
-  // }
-  // if(gps->getPVT()) {
-  //     // GPS Lock Acquired
-  //     sensorPacket.gpsLock = gps->getGnssFixOk();
+  sensorPacket.gpsLock = gnss->getLockStatus();
 
-  //     sensorPacket.gpsLat = gps->getLatitude() / pow(10,7); // [deg]
-  //     sensorPacket.gpsLong = gps->getLongitude() / pow(10,7); // [deg]
-  //     sensorPacket.gpsAltAGL = gps->getAltitude() / 1000; // [m]
-  //     sensorPacket.gpsAltMSL = gps->getAltitudeMSL() / 1000; // [m]
-  //     sensorPacket.satellites = gps->getSIV();
-  //     // Serial.println("Satelltites: "); Serial.println(gps->getSIV());
-  
-  // } else {
-  //     // Serial.print(gps->getHour()); Serial.print(":"); Serial.print(gps->getMinute()); Serial.print(":"); Serial.println(gps->getSecond());
-  //     // Serial.print(gps->getMonth()); Serial.print("/"); Serial.print(gps->getDay()); Serial.print("/"); Serial.println(gps->getYear());
-  //     // Serial.println(gps->getTimeOfWeek());
-  //     return;
-  // };
+  // If there is no lock, DO NOT update anything critical to calculations
+
+  sensorPacket.gpsLat = gnss->getLatitude() / pow(10,7);
+  sensorPacket.gpsLong = gnss->getLongitude() / pow(10,7);
+  sensorPacket.gpsAltAGL = gnss->getAltAGL() / pow(10,3);
+  sensorPacket.gpsAltMSL = gnss->getAltMSL() / pow(10,3);
+  sensorPacket.satellites = gnss->getSatellites();
+
+
   return sensorPacket;
 }
 

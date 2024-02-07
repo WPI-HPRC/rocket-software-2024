@@ -84,54 +84,8 @@ void loop()
 {
     if (timer.check() == 1)
     {
-        // readsensors();
-        // memcpy(&state->sensorPacket, &sensorPacket, sizeof(sensorPacket));
         state->loop();
-
-        Serial.print("Dt: "); Serial.println(millis() - previousTime);
         previousTime = millis();
-
-        // Serial.println("<--- Accel --->");
-        // Serial.print("Accel X: "); Serial.println(sensorPacket.accelX);
-        // Serial.print("Accel Y: "); Serial.println(sensorPacket.accelY);
-        // Serial.print("Accel Z: "); Serial.println(sensorPacket.accelZ);
-
-        // Serial.println("<--- Gyro --->");
-        // Serial.print("Gyro X: "); Serial.println(sensorPacket.gyroX);
-        // Serial.print("Gyro Y: "); Serial.println(sensorPacket.gyroY);
-        // Serial.print("Gyro Z: "); Serial.println(sensorPacket.gyroZ);
-
-        // Serial.print(state->sensorPacket.accelX); Serial.print(",");
-        // Serial.print(state->sensorPacket.accelY); Serial.print(",");
-        // Serial.print(state->sensorPacket.accelZ); Serial.print(",");
-        // Serial.print(state->sensorPacket.gyroX); Serial.print(",");
-        // Serial.print(state->sensorPacket.gyroY); Serial.print(",");
-        // Serial.print(state->sensorPacket.gyroZ); Serial.print(",");
-        // Serial.print(state->sensorPacket.magX); Serial.print(",");
-        // Serial.print(state->sensorPacket.magY); Serial.print(",");
-        // Serial.print(state->sensorPacket.magZ); Serial.print(",");
-        // Serial.print(state->sensorPacket.altitude); Serial.print(",");
-        // Serial.print(state->sensorPacket.w); Serial.print(",");
-        // Serial.print(state->sensorPacket.i); Serial.print(",");
-        // Serial.print(state->sensorPacket.j); Serial.print(",");
-        // Serial.print(state->sensorPacket.k); Serial.print(",");
-        // Serial.print(bnoQuat.w()); Serial.print(",");
-        // Serial.print(bnoQuat.x()); Serial.print(",");
-        // Serial.print(bnoQuat.y()); Serial.print(",");
-        // Serial.print(bnoQuat.z()); Serial.print(",");
-        // Serial.println(millis());
-
-        // Serial.print("QUAT|");
-        // Serial.print(state->x_state(0)); Serial.print(",");
-        // Serial.print(state->x_state(1)); Serial.print(",");
-        // Serial.print(state->x_state(2)); Serial.print(",");
-        // Serial.println(state->x_state(3));
-
-//     // Serial.print("ACC|");
-//     // Serial.print(sensorPacket.ac_x); Serial.print(",");
-//     // Serial.print(sensorPacket.ac_y); Serial.print(",");
-//     // Serial.println(sensorPacket.ac_z);
-
         State *nextState = state->nextState();
         if (nextState != nullptr)
         {

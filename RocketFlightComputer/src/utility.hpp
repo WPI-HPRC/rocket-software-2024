@@ -56,6 +56,7 @@ class Utility {
         float gpsLong;
         float gpsAltMSL;
         float gpsAltAGL;
+        String time;
         uint8_t satellites;
         boolean gpsLock = false;
 
@@ -66,4 +67,5 @@ class Utility {
     constexpr static float a_earth = 6378137.0; // [m] Semi-major axis of Earth
     constexpr static float b_earth = 6356752.3142; // [m] Semi-Minor axis of Earth
     constexpr static float e_earth = 0.0818191908426; // Eccentricity of Earth
+    constexpr static float r_earth = 6378137; // [m] Radius of Earth
 };

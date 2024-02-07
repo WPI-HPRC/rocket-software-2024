@@ -32,11 +32,11 @@ void GNSS::outputData() {
     Serial.println("Latitude: " + String(lat) + ". Longitude: " + String(lon));
 }
 
-double GNSS::getLatitude() {
+float GNSS::getLatitude() {
     return gnss.getLatitude();
 }
 
-double GNSS::getLongitude() {   
+float GNSS::getLongitude() {   
     return gnss.getLongitude();
 }
 
@@ -44,6 +44,24 @@ uint8_t GNSS::getSatellites() {
     return gnss.getSIV();
 }
 
-sfe_ublox_antenna_status_e GNSS::checkAntenna() {
-    return gnss.getAntennaStatus();
+bool GNSS::getLockStatus() {
+    return gnss.getGnssFixOk();
+}
+
+float GNSS::getAltMSL() {
+    return gnss.getAltitudeMSL();
+};
+
+float GNSS::getAltAGL() {
+    return gnss.getAltitude();
+};
+
+String GNSS::getTime() {
+    String timeString;
+    
+    String hour = String(gnss.getHour());
+    String minute = String(gnss.getMinute());
+    String second = String(gnss.getSecond());
+
+    timeString += hour + ":" + minute + ":" + second;
 }

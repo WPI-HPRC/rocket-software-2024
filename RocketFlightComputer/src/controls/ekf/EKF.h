@@ -88,19 +88,6 @@ class StateEstimator {
         0,0,0,0,0,0,0,0,0,1,
     }; // 10 Element Identity Matrix
 
-    /** Hard Iron Calibration */
-    // **WARNING** THIS CALIBRATION MUST BE DONE WITH ANY SIGNIFICANT CHANGE IN NEARFIELD OF SENSOR
-        // Refer to controlsystem_2023\StateEstimator\MagnetometerCal for further information
-    BLA::Matrix<3,3> magSoftIron = {
-        1.3518,    0.1398,    0.0016,
-        0.1398,    0.9389,   -0.2211,
-        0.0016,   -0.2211,    0.8532,
-    };
-
-    BLA::Matrix<3> hardIronCal = {
-        1.3497*100000, 1.3211*100000, 1.3836*100000
-    };
-
     BLA::Matrix<10> measurementFunction(Utility::SensorPacket sensorPacket);
     BLA::Matrix<10,10> measurementJacobian(Utility::SensorPacket sensorPacket);
 

@@ -3,7 +3,6 @@
 #include <Wire.h>
 #include <SPI.h>
 
-#include <SparkFun_u-blox_GNSS_v3.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <Adafruit_LPS2X.h>

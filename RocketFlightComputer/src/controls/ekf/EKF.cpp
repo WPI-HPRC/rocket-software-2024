@@ -19,7 +19,6 @@ StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt) {
  * @return BLA::Matrix<4> State Vector
  */
 BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
-
     /* Read Data from Sensors and Convert to SI Units */
     // Convert Accel values to m/s/s
     sensorPacket.accelX = sensorPacket.accelX * 9.81;
@@ -94,25 +93,26 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
     // x(2) = x(2) / quatNorm;
     // x(3) = x(3) / quatNorm;
 
-    float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
-	float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth,2) * pow(sin(sensorPacket.gpsLat), 2));
+    // float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
+	// float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth,2) * pow(sin(sensorPacket.gpsLat), 2));
 
-	float X_NEW = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * cos(sensorPacket.gpsLong * DEG_TO_RAD);
-	float Y_NEW = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * sin(sensorPacket.gpsLong * DEG_TO_RAD);
-	// float Z_0 = (((Utility::b_earth*Utility::b_earth)/(Utility::a_earth*Utility::a_earth))*N_earth + sensorPacket.gpsAltAGL) * sin(sensorPacket.gpsLat * DEG_TO_RAD);
-	float Z_NEW = (N_earth*(1-pow(Utility::e_earth,2))+sensorPacket.gpsAltAGL)*sin(sensorPacket.gpsLat);
+	// float X_NEW = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * cos(sensorPacket.gpsLong * DEG_TO_RAD);
+	// float Y_NEW = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * sin(sensorPacket.gpsLong * DEG_TO_RAD);
+	// // float Z_0 = (((Utility::b_earth*Utility::b_earth)/(Utility::a_earth*Utility::a_earth))*N_earth + sensorPacket.gpsAltAGL) * sin(sensorPacket.gpsLat * DEG_TO_RAD);
+	// float Z_NEW = (N_earth*(1-pow(Utility::e_earth,2))+sensorPacket.gpsAltAGL)*sin(sensorPacket.gpsLat);
 
-    x(4) = X_NEW;
-    x(5) = Y_NEW;
-    x(6) = Z_NEW;
+    // x(4) = X_NEW;
+    // x(5) = Y_NEW;
+    // x(6) = Z_NEW;
 
     return this->x;
 }
 
 BLA::Matrix<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacket) {
     float p = sensorPacket.gyroX; float q = sensorPacket.gyroY; float r = sensorPacket.gyroZ;
-    // BLA::Matrix<3> bodyAccel = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
+    BLA::Matrix<3> accelR = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ}; // Accel Readings
 
+    // Update function for quaternion prediction
     BLA::Matrix<4> f_q = {
         x(0) - (dt/2)*p*x(1) - (dt/2)*q*x(2) - (dt/2)*r*x(3),
         x(1) + (dt/2)*p*x(0) - (dt/2)*q*x(3) + (dt/2)*r*x(2),
@@ -120,19 +120,24 @@ BLA::Matrix<10> StateEstimator::measurementFunction(Utility::SensorPacket sensor
         x(3) - (dt/2)*p*x(2) + (dt/2)*q*x(1) + (dt/2)*r*x(0)
     };
 
-    // Serial.println("<----- State ----->");
-    // for (int i = 0; i < f_q.Rows; i++) {
-    //     for (int j = 0; j < f_q.Cols; j++) {
-    //         Serial.print(String(f_q(i,j)) + "\t");
-    //     }
-    //     Serial.println("");
-    // }
+    // Calculate linear accelerations in the NED Frame
+    BLA::Matrix<4> quat = {x(0), x(1), x(2), x(3)};
+    BLA::Matrix<3,3> R_BT = quat2rotm(quat);
 
-    // BLA::Matrix<4> gravNEDQuat = {0, 0, 0,-9.81};
+    // Apply Gravity Compensation
+    BLA::Matrix<3> gravNED = {0, 0, -G};
+    BLA::Matrix<3> gravB = BLA::MatrixTranspose<BLA::Matrix<3,3>>(R_BT) * gravNED; // Gravity in body frame
+    BLA::Matrix<3> accelB = accelR - gravB; // Linear Accelartions in body frame
 
-    // BLA::Matrix<4> quatConj = {x(0), -x(1), -x(2), -x(3)};
+    BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3,3>>(R_BT) * accelB;
 
-    // BLA::Matrix<4> bodyGrav = quaternionMultiplication(quaternionMultiplication(x, gravNEDQuat), quatConj);
+    Serial.println("<----- Linear Accel ----->");
+    for (int i = 0; i < accelT.Rows; i++) {
+        for (int j = 0; j < accelT.Cols; j++) {
+            Serial.print(String(accelT(i,j)) + "\t");
+        }
+        Serial.println("");
+    }
 
     // Normalize Quaternion Function
     f_q = f_q / BLA::Norm(f_q);

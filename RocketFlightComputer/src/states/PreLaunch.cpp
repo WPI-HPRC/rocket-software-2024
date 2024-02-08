@@ -4,6 +4,8 @@
 #include "Debug.h"
 #include "Sensors.h"
 
+#define IN_FOISE false
+
 PreLaunch::PreLaunch(struct Sensors *sensors) : State(sensors) {}
 
 void PreLaunch::initialize_impl() {
@@ -12,10 +14,17 @@ void PreLaunch::initialize_impl() {
 void PreLaunch::loop_impl() {
 	// Read bno for example
 	if(!sensorPacket.gpsLock) {
-		Serial.println("Gps Lock Failed...");
-		return;
+		Serial.println("[PreLaunch] Gps Lock Failed...");
+		
 		delay(100);
-	};
+		return;
+	} else if(IN_FOISE) {
+		Serial.println("[PreLaunch] I am sorry to hear you are in Foise, no GPS for you :D");
+		BLA::Matrix<10> x_0 = {1,0,0,0,0,0,0,0,0,0};
+		ekf = new StateEstimator(x_0, 0.025);
+
+		return;
+	}
 
 	// float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
 	float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth,2) * pow(sin(sensorPacket.gpsLat), 2));
@@ -42,7 +51,7 @@ State *PreLaunch::nextState_impl()
 {
 
 	// DO NOT MOVE TO NEXT STATE UNTIL GPS LOCK IS ACQUIRED
-	if(DEBUG_MODE && sensorPacket.gpsLock) {
+	if(DEBUG_MODE && (sensorPacket.gpsLock || IN_FOISE)) {
 		return new Debug(sensors,this->ekf);
 	}
 

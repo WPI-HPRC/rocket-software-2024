@@ -9,7 +9,7 @@
  */
 #pragma once
 #include <Arduino.h>
-#include <SparkFun_u-blox_GNSS_v3.h>
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 
 class GNSS
 {
@@ -74,6 +74,18 @@ public:
      */
     String getTime();
 
+    /**
+     * @brief Checks PVT and Fix Status to see if data is ready
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool dataReady();
+
+    void printHwStatus();
+
 private:
     SFE_UBLOX_GNSS gnss;
+
+    
 };

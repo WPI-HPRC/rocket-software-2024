@@ -38,14 +38,19 @@ Utility::SensorPacket Sensors::readSensors() {
 
   sensorPacket.gpsLock = gnss->getLockStatus();
 
-  // If there is no lock, DO NOT update anything critical to calculations
-
-  sensorPacket.gpsLat = gnss->getLatitude() / pow(10,7);
-  sensorPacket.gpsLong = gnss->getLongitude() / pow(10,7);
-  sensorPacket.gpsAltAGL = gnss->getAltAGL() / pow(10,3);
-  sensorPacket.gpsAltMSL = gnss->getAltMSL() / pow(10,3);
-  sensorPacket.satellites = gnss->getSatellites();
-
+  if(sensorPacket.gpsLock) {
+    sensorPacket.gpsLat = gnss->getLatitude() / pow(10,7);
+    sensorPacket.gpsLong = gnss->getLongitude() / pow(10,7);
+    sensorPacket.gpsAltAGL = gnss->getAltAGL() / pow(10,3);
+    sensorPacket.gpsAltMSL = gnss->getAltMSL() / pow(10,3);
+    sensorPacket.satellites = gnss->getSatellites();
+  } else {
+    sensorPacket.gpsLat = 0;
+    sensorPacket.gpsLong = 0;
+    sensorPacket.gpsAltAGL = 0;
+    sensorPacket.gpsAltMSL = 0;
+    sensorPacket.satellites = gnss->getSatellites();
+  }
 
   return sensorPacket;
 }

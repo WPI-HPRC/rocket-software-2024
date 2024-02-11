@@ -1,10 +1,12 @@
 #include "State.h"
 #include "DrogueDescent.h"
+#include "Sensors.h"
 
 int sumDrogueDescentVel = 0;
 const float METER_CONVERSION = 0.3048;
 
 float DROGUE_DESCENT_THRESHOLD; // tbd
+DrogueDescent::DrogueDescent(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
 
 
 DrogueDescent::DrogueDescent() 

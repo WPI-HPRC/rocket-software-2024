@@ -4,7 +4,7 @@
 #include "Debug.h"
 #include "Sensors.h"
 
-#define IN_FOISE false
+#define IN_FOISE true
 
 PreLaunch::PreLaunch(struct Sensors *sensors) : State(sensors) {}
 
@@ -13,7 +13,7 @@ void PreLaunch::initialize_impl() {
 
 void PreLaunch::loop_impl() {
 	// Read bno for example
-	if(!sensorPacket.gpsLock) {
+	if(!sensorPacket.gpsLock && !IN_FOISE) {
 		Serial.println("[PreLaunch] Gps Lock Failed...");
 		
 		delay(100);
@@ -41,7 +41,7 @@ void PreLaunch::loop_impl() {
 	Serial.print("Initial Position: <"); Serial.print(X_0,4); Serial.print(", "); Serial.print(Y_0,4); Serial.print(", "); Serial.print(Z_0,4); Serial.println(">");
 
 	// Intialize EKF
-	BLA::Matrix<10> x_0 = {1,0,0,0, X_0, Y_0, Z_0, 0,0,0};
+	BLA::Matrix<10> x_0 = {1,0,0,0, 0, 0, 0, 0,0,0};
 	ekf = new StateEstimator(x_0, 0.025);
 	// ekf = new StateEstimator(x_0, 0.025);
 }

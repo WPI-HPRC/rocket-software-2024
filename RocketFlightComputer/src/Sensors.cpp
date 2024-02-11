@@ -5,6 +5,15 @@
 #include "utility.hpp"
 #include <Arduino.h>
 
+// Sensor Calbiration Factors
+float biasAccelX = 0;
+float biasAccelY = 0.025;
+float biasAccelZ = 0.02;
+
+float biasGyroX = 0.0017;
+float biasGyroY = -0.0054;
+float biasGyroZ = -0.0046;
+
 Utility::SensorPacket Sensors::readSensors() {
   Utility::SensorPacket sensorPacket;
 
@@ -25,31 +34,39 @@ Utility::SensorPacket Sensors::readSensors() {
 
   MMC_data magnetometerData = this->mag->read();
 
-  sensorPacket.magX = magnetometerData.x - 134960.0;
-  sensorPacket.magY /= 134960.0;
-  sensorPacket.magZ = magnetometerData.y - 132340.0;
-  sensorPacket.magX /= 132340.0;
-  sensorPacket.magY = magnetometerData.z - 138560.0;
-  sensorPacket.magZ /= 138560.0;
+  sensorPacket.magX = magnetometerData.x;
+  sensorPacket.magY = magnetometerData.y;
+  sensorPacket.magZ = magnetometerData.z;
 
-  sensorPacket.magX *= 8; // [Gauss]-
-  sensorPacket.magY *= 8; // [Gauss]
-  sensorPacket.magZ *= 8; // [Gauss]
+  // sensorPacket.magX = magnetometerData.x - 134960.0;
+  // sensorPacket.magY /= 134960.0;
+  // sensorPacket.magZ = magnetometerData.y - 132340.0;
+  // sensorPacket.magX /= 132340.0;
+  // sensorPacket.magY = magnetometerData.z - 138560.0;
+  // sensorPacket.magZ /= 138560.0;
+
+  // sensorPacket.magX *= 8; // [T]
+  // sensorPacket.magY *= 8; // [T]
+  // sensorPacket.magZ *= 8; // [T]
 
   sensorPacket.gpsLock = gnss->getLockStatus();
 
   if(sensorPacket.gpsLock) {
-    sensorPacket.gpsLat = gnss->getLatitude() / pow(10,7);
-    sensorPacket.gpsLong = gnss->getLongitude() / pow(10,7);
-    sensorPacket.gpsAltAGL = gnss->getAltAGL() / pow(10,3);
-    sensorPacket.gpsAltMSL = gnss->getAltMSL() / pow(10,3);
+    sensorPacket.gpsLat = gnss->getLatitude();
+    sensorPacket.gpsLong = gnss->getLongitude();
+    sensorPacket.gpsAltAGL = gnss->getAltAGL();
+    sensorPacket.gpsAltMSL = gnss->getAltMSL();
     sensorPacket.satellites = gnss->getSatellites();
+    sensorPacket.epochTime = gnss->getEpochTime();
+    // sensorPacket.time = gnss->getTime();
   } else {
     sensorPacket.gpsLat = 0;
     sensorPacket.gpsLong = 0;
     sensorPacket.gpsAltAGL = 0;
     sensorPacket.gpsAltMSL = 0;
     sensorPacket.satellites = gnss->getSatellites();
+    sensorPacket.epochTime = gnss->getEpochTime();
+    // sensorPacket.time = gnss->getTime();
   }
 
   return sensorPacket;

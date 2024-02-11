@@ -82,7 +82,20 @@ public:
      */
     bool dataReady();
 
+    /**
+     * @brief Debug print all hardware status - BLOCKING FUNCTION VERY SLOW
+     * 
+     */
     void printHwStatus();
+
+    int getMagneticDeclination();
+
+    /**
+     * @brief Get the epoch (UNIX) time
+     * 
+     * @return uint64_t 
+     */
+    uint32_t getEpochTime();
 
 private:
     SFE_UBLOX_GNSS gnss;

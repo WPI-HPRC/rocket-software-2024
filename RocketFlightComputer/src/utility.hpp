@@ -57,11 +57,12 @@ class Utility {
         float gpsAltMSL;
         float gpsAltAGL;
         String time;
+        uint64_t epochTime;
         uint8_t satellites;
         boolean gpsLock = false;
 
         long timestamp;
-    };	
+    };
 
     // WGS84 Ellipsoid Model
     constexpr static float a_earth = 6378137.0; // [m] Semi-major axis of Earth

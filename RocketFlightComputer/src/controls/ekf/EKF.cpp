@@ -10,6 +10,12 @@ StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt) {
     this->x = initialOrientation;
     this->x_min = initialOrientation;
     this->dt = dt;
+
+    // C++ was mad at me so I had to dynamically allocate outside of header
+    accelXBuffer = new float[bufferSize];
+    accelYBuffer = new float[bufferSize];
+    accelZBuffer = new float[bufferSize];
+    bufferIndex = 0;
 };
 
 /**
@@ -21,9 +27,9 @@ StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt) {
 BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
     /* Read Data from Sensors and Convert to SI Units */
     // Convert Accel values to m/s/s
-    sensorPacket.accelX = sensorPacket.accelX * 9.81;
-    sensorPacket.accelY = sensorPacket.accelY * 9.81;
-    sensorPacket.accelZ = sensorPacket.accelZ * 9.81;
+    sensorPacket.accelX = sensorPacket.accelX * g;
+    sensorPacket.accelY = sensorPacket.accelY * g;
+    sensorPacket.accelZ = sensorPacket.accelZ * g;
     // Convert gyro values from deg/s to rad/s
     sensorPacket.gyroX = sensorPacket.gyroX * (PI / 180);
     sensorPacket.gyroY = sensorPacket.gyroY * (PI / 180);
@@ -33,6 +39,36 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
     sensorPacket.magX = sensorPacket.magX * 100000;
     sensorPacket.magY = sensorPacket.magY * 100000;
     sensorPacket.magZ = sensorPacket.magZ * 100000;
+
+    // float filteredAccelX = sensorPacket.accelX;
+    // float filteredAccelY = sensorPacket.accelY;
+    // float filteredAccelZ = sensorPacket.accelZ;
+
+    // /* APPLY LOW PASS FILTER */
+    // accelXBuffer[bufferIndex] = sensorPacket.accelX;
+    // accelYBuffer[bufferIndex] = sensorPacket.accelY;
+    // accelZBuffer[bufferIndex] = sensorPacket.accelZ;
+
+    // // Increment buffer index (wrap around if necessary)
+    // bufferIndex = (bufferIndex + 1) % bufferSize;
+
+    // // Apply low-pass filter using circular buffer for each accelerometer component
+    // for (int i = 0; i < bufferSize; ++i) {
+    //     filteredAccelX = alpha * accelXBuffer[i] + (1 - alpha) * filteredAccelX;
+    //     filteredAccelY = alpha * accelYBuffer[i] + (1 - alpha) * filteredAccelY;
+    //     filteredAccelZ = alpha * accelZBuffer[i] + (1 - alpha) * filteredAccelZ;
+    // }
+
+    // Update sensorPacket with filtered accelerometer readings
+    // sensorPacket.accelX = filteredAccelX;
+    // sensorPacket.accelY = filteredAccelY;
+    // sensorPacket.accelZ = filteredAccelZ;
+
+    // Serial.println("<--- Acceleration Filtered ---> ");
+    // Serial.print("Accel X: "); Serial.println(sensorPacket.accelX);
+    // Serial.print("Accel Y: "); Serial.println(sensorPacket.accelY);
+    // Serial.print("Accel Z: "); Serial.println(sensorPacket.accelZ);
+
 
     /* PREDICTION STEP 
     x_min = f(x,dt)
@@ -87,11 +123,24 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
     // Update error covariance matrix
     P = (eye10 - K*H)*P_min;
 
-    // float quatNorm = sqrt(x(0)*x(0) + x(1)*x(1) + x(2)*x(2) + x(3)*x(3));
-    // x(0) = x(0) / quatNorm;
-    // x(1) = x(1) / quatNorm;
-    // x(2) = x(2) / quatNorm;
-    // x(3) = x(3) / quatNorm;
+    // Serial.println("<----- State ----->");
+    // for (int i = 0; i < x.Rows; i++) {
+    //     for (int j = 0; j < x.Cols; j++) {
+    //         Serial.print(String(x(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // }
+
+    float quatNorm = sqrt(x(0)*x(0) + x(1)*x(1) + x(2)*x(2) + x(3)*x(3));
+    x(0) = x(0) / quatNorm;
+    x(1) = x(1) / quatNorm;
+    x(2) = x(2) / quatNorm;
+    x(3) = x(3) / quatNorm;
+
+    Serial.print("VEL|");
+    Serial.print(x(7)); Serial.print(",");
+    Serial.print(x(8)); Serial.print(",");
+    Serial.println(x(9));
 
     // float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
 	// float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth,2) * pow(sin(sensorPacket.gpsLat), 2));
@@ -125,22 +174,34 @@ BLA::Matrix<10> StateEstimator::measurementFunction(Utility::SensorPacket sensor
     BLA::Matrix<3,3> R_BT = quat2rotm(quat);
 
     // Apply Gravity Compensation
-    BLA::Matrix<3> gravNED = {0, 0, -G};
+    BLA::Matrix<3> gravNED = {0, 0, -g};
     BLA::Matrix<3> gravB = BLA::MatrixTranspose<BLA::Matrix<3,3>>(R_BT) * gravNED; // Gravity in body frame
     BLA::Matrix<3> accelB = accelR - gravB; // Linear Accelartions in body frame
 
     BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3,3>>(R_BT) * accelB;
 
-    Serial.println("<----- Linear Accel ----->");
-    for (int i = 0; i < accelT.Rows; i++) {
-        for (int j = 0; j < accelT.Cols; j++) {
-            Serial.print(String(accelT(i,j)) + "\t");
-        }
-        Serial.println("");
-    }
+    // Serial.println("<----- Linear Accel ----->");
+    // for (int i = 0; i < accelT.Rows; i++) {
+    //     for (int j = 0; j < accelT.Cols; j++) {
+    //         Serial.print(String(accelT(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // }
 
     // Normalize Quaternion Function
     f_q = f_q / BLA::Norm(f_q);
+
+    // BLA::Matrix<3> f_p = {
+    //     x(4) + (x(7)*dt + 0.5*accelT(0)*(dt*dt)),
+    //     x(5) + (x(8)*dt + 0.5*accelT(1)*(dt*dt)),
+    //     x(6) + (x(9)*dt + 0.5*accelT(2)*(dt*dt))
+    // };
+
+    // BLA::Matrix<3> f_v = {
+    //     x(7) + accelT(0)*dt,
+    //     x(8) + accelT(1)*dt,
+    //     x(9) + accelT(2)*dt
+    // };
 
     BLA::Matrix<3> f_v = {0,0,0};
     BLA::Matrix<3> f_p = {0,0,0};
@@ -169,12 +230,12 @@ BLA::Matrix<10,10> StateEstimator::measurementJacobian(Utility::SensorPacket sen
         (dt/2)*p, 1, (dt/2)*r, -(dt/2)*q, 0,0,0,0,0,0,
         (dt/2)*q, -(dt/2)*r, 1, (dt/2)*p, 0,0,0,0,0,0,
         (dt/2)*r, (dt/2)*q, -(dt/2)*p, 1, 0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,1,0,0,dt,0,0,
+        0,0,0,0,0,1,0,0,dt,0,
+        0,0,0,0,0,0,1,0,0,dt,
+        0,0,0,0,0,0,0,1,0,0,
+        0,0,0,0,0,0,0,0,1,0,
+        0,0,0,0,0,0,0,0,0,1,
     };
 
     return A;
@@ -189,7 +250,7 @@ BLA::Matrix<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket
     r = r / BLA::Norm(r);
 
     BLA::Matrix<3> G = {
-        0, 0, -9.81
+        0, 0, -g
     }; // NED Gravity Vector
     
     // Must normalize vector for correction step
@@ -226,7 +287,7 @@ BLA::Matrix<6,10> StateEstimator::updateJacobian(Utility::SensorPacket sensorPac
     r = r / BLA::Norm(r);
 
     BLA::Matrix<3> G = {
-        0, 0, -9.81
+        0, 0, -g
     }; // NED Gravity Vector
     
     // Must normalize vector for correction step

@@ -18,29 +18,28 @@ bool GNSS::init() {
     }
 
     this->gnss.setI2COutput(COM_TYPE_UBX);
-    this->gnss.setNavigationFrequency(10);
+    this->gnss.setNavigationFrequency(40);
     this->gnss.setAutoPVT(true);
 
     // Enable the jamming / interference monitor
-    UBX_CFG_ITFM_data_t jammingConfig; // Create storage for the jamming configuration
-    if (gnss.getJammingConfiguration(&jammingConfig)) // Read the jamming configuration
-    {
-        Serial.print(F("[GNSS] The jamming / interference monitor is "));
-        if (jammingConfig.config.bits.enable == 0) // Check if the monitor is already enabled
-        Serial.print(F("not "));
-        Serial.println(F("enabled"));
+    // UBX_CFG_ITFM_data_t jammingConfig; // Create storage for the jamming configuration
+    // if (gnss.getJammingConfiguration(&jammingConfig)) // Read the jamming configuration
+    // {
+    //     Serial.print(F("[GNSS] The jamming / interference monitor is "));
+    //     if (jammingConfig.config.bits.enable == 0) // Check if the monitor is already enabled
+    //     Serial.print(F("not "));
+    //     Serial.println(F("enabled"));
 
-        if (jammingConfig.config.bits.enable == 0) // Check if the monitor is already enabled
-        {
-        Serial.print(F("[GNSS] Enabling the jamming / interference monitor: "));
-        (jammingConfig.config.bits.enable = 1); // Enable the monitor
-        if (gnss.setJammingConfiguration(&jammingConfig)) // Set the jamming configuration
-            Serial.println(F(" -> success"));
-        else
-            Serial.println(F(" -> failed!"));
-        }
-    }
-
+    //     if (jammingConfig.config.bits.enable == 0) // Check if the monitor is already enabled
+    //     {
+    //     Serial.print(F("[GNSS] Enabling the jamming / interference monitor: "));
+    //     (jammingConfig.config.bits.enable = 1); // Enable the monitor
+    //     if (gnss.setJammingConfiguration(&jammingConfig)) // Set the jamming configuration
+    //         Serial.println(F(" -> success"));
+    //     else
+    //         Serial.println(F(" -> failed!"));
+    //     }
+    // }
 
     // this->gnss.saveConfiguration();
 
@@ -89,6 +88,8 @@ String GNSS::getTime() {
     return timeString;
 }
 
+
+
 bool GNSS::dataReady() {
     return (gnss.getPVT() && (gnss.getInvalidLlh() == false));
 };
@@ -121,4 +122,17 @@ void GNSS::printHwStatus() {
 
         Serial.println();
     };
+}
+
+int GNSS::getMagneticDeclination() {
+    if(gnss.getHeadVehValid()) {
+        return gnss.getMagDec();
+    } else {
+        return -1;
+    }
+    
+}
+
+uint32_t GNSS::getEpochTime() {
+    return gnss.getUnixEpoch();
 }

@@ -6,7 +6,12 @@ Abort::Abort(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip 
 void Abort::initialize_impl() {}
 
 void Abort::loop_impl()
-{}
+{
+    // shut down all systems, log slowly
+
+    // busy wait
+    delay(500);
+}
 
 State *Abort::nextState_impl()
 {

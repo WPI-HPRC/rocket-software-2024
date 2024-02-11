@@ -10,5 +10,5 @@ class MainDescent : public State {
     private:
         float altitudeBuffer[10];
 	public:
-		MainDescent(struct Sensors *sensors);
+		MainDescent(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip);
 };

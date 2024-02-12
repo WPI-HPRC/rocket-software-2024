@@ -21,6 +21,7 @@ void MainDescent::loop_impl() {
         average = avg_sum / 10.0;
 
         // find average standard deviation
+        // TODO: this is not the correct way to calculate standard deviation, fix this?
         float avg_std_sum = 0.0;
         float avg_std = 0.0;
         for (int i = 0; i < 10; i++)

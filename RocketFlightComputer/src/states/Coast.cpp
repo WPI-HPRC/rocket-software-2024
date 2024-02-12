@@ -26,6 +26,7 @@ void Coast::loop_impl()
 
     transitionBufIndVelVert = (transitionBufIndVelVert + 1) % 10;
     // if average vertical velocity is negative, passed apogee
+    // TODO Check for acceleration as well
     if (average < 0)
     {
         // TODO: debounce apogeePassed

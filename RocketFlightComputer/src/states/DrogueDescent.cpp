@@ -10,6 +10,7 @@ DrogueDescent::DrogueDescent()
 
 void DrogueDescent::initialize_impl() {}
 
+// TODO: Debounce
 void DrogueDescent::loop_impl()
 {
     // calculate vertical velocity

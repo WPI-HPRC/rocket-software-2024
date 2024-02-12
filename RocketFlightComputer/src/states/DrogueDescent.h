@@ -2,7 +2,7 @@
 #include "State.h"
 #include "Sensors.h"
 
-#Define DROGUE_DESCENT_RATE 10 // m/s
+#define DROGUE_DESCENT_RATE 10 // m/s
 
 class DrogueDescent : public State
 {

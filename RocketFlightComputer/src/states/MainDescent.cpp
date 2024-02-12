@@ -35,7 +35,7 @@ void MainDescent::loop_impl() {
 }
 
 State *MainDescent::nextState_impl() {
-    if (this->currentTime > MAIN_DESCENT_TIMEOUT && avg_std < 5 && curr_altitude <= LAND_THRESHOLD) {
+    if (this->currentTime > MAIN_DESCENT_TIMEOUT && avg_std < 2 && curr_altitude <= LAND_THRESHOLD) { // TODO: change avg_std check
         return new Recovery(sensors, stateEstimator, flash);
     }
 

@@ -40,12 +40,6 @@ class Utility {
         // Calculated Values
         float altitude;
 
-        // State Estimator Outputs
-        float w;
-        float i;
-        float j;
-        float k;
-
         // Geocentric Position
         float X;
         float Y;
@@ -57,7 +51,7 @@ class Utility {
         float gpsAltMSL;
         float gpsAltAGL;
         String time;
-        uint64_t epochTime;
+        uint32_t epochTime;
         uint8_t satellites;
         boolean gpsLock = false;
 

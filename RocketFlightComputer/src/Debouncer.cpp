@@ -1,26 +1,15 @@
 #include "Debouncer.h"
 
 
-Debouncer::Debouncer(int threshold, bool initialValue) {
-    currCount = 0;
-    internalValue = initialValue;
-
-}
-
-Debouncer::Debouncer(int threshold) {
-    Debouncer(threshold, false);
-}
+Debouncer::Debouncer(int threshold) : threshold(threshold), count(0) {}
 
 bool Debouncer::checkOut(bool input) {
-    if (input == lastValue) {
-        if (currCount < threshold) {
-            currCount += 1;
-		} else {
-            internalValue = input;
-		}
-    } else:
-        currCount = 0;
-    lastValue = input;
-    return internalValue;
+    if (input) {
+        this->count++;
+    } else {
+        this->count = 0;
+    }
+
+    return this->count >= this->threshold;
 }
 

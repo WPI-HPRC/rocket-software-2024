@@ -6,6 +6,4 @@ class Debug : public State {
 	_STATE_CLASS_IMPLS_
 	public:
 		Debug(struct Sensors *sensors, StateEstimator * ekf);
-    private:
-        StateEstimator * ekf;
 };

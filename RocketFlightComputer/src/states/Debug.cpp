@@ -1,9 +1,7 @@
 #include "Debug.h"
 #include "State.h"
 
-Debug::Debug(struct Sensors *sensors, StateEstimator * ekf) : State(sensors) {
-    this->ekf = ekf;
-}
+Debug::Debug(struct Sensors *sensors, StateEstimator * ekf) : State(sensors, ekf) {}
 
 void Debug::initialize_impl() {
 	// Initialize sensors
@@ -11,8 +9,6 @@ void Debug::initialize_impl() {
 }
 
 void Debug::loop_impl() {
-    this->x_state = ekf->onLoop(sensorPacket);
-
     // Update Sensor Packet with EKF
     this->sensorPacket.w = x_state(0);
     this->sensorPacket.i = x_state(1);

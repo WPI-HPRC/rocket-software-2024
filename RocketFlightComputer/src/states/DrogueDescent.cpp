@@ -1,12 +1,10 @@
 #include "State.h"
 #include "DrogueDescent.h"
+#include "MainDescent.h"
+#include "Abort.h"
 #include "Sensors.h"
 
-DrogueDescent::DrogueDescent(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
-
-DrogueDescent::DrogueDescent()
-{
-}
+DrogueDescent::DrogueDescent(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
 void DrogueDescent::initialize_impl() {}
 
@@ -43,14 +41,14 @@ State *DrogueDescent::nextState_impl()
 {
     if (drogueDescentRateMatched)
     {
-        return new MainDescent(sensors, stateEstimator, flash);
+        return new MainDescent(sensors, stateEstimator);
     }
 
     // if the state hasn't changed for much more than the expected DROGUE time, go to abort
     // 1.2 * TIME_IN_DROGUE_DESCENT == 85.2 seconds
     if (this->currentTime > 1.2 * TIME_IN_DROGUE_DESCENT)
     {
-        return new Abort(sensors, stateEstimator, flash);
+        return new Abort(sensors, stateEstimator);
     }
 
     return nullptr;

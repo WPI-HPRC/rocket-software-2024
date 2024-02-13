@@ -42,14 +42,13 @@ public:
 
 protected:
     //! @note Constructor to be called from subclasses to initialize the `sensors` object
-    State(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flash);
+    State(struct Sensors *sensors, StateEstimator *stateEstimator);
     //! @brief number of milliseconds since the initialize call
     long long currentTime = 0;
     //! @brief number of milliseconds since the last loop call
     long long deltaTime = 0;
     //! @brief loop count since initialization
     long long loopCount = 0;
-    FlashChip *flash;
     StateEstimator *stateEstimator;
     //! @brief "global" sensors object
     struct Sensors *sensors;

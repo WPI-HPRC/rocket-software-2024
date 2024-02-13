@@ -1,4 +1,5 @@
 #pragma once
+#if 0
 
 #include "Arduino.h"
 #include <SPIFlash.h>
@@ -24,3 +25,4 @@ private:
     uint32_t maxPage;
 
 };
+#endif

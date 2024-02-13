@@ -24,10 +24,9 @@
 Metro timer = Metro(1000 / LOOP_RATE);
 
 struct Sensors sensors;
-FlashChip *flash = new FlashChip();
 StateEstimator *stateEstimator = nullptr;
 // Start in pre-launch
-State *state = new PreLaunch(&sensors, stateEstimator, flash);
+State *state = new PreLaunch(&sensors, stateEstimator);
 
 void setup()
 {

@@ -1,14 +1,14 @@
 #include "Debouncer.h"
 
-Debouncer::Debouncer(int threshold) {
-    currCount = 0;
-    internalValue = false;
-}
 
 Debouncer::Debouncer(int threshold, bool initialValue) {
     currCount = 0;
     internalValue = initialValue;
 
+}
+
+Debouncer::Debouncer(int threshold) {
+    Debouncer(threshold, false);
 }
 
 bool Debouncer::checkOut(bool input) {
@@ -20,6 +20,7 @@ bool Debouncer::checkOut(bool input) {
 		}
     } else:
         currCount = 0;
+    lastValue = input;
     return internalValue;
 }
 

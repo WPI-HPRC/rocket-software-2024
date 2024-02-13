@@ -38,9 +38,15 @@ void Coast::loop_impl()
 //! @details max 8 seconds until deploy
 State *Coast::nextState_impl()
 {
-    if (this->currentTime > MAX_COAST_TIME || apogeePassed)
+    if (apogeePassed)
     {
         return new DrogueDescent(sensors, stateEstimator, flash);
     }
-    return nullptr;
+    
+    // if the state hasn't changed for much more than the expected COAST time, go to abort
+    // 1.5 * TIME_IN_COAST == 28.5 seconds
+    if (this->currentTime > 1.5 * TIME_IN_COAST)
+    {
+        return new Abort(sensors, stateEstimator, flash);
+    }
 }

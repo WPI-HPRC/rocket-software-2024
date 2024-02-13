@@ -80,5 +80,5 @@ State *PreLaunch::nextState_impl()
     {
         return new Launch(sensors, stateEstimator, flashChip);
     }
-    return nullptr;
+    // not going to abort
 }

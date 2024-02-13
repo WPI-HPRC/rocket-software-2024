@@ -31,9 +31,10 @@ void DrogueDescent::loop_impl()
 
     transitionBuffIndexVerticalVelocity = (transitionBuffIndexVerticalVelocity + 1) % 10;
 
-    if (average < DROGUE_DESCENT_RATE)
+    // if the average vertical velocity is less that the expected velocity at main deploy, swap states
+    if (average < MAIN_DEPLOY_VELOCITY)
     {
-        Serial.println("Drogue descent rate matched!");
+        Serial.println("Reached main deploy velocity!");
         drogueDescentRateMatched = true;
     }
 }
@@ -45,6 +46,10 @@ State *DrogueDescent::nextState_impl()
         return new MainDescent(sensors, stateEstimator, flash);
     }
 
-    // if abort (was a 10 second timeout)
-    return nullptr;
+    // if the state hasn't changed for much more than the expected DROGUE time, go to abort
+    // 1.2 * TIME_IN_DROGUE_DESCENT == 85.2 seconds
+    if (this->currentTime > 1.2 * TIME_IN_DROGUE_DESCENT)
+    {
+        return new Abort(sensors, stateEstimator, flash);
+    }
 }

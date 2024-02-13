@@ -2,7 +2,7 @@
 #include "State.h"
 #include "Sensors.h"
 
-#define MAX_COAST_TIME 30000
+#define TIME_IN_COAST 19 * 1000 // seconds, OpenRocket for Test Launch 2/17
 
 class Coast : public State
 {

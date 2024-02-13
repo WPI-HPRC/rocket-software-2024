@@ -10,6 +10,7 @@ void MainDescent::loop_impl() {
     float curr_altitude = sensorPacket.altitude;
     altitudeBuffer[altitudeBufferIndex] = curr_altitude;
     
+    // TODO: Use the debouncer instead
     if (altitudeBufferIndex == 9) {
         // take the average of the full buffer
         float avg_sum = 0.0;
@@ -35,9 +36,13 @@ void MainDescent::loop_impl() {
 }
 
 State *MainDescent::nextState_impl() {
-    if (this->currentTime > MAIN_DESCENT_TIMEOUT && avg_std < 2 && curr_altitude <= LAND_THRESHOLD) { // TODO: change avg_std check
+    if (avg_std < 2 && curr_altitude <= LAND_THRESHOLD) {
         return new Recovery(sensors, stateEstimator, flash);
     }
 
-	return nullptr;
+    // if the state hasn't changed for much more than the expected MAIN_DESCENT time, go to abort
+    // 1.1 * TIME_IN_MAIN_DESCENT == 96.8 seconds
+	if (this->currentTime > 1.1 * TIME_IN_MAIN_DESCENT) {
+        return new Abort(sensors, stateEstimator, flash);
+    }
 }

@@ -36,10 +36,14 @@ void Launch::loop_impl()
 State *Launch::nextState_impl()
 {
     // Stay in this state for at least 3 seconds to prevent airbrake activation
-    if (this->currentTime > MIN_LAUNCH_TIME && motorBurnout)
+    if (this->currentTime > MOTOR_BURN_TIME && motorBurnout)
     {
         return new Coast(sensors, stateEstimator, flash);
     }
-    // TODO: add abort
-    return nullptr;
+    
+    // if state hasn't changed for much more than motor burnout time, go to abort
+    if (this->currentTime > 2 * MOTOR_BURN_TIME)
+    {
+        return new Abort(sensors, stateEstimator, flash);
+    }
 }

@@ -2,7 +2,7 @@
 #include "State.h"
 #include "Sensors.h"
 
-#define MIN_LAUNCH_TIME 3000 // TODO: check with OpenRocket sim
+#define MOTOR_BURN_TIME 3 * 1000 // 3 second timeout
 
 class Launch : public State
 {

@@ -1,6 +1,9 @@
 #pragma once
 #include "State.h"
 #include "Sensors.h"
+#include "utility.h"
+
+#define LAUNCH_ACCEL_THRESHOLD 3.0 * G
 
 class PreLaunch : public State {
 	_STATE_CLASS_IMPLS_

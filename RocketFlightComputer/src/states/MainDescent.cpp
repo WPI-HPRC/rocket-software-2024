@@ -45,4 +45,6 @@ State *MainDescent::nextState_impl() {
 	if (this->currentTime > 1.1 * TIME_IN_MAIN_DESCENT) {
         return new Abort(sensors, stateEstimator, flash);
     }
+
+    return nullptr;
 }

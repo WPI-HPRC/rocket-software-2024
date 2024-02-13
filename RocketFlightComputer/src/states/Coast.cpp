@@ -49,4 +49,5 @@ State *Coast::nextState_impl()
     {
         return new Abort(sensors, stateEstimator, flash);
     }
+    return nullptr;
 }

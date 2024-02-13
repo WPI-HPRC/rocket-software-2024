@@ -15,16 +15,16 @@ void Debug::loop_impl() {
     this->x_state = ekf->onLoop(sensorPacket);
 
     // Update Sensor Packet with EKF
-    this->sensorPacket.w = x_state(0);
-    this->sensorPacket.i = x_state(1);
-    this->sensorPacket.j = x_state(2);
-    this->sensorPacket.k = x_state(3);  
+    this->telemPacket.w = x_state(0);
+    this->telemPacket.i = x_state(1);
+    this->telemPacket.j = x_state(2);
+    this->telemPacket.k = x_state(3);  
 
-    Serial.print("QUAT|");
-    Serial.print(sensorPacket.w); Serial.print(",");
-    Serial.print(sensorPacket.i); Serial.print(",");
-    Serial.print(sensorPacket.j); Serial.print(",");
-    Serial.println(sensorPacket.k);
+    // Serial.print("QUAT|");
+    // Serial.print(telemPacket.w); Serial.print(",");
+    // Serial.print(telemPacket.i); Serial.print(",");
+    // Serial.print(telemPacket.j); Serial.print(",");
+    // Serial.println(telemPacket.k);
     
     // this->sensorPacket.X = x_state(4);
     // this->sensorPacket.Y = x_state(5);

@@ -34,6 +34,7 @@ class State {
 
 		// FIXME: I think these should be protected
 		Utility::SensorPacket sensorPacket;
+		Utility::TelemPacket telemPacket;
 
 		// Eigen::Vector<float, 10> x_state;
 		BLA::Matrix<10> x_state;

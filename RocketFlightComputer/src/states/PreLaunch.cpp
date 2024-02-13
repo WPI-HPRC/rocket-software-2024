@@ -4,7 +4,7 @@
 #include "Debug.h"
 #include "Sensors.h"
 
-#define IN_FOISE false
+#define IN_FOISE true
 
 PreLaunch::PreLaunch(struct Sensors *sensors) : State(sensors) {}
 

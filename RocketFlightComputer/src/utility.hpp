@@ -40,22 +40,56 @@ class Utility {
         // Calculated Values
         float altitude;
 
-        // Geocentric Position
-        float X;
-        float Y;
-        float Z;
+        // GPS Inputs
+        float gpsLat;
+        float gpsLong;
+        float gpsAltMSL;
+        float gpsAltAGL;
+        uint32_t epochTime;
+        uint8_t satellites;
+        boolean gpsLock = false;
+
+        uint32_t timestamp;
+    };
+
+    struct TelemPacket {
+        // Raw Sensor Readings
+        float accelX;
+        float accelY;
+        float accelZ;
+        float gyroX;
+        float gyroY;
+        float gyroZ;
+        float magX;
+        float magY;
+        float magZ;
+        float pressure;
+
+        // Calculated Values
+        float altitude;
+
+        // EKF Results
+        float w; // Quaternion State
+        float i;
+        float j;
+        float k;
+        float posX; // Position State ECEF
+        float posY;
+        float posZ;
+        float velX; // Velocity State ECEF
+        float velY;
+        float velZ;
 
         // GPS Inputs
         float gpsLat;
         float gpsLong;
         float gpsAltMSL;
         float gpsAltAGL;
-        String time;
         uint32_t epochTime;
         uint8_t satellites;
         boolean gpsLock = false;
 
-        long timestamp;
+        uint32_t timestamp;
     };
 
     // WGS84 Ellipsoid Model

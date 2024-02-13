@@ -137,10 +137,10 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket) {
     x(2) = x(2) / quatNorm;
     x(3) = x(3) / quatNorm;
 
-    Serial.print("VEL|");
-    Serial.print(x(7)); Serial.print(",");
-    Serial.print(x(8)); Serial.print(",");
-    Serial.println(x(9));
+    // Serial.print("VEL|");
+    // Serial.print(x(7)); Serial.print(",");
+    // Serial.print(x(8)); Serial.print(",");
+    // Serial.println(x(9));
 
     // float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
 	// float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth,2) * pow(sin(sensorPacket.gpsLat), 2));

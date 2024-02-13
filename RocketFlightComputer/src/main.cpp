@@ -18,11 +18,15 @@
 #include <Accelerometer.h>
 #include <Magnetometer.h>
 
+#include <TelemetryBoard/XBeeProSX.h>
+
 Metro timer = Metro(1000 / LOOP_RATE);
 
 struct Sensors sensors;
 
 State *state = new PreLaunch(&sensors);
+
+XbeeProSX * xbee = new XbeeProSX(17); // CS GPIO17
 
 void setup()
 {
@@ -72,6 +76,8 @@ void setup()
         Serial.println("[Sensorboard] NEOM10S GPS Detected");
     }
 
+    xbee->begin();
+
     state->initialize();
 
     timer.reset();
@@ -85,6 +91,11 @@ void loop()
     {
         state->loop();
         previousTime = millis();
+
+        xbee->updateSubscribers();
+
+        std::string message = "Hello monkey!";
+        
         State *nextState = state->nextState();
         if (nextState != nullptr)
         {

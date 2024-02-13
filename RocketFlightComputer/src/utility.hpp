@@ -3,6 +3,7 @@
 
 #define DEBUG_MODE true
 #define LOOP_RATE 40
+#define G 9.81
 
 class Utility
 {
@@ -28,6 +29,16 @@ public:
 
     struct SensorPacket
     {
+        // State Integer
+        // 0 - PreLaunch
+        // 1 - Launch
+        // 2 - Coast
+        // 3 - DrogueDescent
+        // 4 - MainDescent
+        // 5 - Recovery
+        // 6 - Abort
+        uint8_t state;
+
         // Raw Sensor Readings
         float accelX;
         float accelY;

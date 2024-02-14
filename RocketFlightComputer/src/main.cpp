@@ -26,8 +26,6 @@ struct Sensors sensors;
 
 State *state = new PreLaunch(&sensors);
 
-XbeeProSX * xbee = new XbeeProSX(17); // CS GPIO17
-
 void setup()
 {
     Serial.begin(115200);
@@ -37,6 +35,9 @@ void setup()
 
     Wire.begin();
     Wire.setClock(400000);
+
+    SPI.begin();
+    SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE0));
 
     sensors = {
         .barometer = new Barometer(),
@@ -76,8 +77,6 @@ void setup()
         Serial.println("[Sensorboard] NEOM10S GPS Detected");
     }
 
-    xbee->begin();
-
     state->initialize();
 
     timer.reset();
@@ -91,10 +90,6 @@ void loop()
     {
         state->loop();
         previousTime = millis();
-
-        xbee->updateSubscribers();
-
-        std::string message = "Hello monkey!";
         
         State *nextState = state->nextState();
         if (nextState != nullptr)

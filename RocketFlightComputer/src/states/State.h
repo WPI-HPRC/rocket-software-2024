@@ -12,6 +12,8 @@ private:                             \
 #include <ArduinoEigen.h>
 #include <controls/ekf/EKF.h>
 #include <BasicLinearAlgebra.h>
+#include <TelemetryBoard/XBeeProSX.h>
+
 /**
  * @brief Abstract class representing a rocket state.
  */
@@ -50,6 +52,8 @@ class State {
 		long long loopCount = 0;
 		//! @brief "global" sensors object
 		struct Sensors *sensors;
+		
+		XbeeProSX * xbee = new XbeeProSX(17); // CS GPIO17
 
 	private:
 		//! @brief number of milliseconds from boot to the initialize call

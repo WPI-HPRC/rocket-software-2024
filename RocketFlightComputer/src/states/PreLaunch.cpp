@@ -22,7 +22,6 @@ void PreLaunch::loop_impl() {
 		Serial.println("[PreLaunch] I am sorry to hear you are in Foise, no GPS for you :D");
 		BLA::Matrix<10> x_0 = {1,0,0,0,0,0,0,0,0,0};
 		ekf = new StateEstimator(x_0, 0.025);
-
 		return;
 	}
 

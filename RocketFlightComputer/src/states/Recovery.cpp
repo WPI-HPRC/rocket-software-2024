@@ -15,3 +15,7 @@ void Recovery::loop_impl() {
 State *Recovery::nextState_impl() {
 	return nullptr;
 }
+
+enum StateId Recovery::getId() {
+	return StateId::ID_Recovery;
+}

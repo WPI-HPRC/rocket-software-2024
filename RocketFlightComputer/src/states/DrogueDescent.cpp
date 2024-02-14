@@ -53,3 +53,7 @@ State *DrogueDescent::nextState_impl()
 
     return nullptr;
 }
+
+enum StateId DrogueDescent::getId() {
+    return StateId::ID_DrogueDescent;
+}

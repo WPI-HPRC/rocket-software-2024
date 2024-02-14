@@ -17,3 +17,7 @@ State *Abort::nextState_impl()
 {
     return nullptr;
 }
+
+enum StateId Abort::getId() {
+    return StateId::ID_Abort;
+}

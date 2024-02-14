@@ -50,3 +50,7 @@ State *Launch::nextState_impl()
 
     return nullptr;
 }
+
+enum StateId Launch::getId() {
+    return StateId::ID_Launch;
+}

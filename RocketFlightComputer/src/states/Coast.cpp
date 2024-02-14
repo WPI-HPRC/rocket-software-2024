@@ -53,3 +53,7 @@ State *Coast::nextState_impl()
     }
     return nullptr;
 }
+
+enum StateId Coast::getId() {
+    return StateId::ID_Coast;
+}

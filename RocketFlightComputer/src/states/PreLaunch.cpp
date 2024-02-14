@@ -85,3 +85,7 @@ State *PreLaunch::nextState_impl()
     
     return nullptr;
 }
+
+enum StateId PreLaunch::getId() {
+    return StateId::ID_PreLaunch;
+}

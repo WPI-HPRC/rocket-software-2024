@@ -50,3 +50,7 @@ State *MainDescent::nextState_impl() {
 
     return nullptr;
 }
+
+enum StateId MainDescent::getId() {
+    return StateId::ID_MainDescent;
+}

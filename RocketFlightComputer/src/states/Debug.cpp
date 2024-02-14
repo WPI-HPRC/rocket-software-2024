@@ -49,3 +49,7 @@ State *Debug::nextState_impl()
 {
 	return nullptr;
 }
+
+enum StateId Debug::getId() {
+	return StateId::ID_Debug;
+}

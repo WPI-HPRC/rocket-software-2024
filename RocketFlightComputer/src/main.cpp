@@ -29,8 +29,8 @@ State *state = new PreLaunch(&sensors);
 void setup()
 {
     Serial.begin(115200);
-
-    while(!Serial);
+    
+    // while(!Serial); 
     Serial.println("Beginning Flight Computer");
 
     Wire.begin();

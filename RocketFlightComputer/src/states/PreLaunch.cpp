@@ -4,7 +4,7 @@
 #include "Debug.h"
 #include "Sensors.h"
 
-#define IN_FOISE true
+#define IN_FOISE false
 
 PreLaunch::PreLaunch(struct Sensors *sensors) : State(sensors) {}
 
@@ -16,12 +16,13 @@ void PreLaunch::loop_impl() {
 	if(!sensorPacket.gpsLock && !IN_FOISE) {
 		Serial.println("[PreLaunch] Gps Lock Failed...");
 		
-		delay(100);
+		// delay(100);
 		return;
 	} else if(IN_FOISE) {
 		Serial.println("[PreLaunch] I am sorry to hear you are in Foise, no GPS for you :D");
 		BLA::Matrix<10> x_0 = {1,0,0,0,0,0,0,0,0,0};
 		ekf = new StateEstimator(x_0, 0.025);
+
 		return;
 	}
 

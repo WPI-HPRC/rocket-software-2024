@@ -40,25 +40,19 @@ void State::loop() {
 
 	this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
 	this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
-
 	this->telemPacket.epochTime = this->sensorPacket.epochTime;
 	this->telemPacket.satellites = this->sensorPacket.satellites;
 	this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
-	this->telemPacket.timestamp = this->sensorPacket.timestamp;
+	this->telemPacket.timestamp = millis();
 
 	/** Loop Radio and Send Data */
 	// xbee->updateSubscribers();
 
-	std::string testPacket = "Test";
-
-	// xbee->send(0x0013A200423F474C, testPacket.c_str(), testPacket.size());
-	// for(int i=0; i < 5; i++) {
-		// xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
-	// };
-
 	xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
 
-	Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
+	Serial.print("Packet Success: "); Serial.println(millis());
+
+	// Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
 	// Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));
 	
 }

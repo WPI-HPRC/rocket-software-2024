@@ -91,13 +91,13 @@ void XbeeProSX::send(uint64_t address, const void * data, size_t size_bytes) {
     digitalWrite(_cs_pin, HIGH);  // De-asserts module
 
 
-    Serial.println("Packet:");
-    for (size_t i = 0; i < index; i++) {
-        if (packet[i] < 16) Serial.print("0");
-        Serial.print(packet[i], HEX);
-        Serial.print(" ");
-    }
-    Serial.println();
+    // Serial.println("Packet:");
+    // for (size_t i = 0; i < index; i++) {
+    //     if (packet[i] < 16) Serial.print("0");
+    //     Serial.print(packet[i], HEX);
+    //     Serial.print(" ");
+    // }
+    // Serial.println();
     
 
 

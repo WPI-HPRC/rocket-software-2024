@@ -54,42 +54,42 @@ class Utility {
 
     struct TelemPacket {
         // Raw Sensor Readings
-        float accelX;
-        float accelY;
-        float accelZ;
-        float gyroX;
-        float gyroY;
-        float gyroZ;
-        float magX;
-        float magY;
-        float magZ;
-        float pressure;
+        float accelX = 0.0f;
+        float accelY = 0.0f;
+        float accelZ = 0.0f;
+        float gyroX = 0.0f;
+        float gyroY = 0.0f;
+        float gyroZ = 0.0f;
+        float magX = 0.0f;
+        float magY = 0.0f;
+        float magZ = 0.0f;
+        float pressure = 0.0f;
 
         // Calculated Values
-        float altitude;
+        float altitude = 0.0f;
 
         // EKF Results
-        float w; // Quaternion State
-        float i;
-        float j;
-        float k;
-        float posX; // Position State ECEF
-        float posY;
-        float posZ;
-        float velX; // Velocity State ECEF
-        float velY;
-        float velZ;
+        float w = 0.0f; // Quaternion State
+        float i = 0.0f;
+        float j = 0.0f;
+        float k = 0.0f;
+        float posX = 0.0f; // Position State ECEF
+        float posY = 0.0f;
+        float posZ = 0.0f;
+        float velX = 0.0f; // Velocity State ECEF
+        float velY = 0.0f;
+        float velZ = 0.0f;
 
         // GPS Inputs
-        float gpsLat;
-        float gpsLong;
-        float gpsAltMSL;
-        float gpsAltAGL;
-        uint32_t epochTime;
-        uint8_t satellites;
+        float gpsLat = 0.0f;
+        float gpsLong = 0.0f;
+        float gpsAltMSL = 0.0f;
+        float gpsAltAGL = 0.0f;
+        uint32_t epochTime = 0;
+        uint8_t satellites = 0;
         boolean gpsLock = false;
 
-        uint32_t timestamp;
+        uint32_t timestamp = 0;
     };
 
     // WGS84 Ellipsoid Model

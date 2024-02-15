@@ -5,7 +5,8 @@
 private:                             \
     void initialize_impl() override; \
     void loop_impl() override;       \
-    State *nextState_impl() override;
+    State *nextState_impl() override; \
+    StateId getId() override;
 
 #include "Arduino.h"
 #include "../utility.hpp"
@@ -13,6 +14,19 @@ private:                             \
 #include <BasicLinearAlgebra.h>
 #include <Flash.h>
 #include <EKF.h>
+
+//! @brief Enum representing the id of the state, to be used in logging and communication with ground station
+enum StateId {
+  ID_PreLaunch = 0,
+  ID_Launch,
+  ID_Coast,
+  ID_DrogueDescent,
+  ID_MainDescent,
+  ID_Recovery,
+  ID_Abort,
+  ID_Debug,
+};
+
 /**
  * @brief Abstract class representing a rocket state.
  */
@@ -32,7 +46,11 @@ public:
      * @return The pointer to the next state or nullptr if the state has not changed.
      */
     State *nextState();
-    virtual ~State() {}
+  /**
+   * @brief Get the ID of this state
+   */
+  virtual enum StateId getId() = 0;
+  virtual ~State() {}
 
     // FIXME: I think these should be protected
     Utility::SensorPacket sensorPacket;
@@ -42,14 +60,13 @@ public:
 
 protected:
     //! @note Constructor to be called from subclasses to initialize the `sensors` object
-    State(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flash);
+    State(struct Sensors *sensors, StateEstimator *stateEstimator);
     //! @brief number of milliseconds since the initialize call
     long long currentTime = 0;
     //! @brief number of milliseconds since the last loop call
     long long deltaTime = 0;
     //! @brief loop count since initialization
     long long loopCount = 0;
-    FlashChip *flash;
     StateEstimator *stateEstimator;
     //! @brief "global" sensors object
     struct Sensors *sensors;

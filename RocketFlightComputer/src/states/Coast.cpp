@@ -1,8 +1,10 @@
 #include "Coast.h"
+#include "DrogueDescent.h"
+#include "Abort.h"
 #include "State.h"
 #include "Sensors.h"
 
-Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
+Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
 void Coast::initialize_impl() {}
 
@@ -40,14 +42,18 @@ State *Coast::nextState_impl()
 {
     if (apogeePassed)
     {
-        return new DrogueDescent(sensors, stateEstimator, flash);
+        return new DrogueDescent(sensors, stateEstimator);
     }
     
     // if the state hasn't changed for much more than the expected COAST time, go to abort
     // 1.5 * TIME_IN_COAST == 28.5 seconds
     if (this->currentTime > 1.5 * TIME_IN_COAST)
     {
-        return new Abort(sensors, stateEstimator, flash);
+        return new Abort(sensors, stateEstimator);
     }
     return nullptr;
+}
+
+enum StateId Coast::getId() {
+    return StateId::ID_Coast;
 }

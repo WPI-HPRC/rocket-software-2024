@@ -1,7 +1,7 @@
 #include "State.h"
 #include <Arduino.h>
 
-State::State(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : sensors(sensors), stateEstimator(stateEstimator), flashChip(flashChip) {}
+State::State(struct Sensors *sensors, StateEstimator *stateEstimator) : sensors(sensors), stateEstimator(stateEstimator) {}
 
 void State::initialize()
 {
@@ -16,8 +16,8 @@ void State::loop()
     this->deltaTime = now - this->lastLoopTime;
     this->loopCount++;
     this->sensorPacket = this->sensors->readSensors();
-    Utility::logData(this->flash, this->sensorPacket);
-    this->x_state = this->stateEstimator->onLoop();
+    // Utility::logData(this->flash, this->sensorPacket);
+    this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
     loop_impl();
     this->lastLoopTime = millis();
 }

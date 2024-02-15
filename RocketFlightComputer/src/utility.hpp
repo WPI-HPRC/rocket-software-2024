@@ -1,9 +1,7 @@
 #pragma once
-#include <Flash.h>
 
-#define DEBUG_MODE true
+// #define DEBUG_MODE 
 #define LOOP_RATE 40
-#define G 9.81
 
 class Utility
 {
@@ -76,6 +74,7 @@ public:
         long timestamp;
     };
 
+#if 0 // NOTE: REMOVES FLASH CODE
     static void logData(FlashChip *flash, SensorPacket sensorPacket)
     {
         String structString = String(sensorPacket.accelX) + "," +
@@ -105,6 +104,7 @@ public:
                               String(sensorPacket.timestamp);
         flash->writeStruct(structString);
     }
+#endif // NOTE: REMOVES FLASH CODE
 
     // WGS84 Ellipsoid Model
     constexpr static float a_earth = 6378137.0;       // [m] Semi-major axis of Earth

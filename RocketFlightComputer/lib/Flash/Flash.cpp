@@ -1,3 +1,4 @@
+#if 0
 #include "Flash.h"
 
 FlashChip::FlashChip() {
@@ -72,3 +73,4 @@ bool FlashChip::eraseMemory() {
     return true;
 
 }
+#endif

@@ -1,8 +1,10 @@
 #include "MainDescent.h"
+#include "Abort.h"
+#include "Recovery.h"
 #include "State.h"
 #include "Sensors.h"
 
-MainDescent::MainDescent(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
+MainDescent::MainDescent(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
 void MainDescent::initialize_impl() {}
 
@@ -36,15 +38,19 @@ void MainDescent::loop_impl() {
 }
 
 State *MainDescent::nextState_impl() {
-    if (avg_std < 2 && curr_altitude <= LAND_THRESHOLD) {
-        return new Recovery(sensors, stateEstimator, flash);
+    if (/*avg_std < 2 && */sensorPacket.altitude <= LAND_THRESHOLD) {
+        return new Recovery(sensors, stateEstimator);
     }
 
     // if the state hasn't changed for much more than the expected MAIN_DESCENT time, go to abort
     // 1.1 * TIME_IN_MAIN_DESCENT == 96.8 seconds
 	if (this->currentTime > 1.1 * TIME_IN_MAIN_DESCENT) {
-        return new Abort(sensors, stateEstimator, flash);
+        return new Abort(sensors, stateEstimator);
     }
 
     return nullptr;
+}
+
+enum StateId MainDescent::getId() {
+    return StateId::ID_MainDescent;
 }

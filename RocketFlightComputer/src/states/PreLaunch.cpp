@@ -4,7 +4,7 @@
 #include "Debug.h"
 #include "Sensors.h"
 
-PreLaunch::PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator, FlashChip *flashChip) : State(sensors, stateEstimator, flashChip) {}
+PreLaunch::PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
 float PreLaunch::avgAccelZ()
 {
@@ -61,7 +61,7 @@ void PreLaunch::loop_impl()
     // Intialize EKF
     BLA::Matrix<10> x_0 = {1, 0, 0, 0, X_0, Y_0, Z_0, 0, 0, 0};
     // BLA::Matrix<4> x_0 = {1,0,0,0};
-    this->ekf = new StateEstimator(x_0, 0.025);
+    this->stateEstimator = new StateEstimator(x_0, 0.025);
 
     this->stateEstimatorInitialized = true;
 }
@@ -71,15 +71,21 @@ State *PreLaunch::nextState_impl()
 {
 
     // DO NOT MOVE TO NEXT STATE UNTIL GPS LOCK IS ACQUIRED
-    if (DEBUG_MODE && sensorPacket.gpsLock)
+#ifdef DEBUG_MODE
+    if (sensorPacket.gpsLock)
     {
         return new Debug(this->sensors, this->ekf);
     }
+#endif
 
     if (sensorPacket.gpsLock && this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD)
     {
-        return new Launch(sensors, stateEstimator, flashChip);
+        return new Launch(sensors, stateEstimator);
     }
     
     return nullptr;
+}
+
+enum StateId PreLaunch::getId() {
+    return StateId::ID_PreLaunch;
 }

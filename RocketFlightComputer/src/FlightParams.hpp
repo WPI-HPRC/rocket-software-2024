@@ -3,7 +3,7 @@
 
 // PreLaunch -------------------------
 // PreLaunch to Launch Conditions
-// average Z acceleration > LAUNCH_ACCEL_THRESHOLD
+    // average Z acceleration > LAUNCH_ACCEL_THRESHOLD
 // Cannot go to Abort state from PreLaunch
 
 // measured in G's
@@ -12,11 +12,11 @@
 
 // Launch -------------------------
 // Launch to Coast Conditions
-// time in Launch >= MOTOR_BURN_TIME
-// and
-// average Z acceleration < BURNOUT_THRESHOLD
+    // time in Launch >= MOTOR_BURN_TIME
+    // and
+    // average Z acceleration < BURNOUT_THRESHOLD
 // Launch to Abort Conditions
-// time in Launch > 2 * MOTOR_BURN_TIME
+    // time in Launch > 2 * MOTOR_BURN_TIME
 
 // 3.1 second timeout, as defined in OpenRocket for Test Launch 2/17
 #define MOTOR_BURN_TIME 3.1 * 1000.0
@@ -27,18 +27,18 @@
 
 // Coast -------------------------
 // Coast to DrogueDescent Conditions
-// average vertical velocity <= 0
+    // average vertical velocity <= 0
 // Coast to Abort Conditions
-// time in Coast > 1.5 * TIME_IN_COAST
+    // time in Coast > 1.5 * TIME_IN_COAST
 
 // seconds, OpenRocket for Test Launch 2/17
 #define TIME_IN_COAST 18.4 * 1000.0
 
 // DrogueDescent -------------------------
 // DrogueDescent to MainDescent Conditions
-// average vertical velocity <= MAIN_DEPLOY_VELOCITY
+    // average vertical velocity <= MAIN_DEPLOY_VELOCITY
 // DrogueDescent to Abort Conditions
-// time in DrogueDescent > 1.2 * TIME_IN_DROGUE_DESCENT
+    // time in DrogueDescent > 1.2 * TIME_IN_DROGUE_DESCENT
 
 // converts ft/s to m/s, OpenRocket sim Test Launch 2/17
 #define FPS_TO_MPS 3.281
@@ -52,9 +52,9 @@
 
 // MainDescent -------------------------
 // MainDescent to Recovery Conditions
-// average vertical velocity < LANDING_VELOCITY
+    // average vertical velocity < LANDING_VELOCITY
 // MainDescent to Abort Conditions
-// time in MainDescent > 1.1 * TIME_IN_MAIN_DESCENT
+    // time in MainDescent > 1.1 * TIME_IN_MAIN_DESCENT
 
 // 88 seconds, OpenRocket for Test Launch 2/17
 #define TIME_IN_MAIN_DESCENT 90.0 * 1000.0

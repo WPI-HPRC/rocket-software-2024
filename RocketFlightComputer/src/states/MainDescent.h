@@ -1,6 +1,7 @@
 #pragma once
 #include "State.h"
 #include "Sensors.h"
+#include "Debouncer.h"
 
 class MainDescent : public State
 {
@@ -13,4 +14,5 @@ private:
     int transitionBufIndVelVert = 0;
     float lastAltitude = 0;
     bool landed = false;
+    Debouncer landedDebouncer = Debouncer(30);
 };

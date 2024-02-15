@@ -29,11 +29,7 @@ void MainDescent::loop_impl()
     transitionBufIndVelVert = (transitionBufIndVelVert + 1) % 10;
     // if average vertical velocity is below the expected landing velocity, landed
     // TODO: debounce landed
-    if (average < LANDING_VELOCITY)
-    {
-        Serial.println("Landed!");
-        landed = true;
-    }
+    landed = landedDebouncer.checkOut(average < LANDING_VELOCITY);
 }
 
 State *MainDescent::nextState_impl()

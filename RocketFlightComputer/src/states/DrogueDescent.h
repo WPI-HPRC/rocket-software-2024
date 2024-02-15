@@ -1,6 +1,7 @@
 #pragma once
 #include "State.h"
 #include "Sensors.h"
+#include "Debouncer.h"
 
 class DrogueDescent : public State
 {
@@ -13,4 +14,5 @@ private:
     float transitionBuffVerticalVelocity[10] = {0};
     int transitionBuffIndexVerticalVelocity = 0;
     float lastAltitude = 0;
+    Debouncer drogueDescentDebouncer = Debouncer(30);
 };

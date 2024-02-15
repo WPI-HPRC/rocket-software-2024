@@ -68,6 +68,8 @@ void PreLaunch::loop_impl()
         this->stateEstimator = new StateEstimator(x_0, 0.025);
         this->stateEstimatorInitialized = true;
     }
+
+    launched = launchDebouncer.checkOut(this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD);
 }
 
 //! @details If we are separating this from `Launch`, we need a time limit on this state or something
@@ -81,7 +83,7 @@ State *PreLaunch::nextState_impl()
     }
 #endif
 
-    if (this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD)
+    if (launched)
     {
         return new Launch(sensors, stateEstimator);
     }

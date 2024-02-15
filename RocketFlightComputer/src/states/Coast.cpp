@@ -28,12 +28,7 @@ void Coast::loop_impl()
 
     transitionBufIndVelVert = (transitionBufIndVelVert + 1) % 10;
     // if average vertical velocity is negative, passed apogee
-    // TODO: debounce apogeePassed
-    if (average <= 0)
-    {
-        Serial.println("Apogee detected!");
-        apogeePassed = true;
-    }
+    apogeePassed = apogeeDebouncer.checkOut(average <= 0);
 }
 
 //! @details max 8 seconds until deploy
@@ -41,6 +36,7 @@ State *Coast::nextState_impl()
 {
     if (apogeePassed)
     {
+        Serial.println("Apogee detected!");
         return new DrogueDescent(sensors, stateEstimator);
     }
 

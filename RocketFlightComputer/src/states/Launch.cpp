@@ -25,13 +25,7 @@ void Launch::loop_impl()
 
     transitionBufIndAcc = (transitionBufIndAcc + 1) % 10;
     // compare running average value to defined threshold
-    // TODO: debounce motorBurnout with counter for like 50 loops etc
-    if (average < BURNOUT_THRESHOLD)
-    {
-        transitionBufIndAcc = 0;
-        Serial.println("Motor burnout detected!");
-        motorBurnout = true;
-    }
+    motorBurnout = motorBurnoutDebouncer.checkOut(average < BURNOUT_THRESHOLD);
 }
 
 State *Launch::nextState_impl()

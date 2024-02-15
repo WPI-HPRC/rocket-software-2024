@@ -26,16 +26,6 @@ public:
 
     struct SensorPacket
     {
-        // State Integer
-        // 0 - PreLaunch
-        // 1 - Launch
-        // 2 - Coast
-        // 3 - DrogueDescent
-        // 4 - MainDescent
-        // 5 - Recovery
-        // 6 - Abort
-        uint8_t state;
-
         // Raw Sensor Readings
         float accelX;
         float accelY;
@@ -64,6 +54,15 @@ public:
     };
 
     struct TelemPacket {
+        // State Integer
+        // 0 - PreLaunch
+        // 1 - Launch
+        // 2 - Coast
+        // 3 - DrogueDescent
+        // 4 - MainDescent
+        // 5 - Recovery
+        // 6 - Abort
+        uint8_t state;
         // Raw Sensor Readings
         float accelX = 0.0f;
         float accelY = 0.0f;

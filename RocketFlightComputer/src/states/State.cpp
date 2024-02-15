@@ -25,6 +25,7 @@ void State::loop() {
 	/**
 	 * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
 	*/
+  this->telemPacket.state = this->getId();
 	this->telemPacket.accelX = this->sensorPacket.accelX;
 	this->telemPacket.accelY = this->sensorPacket.accelY;
 	this->telemPacket.accelZ = this->sensorPacket.accelZ;

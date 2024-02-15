@@ -1,9 +1,7 @@
 #pragma once
 #include "State.h"
 #include "Sensors.h"
-
-// seconds, OpenRocket for Test Launch 2/17
-#define TIME_IN_COAST 19 * 1000
+#include "Debouncer.h"
 
 class Coast : public State
 {
@@ -16,4 +14,5 @@ private:
     float transitionBufVelVert[10] = {0};
     int transitionBufIndVelVert = 0;
     float lastAltitude = 0;
+    Debouncer apogeeDebouncer = Debouncer(30);
 };

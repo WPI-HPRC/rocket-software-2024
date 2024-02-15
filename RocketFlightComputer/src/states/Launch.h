@@ -1,9 +1,7 @@
 #pragma once
 #include "State.h"
 #include "Sensors.h"
-
-// 3 second timeout
-#define MOTOR_BURN_TIME 3 * 1000
+#include "Debouncer.h"
 
 class Launch : public State
 {
@@ -15,4 +13,5 @@ private:
     bool motorBurnout = false;
     float transitionBufAcc[10] = {0};
     int transitionBufIndAcc = 0;
+    Debouncer motorBurnoutDebouncer = Debouncer(30);
 };

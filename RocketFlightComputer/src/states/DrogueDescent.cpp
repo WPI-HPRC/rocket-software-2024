@@ -30,11 +30,7 @@ void DrogueDescent::loop_impl()
     transitionBuffIndexVerticalVelocity = (transitionBuffIndexVerticalVelocity + 1) % 10;
 
     // if the average vertical velocity is less that the expected velocity at main deploy, swap states
-    if (average < MAIN_DEPLOY_VELOCITY)
-    {
-        Serial.println("Reached main deploy velocity!");
-        drogueDescentRateMatched = true;
-    }
+    drogueDescentRateMatched = drogueDescentDebouncer.checkOut(average <= MAIN_DEPLOY_VELOCITY);
 }
 
 State *DrogueDescent::nextState_impl()
@@ -54,6 +50,7 @@ State *DrogueDescent::nextState_impl()
     return nullptr;
 }
 
-enum StateId DrogueDescent::getId() {
+enum StateId DrogueDescent::getId()
+{
     return StateId::ID_DrogueDescent;
 }

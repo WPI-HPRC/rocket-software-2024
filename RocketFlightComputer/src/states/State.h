@@ -1,5 +1,7 @@
 #pragma once
 #include "Sensors.h"
+#include "FlightParams.hpp"
+#include "utility.hpp"
 
 #define _STATE_CLASS_IMPLS_          \
 private:                             \

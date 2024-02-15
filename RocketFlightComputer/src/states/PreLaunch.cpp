@@ -19,24 +19,26 @@ float PreLaunch::avgAccelZ()
     return sum / len;
 }
 
-void PreLaunch::initialize_impl() {
+void PreLaunch::initialize_impl()
+{
 }
 
 void PreLaunch::loop_impl()
 {
-  if(!sensorPacket.gpsLock) {
-  	Serial.println("[PreLaunch] Gps Lock Failed...");
-	
-  	// delay(100);
-  	return;
-  }
+    if (!sensorPacket.gpsLock)
+    {
+        Serial.println("[PreLaunch] Gps Lock Failed...");
 
-  if (this->stateEstimatorInitialized)
-  {
-      this->accelReadingBuffer[this->buffIdx++] = this->sensorPacket.accelZ;
-      this->buffIdx %= sizeof(this->accelReadingBuffer) / sizeof(float);
-      return;
-  }
+        // delay(100);
+        // return;
+    }
+
+    if (this->stateEstimatorInitialized)
+    {
+        this->accelReadingBuffer[this->buffIdx++] = this->sensorPacket.accelZ;
+        this->buffIdx %= sizeof(this->accelReadingBuffer) / sizeof(float);
+        return;
+    }
 
     // float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
     // float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth, 2) * pow(sin(sensorPacket.gpsLat), 2));
@@ -59,12 +61,13 @@ void PreLaunch::loop_impl()
     // Serial.print(Z_0, 4);
     // Serial.println(">");
 
-	// Intialize EKF
-  if (!this->stateEstimatorInitialized) {
-  	BLA::Matrix<10> x_0 = {1,0,0,0, 0, 0, 0, 0,0,0};
-    this->stateEstimator = new StateEstimator(x_0, 0.025);
-    this->stateEstimatorInitialized = true;
-  }
+    // Intialize EKF
+    if (!this->stateEstimatorInitialized)
+    {
+        BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        this->stateEstimator = new StateEstimator(x_0, 0.025);
+        this->stateEstimatorInitialized = true;
+    }
 }
 
 //! @details If we are separating this from `Launch`, we need a time limit on this state or something
@@ -78,14 +81,15 @@ State *PreLaunch::nextState_impl()
     }
 #endif
 
-    if (sensorPacket.gpsLock && this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD)
+    if (this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD)
     {
         return new Launch(sensors, stateEstimator);
     }
-    
+
     return nullptr;
 }
 
-enum StateId PreLaunch::getId() {
+enum StateId PreLaunch::getId()
+{
     return StateId::ID_PreLaunch;
 }

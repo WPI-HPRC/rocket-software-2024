@@ -28,10 +28,9 @@ void Coast::loop_impl()
 
     transitionBufIndVelVert = (transitionBufIndVelVert + 1) % 10;
     // if average vertical velocity is negative, passed apogee
-    // TODO Check for acceleration as well
-    if (average < 0)
+    // TODO: debounce apogeePassed
+    if (average <= 0)
     {
-        // TODO: debounce apogeePassed
         Serial.println("Apogee detected!");
         apogeePassed = true;
     }
@@ -44,7 +43,7 @@ State *Coast::nextState_impl()
     {
         return new DrogueDescent(sensors, stateEstimator);
     }
-    
+
     // if the state hasn't changed for much more than the expected COAST time, go to abort
     // 1.5 * TIME_IN_COAST == 28.5 seconds
     if (this->currentTime > 1.5 * TIME_IN_COAST)
@@ -54,6 +53,7 @@ State *Coast::nextState_impl()
     return nullptr;
 }
 
-enum StateId Coast::getId() {
+enum StateId Coast::getId()
+{
     return StateId::ID_Coast;
 }

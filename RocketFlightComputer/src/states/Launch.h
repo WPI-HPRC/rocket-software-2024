@@ -2,9 +2,6 @@
 #include "State.h"
 #include "Sensors.h"
 
-// 3 second timeout
-#define MOTOR_BURN_TIME 3 * 1000
-
 class Launch : public State
 {
     _STATE_CLASS_IMPLS_

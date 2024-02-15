@@ -10,9 +10,9 @@ public:
     DrogueDescent(struct Sensors *sensors, StateEstimator *stateEstimator);
 
 private:
-    boolean drogueDescentRateMatched = false;
-    float transitionBuffVerticalVelocity[10] = {0};
-    int transitionBuffIndexVerticalVelocity = 0;
+    boolean mainDeployVelocityReached = false;
+    float verticalVelocityBuffer[10] = {0};
+    int bufferIndex = 0;
     float lastAltitude = 0;
     Debouncer drogueDescentDebouncer = Debouncer(30);
 };

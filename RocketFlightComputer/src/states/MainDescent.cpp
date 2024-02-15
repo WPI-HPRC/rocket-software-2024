@@ -14,26 +14,27 @@ void MainDescent::loop_impl()
     float verticalVelocity = (sensorPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
     lastAltitude = sensorPacket.altitude;
 
-    // Velocity value gets updated in sensor reading fcn
-    // add to cyclic buffer
-    transitionBufVelVert[transitionBufIndVelVert] = verticalVelocity;
-    // take running average value
+    // add vertical velocity to cyclic buffer
+    verticalVelocityBuffer[bufferIndex] = verticalVelocity;
+    
+    // average all values in the buffer
     float sum = 0.0;
-    float average = 0.0;
+    float averageVerticalVelocity = 0.0;
     for (int i = 0; i < 10; i++)
     {
-        sum += transitionBufVelVert[i];
+        sum += verticalVelocityBuffer[i];
     }
-    average = sum / 10.0;
+    averageVerticalVelocity = sum / 10.0;
 
-    transitionBufIndVelVert = (transitionBufIndVelVert + 1) % 10;
-    // if average vertical velocity is below the expected landing velocity, landed
-    // TODO: debounce landed
-    landed = landedDebouncer.checkOut(average < LANDING_VELOCITY);
+    bufferIndex = (bufferIndex + 1) % 10;
+
+    // if the average vertical velocity is less than the expected landing velocity for 30 cycles, the rocket has landed
+    landed = landedDebouncer.checkOut(averageVerticalVelocity < LANDING_VELOCITY);
 }
 
 State *MainDescent::nextState_impl()
 {
+    // Transition state if condition met
     if (landed)
     {
         return new Recovery(sensors, stateEstimator);

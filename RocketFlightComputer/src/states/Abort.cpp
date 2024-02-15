@@ -1,3 +1,7 @@
+
+// Abort state
+// This state will close any control surfaces and slowly log data
+
 #include "Abort.h"
 #include "State.h"
 

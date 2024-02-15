@@ -3,63 +3,67 @@
 
 State::State(struct Sensors *sensors, StateEstimator *stateEstimator) : sensors(sensors), stateEstimator(stateEstimator) {}
 
-void State::initialize() {
-	this->startTime = millis();
-	initialize_impl();
+void State::initialize()
+{
+    this->startTime = millis();
+    initialize_impl();
 
-	xbee->begin();
+    xbee->begin();
 }
 
-void State::loop() {
-	long long now = millis();
-	this->currentTime = now - this->startTime;
-	this->deltaTime = now - this->lastLoopTime;
-	this->loopCount++;
-	this->sensorPacket = this->sensors->readSensors();
-  if (this->stateEstimatorInitialized) {
-    this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
-  }
-	loop_impl();
-	this->lastLoopTime = millis();
-	
-	/**
-	 * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
-	*/
-  this->telemPacket.state = this->getId();
-	this->telemPacket.accelX = this->sensorPacket.accelX;
-	this->telemPacket.accelY = this->sensorPacket.accelY;
-	this->telemPacket.accelZ = this->sensorPacket.accelZ;
+void State::loop()
+{
+    long long now = millis();
+    this->currentTime = now - this->startTime;
+    this->deltaTime = now - this->lastLoopTime;
+    this->loopCount++;
+    this->sensorPacket = this->sensors->readSensors();
+    if (this->stateEstimatorInitialized)
+    {
+        this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
+    }
+    loop_impl();
+    this->lastLoopTime = millis();
 
-	this->telemPacket.gyroX = this->sensorPacket.gyroX;
-	this->telemPacket.gyroY = this->sensorPacket.gyroY;
-	this->telemPacket.gyroZ = this->sensorPacket.gyroZ;
+    /**
+     * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
+     */
+    this->telemPacket.state = this->getId();
+    this->telemPacket.accelX = this->sensorPacket.accelX;
+    this->telemPacket.accelY = this->sensorPacket.accelY;
+    this->telemPacket.accelZ = this->sensorPacket.accelZ;
 
-	this->telemPacket.magX = this->sensorPacket.magX;
-	this->telemPacket.magY = this->sensorPacket.magY;
-	this->telemPacket.magZ = this->sensorPacket.magZ;
+    this->telemPacket.gyroX = this->sensorPacket.gyroX;
+    this->telemPacket.gyroY = this->sensorPacket.gyroY;
+    this->telemPacket.gyroZ = this->sensorPacket.gyroZ;
 
-	this->telemPacket.pressure = this->sensorPacket.pressure;
+    this->telemPacket.magX = this->sensorPacket.magX;
+    this->telemPacket.magY = this->sensorPacket.magY;
+    this->telemPacket.magZ = this->sensorPacket.magZ;
 
-	this->telemPacket.altitude = this->sensorPacket.altitude;
+    this->telemPacket.pressure = this->sensorPacket.pressure;
 
-	this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
-	this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
-	this->telemPacket.epochTime = this->sensorPacket.epochTime;
-	this->telemPacket.satellites = this->sensorPacket.satellites;
-	this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
-	this->telemPacket.timestamp = millis();
+    this->telemPacket.altitude = this->sensorPacket.altitude;
 
-	/** Loop Radio and Send Data */
-	// xbee->updateSubscribers();
+    this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
+    this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
+    this->telemPacket.epochTime = this->sensorPacket.epochTime;
+    this->telemPacket.satellites = this->sensorPacket.satellites;
+    this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
+    this->telemPacket.timestamp = millis();
 
-	xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
+    /** Loop Radio and Send Data */
+    // xbee->updateSubscribers();
 
-	Serial.print("Packet Success: "); Serial.println(millis());
+    xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
 
-	// Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
-	// Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));
+    Serial.print("Packet Success: ");
+    Serial.println(millis());
+
+    // Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
+    // Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));
 }
-	
+
 State *State::nextState()
 {
     return nextState_impl();

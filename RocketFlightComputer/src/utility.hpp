@@ -53,6 +53,7 @@ public:
         uint32_t timestamp;
     };
 
+    #pragma pack(push,1)
     struct TelemPacket {
         // State Integer
         // 0 - PreLaunch
@@ -101,6 +102,7 @@ public:
 
         uint32_t timestamp = 0;
     };
+    #pragma pack(pop)
 
 #if 0 // NOTE: REMOVES FLASH CODE
     static void logData(FlashChip *flash, SensorPacket sensorPacket)

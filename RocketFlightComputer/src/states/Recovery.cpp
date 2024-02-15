@@ -3,7 +3,7 @@
 #include "State.h"
 #include "Sensors.h"
 
-Recovery::Recovery(struct Sensors *sensors) : State(sensors) {}
+Recovery::Recovery(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
 void Recovery::initialize_impl() {}
 
@@ -14,4 +14,8 @@ void Recovery::loop_impl() {
 
 State *Recovery::nextState_impl() {
 	return nullptr;
+}
+
+enum StateId Recovery::getId() {
+	return StateId::ID_Recovery;
 }

@@ -1,9 +1,7 @@
 #include "Debug.h"
 #include "State.h"
 
-Debug::Debug(struct Sensors *sensors, StateEstimator * ekf) : State(sensors) {
-    this->ekf = ekf;
-}
+Debug::Debug(struct Sensors *sensors, StateEstimator * ekf) : State(sensors, ekf) {}
 
 void Debug::initialize_impl() {
 	// Initialize sensors
@@ -12,8 +10,6 @@ void Debug::initialize_impl() {
 }
 
 void Debug::loop_impl() {
-    this->x_state = ekf->onLoop(sensorPacket);
-
     // Update Sensor Packet with EKF
     this->telemPacket.w = x_state(0);
     this->telemPacket.i = x_state(1);
@@ -82,4 +78,8 @@ void Debug::loop_impl() {
 State *Debug::nextState_impl()
 {
 	return nullptr;
+}
+
+enum StateId Debug::getId() {
+	return StateId::ID_Debug;
 }

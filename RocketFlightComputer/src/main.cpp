@@ -23,14 +23,15 @@
 Metro timer = Metro(1000 / LOOP_RATE);
 
 struct Sensors sensors;
-
-State *state = new PreLaunch(&sensors);
+StateEstimator *stateEstimator = nullptr;
+// Start in pre-launch
+State *state = new PreLaunch(&sensors, stateEstimator);
 
 void setup()
 {
     Serial.begin(115200);
-    
-    // while(!Serial); 
+    // while (!Serial)
+    //     ;
     Serial.println("Beginning Flight Computer");
 
     Wire.begin();
@@ -39,6 +40,7 @@ void setup()
     SPI.begin();
     SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE0));
 
+    // Initialize all sensors
     sensors = {
         .barometer = new Barometer(),
         .gnss = new GNSS(),
@@ -53,15 +55,21 @@ void setup()
         Serial.println("[Sensorboard] BNO055 IMU Detected");
     }
 
-    if(!sensors.barometer->init(0x5C)) {
+    if (!sensors.barometer->init(0x5C))
+    {
         Serial.println("[Sensorboard] No LPS25 Detected");
-    } else {
+    }
+    else
+    {
         Serial.println("[Sensorboard] LPS25 Barometer Detected");
     }
 
-    if(!sensors.mag->init()) {
+    if (!sensors.mag->init())
+    {
         Serial.println("[Sensorboard] No MMC5983 Detected");
-    } else {
+    }
+    else
+    {
         Serial.println("[Sensorboard] MMC5983 Detected");
     }
 
@@ -71,12 +79,25 @@ void setup()
         Serial.println("[Sensorboard] ICM42688 Detected");
     }
 
-    if(!sensors.gnss->init()) {
+    if (!sensors.gnss->init())
+    {
         Serial.println("[Sensorboard] No NEOM10S Detected");
-    } else {
+    }
+    else
+    {
         Serial.println("[Sensorboard] NEOM10S GPS Detected");
     }
 
+    delay(150);
+
+    // Print GPS Configuration Information
+
+    // Serial.println("+=== GNSS SYSTEM ===+");
+    // Serial.print("Module: "); Serial.println(gps->getModuleName());
+    // Serial.print("Protocol Version: "); Serial.print(gps->getProtocolVersionHigh());
+    // Serial.print("."); Serial.println(gps->getProtocolVersionLow());
+
+    // Initialize starting state
     state->initialize();
 
     timer.reset();
@@ -88,9 +109,13 @@ void loop()
 {
     if (timer.check() == 1)
     {
-        state->loop();
         previousTime = millis();
         
+        // Reads sensors, logs to flash chip, loops the state
+        state->loop();
+
+        // Utility::debugPrint();
+
         State *nextState = state->nextState();
         if (nextState != nullptr)
         {

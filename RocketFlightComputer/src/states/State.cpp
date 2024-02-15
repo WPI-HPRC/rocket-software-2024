@@ -1,7 +1,7 @@
 #include "State.h"
 #include <Arduino.h>
 
-State::State(struct Sensors *sensors) : sensors(sensors) {}
+State::State(struct Sensors *sensors, StateEstimator *stateEstimator) : sensors(sensors), stateEstimator(stateEstimator) {}
 
 void State::initialize() {
 	this->startTime = millis();
@@ -16,6 +16,9 @@ void State::loop() {
 	this->deltaTime = now - this->lastLoopTime;
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
+  if (this->stateEstimatorInitialized) {
+    this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
+  }
 	loop_impl();
 	this->lastLoopTime = millis();
 	
@@ -54,9 +57,9 @@ void State::loop() {
 
 	// Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
 	// Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));
-	
 }
-
-State *State::nextState() {
-	return nextState_impl();
+	
+State *State::nextState()
+{
+    return nextState_impl();
 }

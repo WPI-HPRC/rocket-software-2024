@@ -38,7 +38,7 @@ void MainDescent::loop_impl() {
 }
 
 State *MainDescent::nextState_impl() {
-    if (/*avg_std < 2 && */altitudeBuffer[altitudeBufferIndex] <= LAND_THRESHOLD) {
+    if (/*avg_std < 2 && */sensorPacket.altitude <= LAND_THRESHOLD) {
         return new Recovery(sensors, stateEstimator);
     }
 

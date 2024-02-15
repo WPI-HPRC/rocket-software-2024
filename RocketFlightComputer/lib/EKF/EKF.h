@@ -21,11 +21,20 @@ class StateEstimator {
     constexpr static int initialLoopIters = 1000;
 
     // Input variance from sensor data sheet
-    const float gyroVariance = 0.00489/sqrt(100); // [Rad/s]
+    const float gyroVariance = 0.00489/sqrt(40); // [Rad/s]
     const float magVariance = 0.008; // [T]
-    const float accelVariance = 0.00069/sqrt(100); // [m/s/s]
+    const float accelVariance = 0.00069/sqrt(40); // [m/s/s]
 
-    float dt = 0.01;
+    float dt = 0.025;
+
+    // Low Pass Filter Definitions
+    const float alpha = 0.2;
+    const int bufferSize = 10;
+
+    float * accelXBuffer;
+    float * accelYBuffer;
+    float * accelZBuffer;
+    int bufferIndex;
 
     /* Magnetic Field Constants for Earth at WPI */
     // float inclination = 66.546;
@@ -74,6 +83,19 @@ class StateEstimator {
         0, 0, 0, 0, accelVariance*accelVariance, 0,
         0, 0, 0, 0, 0, accelVariance*accelVariance
     };
+
+    const BLA::Matrix<10,10> Q_Inertial = {
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0.7,0,0,0,0,0,
+        0,0,0,0,0,0.7,0,0,0,0,
+        0,0,0,0,0,0,0.7,0,0,0,
+        0,0,0,0,0,0,0,0.7,0,0,
+        0,0,0,0,0,0,0,0,0.7,0,
+        0,0,0,0,0,0,0,0,0,0.7,
+    }; // 10 Element Identity Matrix
     
     const BLA::Matrix<10,10> eye10 = {
         1,0,0,0,0,0,0,0,0,0,
@@ -99,7 +121,7 @@ class StateEstimator {
     BLA::Matrix<10> x;
     BLA::Matrix<10> x_min;
 
-    float G = 9.81;
+    float g = 9.80665;
 
     BLA::Matrix<4> quaternionMultiplication(BLA::Matrix<4> q1, BLA::Matrix<4> q2);
 };

@@ -3,7 +3,6 @@
 #include <Wire.h>
 #include <SPI.h>
 
-#include <SparkFun_u-blox_GNSS_v3.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <Adafruit_LPS2X.h>
@@ -19,7 +18,7 @@
 #include <Accelerometer.h>
 #include <Magnetometer.h>
 
-#define LOOP_RATE 100
+#include <TelemetryBoard/XBeeProSX.h>
 
 Metro timer = Metro(1000 / LOOP_RATE);
 
@@ -31,28 +30,30 @@ State *state = new PreLaunch(&sensors, stateEstimator);
 void setup()
 {
     Serial.begin(115200);
-
-    while (!Serial)
-        ;
+    // while (!Serial)
+    //     ;
     Serial.println("Beginning Flight Computer");
 
     Wire.begin();
     Wire.setClock(400000);
 
+    SPI.begin();
+    SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE0));
+
     // Initialize all sensors
     sensors = {
         .barometer = new Barometer(),
         .gnss = new GNSS(),
-        .bno055 = new BNO055(0), // Unused?
+        .bno055 = new BNO055(0),
         .mag = new Magnetometer(),
         .acc = new Accelerometer(0x68),
     };
 
-    // if(!bno->begin()) {
-    //     Serial.println("[Sensorboard] No BNO055 Detected");
-    // } else {
-    //     Serial.println("[Sensorboard] BNO055 IMU Detected");
-    // }
+    if(!sensors.bno055->init()) {
+        Serial.println("[Sensorboard] No BNO055 Detected");
+    } else {
+        Serial.println("[Sensorboard] BNO055 IMU Detected");
+    }
 
     if (!sensors.barometer->init(0x5C))
     {
@@ -72,11 +73,11 @@ void setup()
         Serial.println("[Sensorboard] MMC5983 Detected");
     }
 
-    // if(icm->begin() < 0) {
-    //     Serial.println("[Sensorboard] No ICM42688 Detected");
-    // } else {
-    //     Serial.println("[Sensorboard] ICM42688 Detected");
-    // }
+    if(!sensors.acc->init()) {
+        Serial.println("[Sensorboard] No ICM42688 Detected");
+    } else {
+        Serial.println("[Sensorboard] ICM42688 Detected");
+    }
 
     if (!sensors.gnss->init())
     {
@@ -102,10 +103,14 @@ void setup()
     timer.reset();
 }
 
+uint32_t previousTime = 0;
+
 void loop()
 {
     if (timer.check() == 1)
     {
+        previousTime = millis();
+        
         // Reads sensors, logs to flash chip, loops the state
         state->loop();
 

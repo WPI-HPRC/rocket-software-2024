@@ -9,6 +9,6 @@ class BNO055 {
         Adafruit_BNO055 bno;
     public:
         BNO055(int32_t sensorID);
-        void init();
+        bool init();
         imu::Quaternion read();
 };

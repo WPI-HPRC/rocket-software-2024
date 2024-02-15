@@ -11,7 +11,6 @@ class PreLaunch : public State {
 	public:
 		PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator);
 	private:
-		bool stateEstimatorInitialized = false;
 		float accelReadingBuffer[10];
 		uint8_t buffIdx = 0;
 		float avgAccelZ();

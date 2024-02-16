@@ -6,15 +6,8 @@ XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin) {
 }
 
 void XbeeProSX::add_subscriber(uint64_t address) {
-    uint64_t *newList = (uint64_t *)calloc(num_subscribers + 1, sizeof(uint64_t));
-
-    memcpy(newList, subscribers, num_subscribers * sizeof(uint64_t));
-
-    num_subscribers += 1;
-    newList[num_subscribers] = address;
-
-    free(subscribers);
-    subscribers = newList;
+    subscribers[num_subscribers] = address;
+    subscribers = (uint64_t *)realloc(subscribers, ++num_subscribers * sizeof(uint64_t));
 }
 
 void XbeeProSX::begin() {
@@ -38,7 +31,7 @@ void XbeeProSX::send(uint64_t address, const void * data, size_t size_bytes) {
 
     size_t contentLength = size_bytes + 14; // +4 for start delimiter, length, and checksum, +8 for address
 
-    uint8_t *packet = (uint8_t*)calloc(0, contentLength);
+    uint8_t *packet = (uint8_t*)calloc(contentLength, 1);
 
     size_t index = 0;
 
@@ -101,7 +94,7 @@ void XbeeProSX::send(uint64_t address, const void * data, size_t size_bytes) {
     
 
 
-    delete[] packet; // Free allocated memory
+    free(packet);
 
 }
 
@@ -180,6 +173,8 @@ void XbeeProSX::updateSubscribers() {
     }
 
     add_subscriber(message->address);
+
+    delete[] message->data;
 }
 
 

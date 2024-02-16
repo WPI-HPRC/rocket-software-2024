@@ -100,7 +100,7 @@ void XbeeProSX::send(uint64_t address, const void * data, size_t size_bytes) {
 
 ReceivePacket *XbeeProSX::receive() {
 
-    ReceivePacket *packet = (ReceivePacket *)calloc(0, sizeof(ReceivePacket));
+    ReceivePacket *packet = (ReceivePacket *)calloc(1, sizeof(ReceivePacket));
     digitalWrite(_cs_pin, LOW);  // Asserts module to receive
 
     // Read length high and low byte
@@ -175,6 +175,7 @@ void XbeeProSX::updateSubscribers() {
     add_subscriber(message->address);
 
     delete[] message->data;
+    free(message);
 }
 
 

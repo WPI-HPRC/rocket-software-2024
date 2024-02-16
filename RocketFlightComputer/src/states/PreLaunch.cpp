@@ -72,10 +72,9 @@ void PreLaunch::loop_impl()
     launched = launchDebouncer.checkOut(this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD);
 }
 
-//! @details If we are separating this from `Launch`, we need a time limit on this state or something
 State *PreLaunch::nextState_impl()
 {
-    // DO NOT MOVE TO NEXT STATE UNTIL GPS LOCK IS ACQUIRED
+
 #ifdef DEBUG_MODE
     if (sensorPacket.gpsLock)
     {

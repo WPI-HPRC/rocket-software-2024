@@ -10,8 +10,8 @@ public:
     MainDescent(struct Sensors *sensors, StateEstimator *stateEstimator);
 
 private:
-    float transitionBufVelVert[10] = {0};
-    int transitionBufIndVelVert = 0;
+    float verticalVelocityBuffer[10] = {0};
+    int bufferIndex = 0;
     float lastAltitude = 0;
     bool landed = false;
     Debouncer landedDebouncer = Debouncer(30);

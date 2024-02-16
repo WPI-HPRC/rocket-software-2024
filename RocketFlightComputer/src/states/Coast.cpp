@@ -1,3 +1,7 @@
+
+// Coast state
+// This state occurs after the motor has burned out as the rocket is on its way to apogee
+
 #include "Coast.h"
 #include "DrogueDescent.h"
 #include "Abort.h"
@@ -14,29 +18,30 @@ void Coast::loop_impl()
     float verticalVelocity = (sensorPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
     lastAltitude = sensorPacket.altitude;
 
-    // Velocity value gets updated in sensor reading fcn
-    // add to cyclic buffer
-    transitionBufVelVert[transitionBufIndVelVert] = verticalVelocity;
-    // take running average value
+    // add vertical velocity to cyclic buffer
+    verticalVelocityBuffer[bufferIndex] = verticalVelocity;
+    
+    // average all values in the buffer
     float sum = 0.0;
-    float average = 0.0;
+    float averageVerticalVelocity = 0.0;
     for (int i = 0; i < 10; i++)
     {
-        sum += transitionBufVelVert[i];
+        sum += verticalVelocityBuffer[i];
     }
-    average = sum / 10.0;
+    averageVerticalVelocity = sum / 10.0;
 
-    transitionBufIndVelVert = (transitionBufIndVelVert + 1) % 10;
-    // if average vertical velocity is negative, passed apogee
-    apogeePassed = apogeeDebouncer.checkOut(average <= 0);
+    bufferIndex = (bufferIndex + 1) % 10;
+    
+    // If the average vertical velocity <= 0 for more than 30 cycles, rocket has passed apogee
+    apogeePassed = apogeeDebouncer.checkOut(averageVerticalVelocity <= 0);
 }
 
 //! @details max 8 seconds until deploy
 State *Coast::nextState_impl()
 {
+    // Transition state if condition met
     if (apogeePassed)
     {
-        Serial.println("Apogee detected!");
         return new DrogueDescent(sensors, stateEstimator);
     }
 

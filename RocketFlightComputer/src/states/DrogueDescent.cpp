@@ -15,27 +15,28 @@ void DrogueDescent::loop_impl()
     float verticalVelocity = (sensorPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
     lastAltitude = sensorPacket.altitude;
 
-    // Velocity value gets updated in sensor reading fcn
-    // add to cyclic buffer
-    transitionBuffVerticalVelocity[transitionBuffIndexVerticalVelocity] = verticalVelocity;
-    // take running average value
+    // add vertical velocity to cyclic buffer
+    verticalVelocityBuffer[bufferIndex] = verticalVelocity;
+
+    // average all values in the buffer
     float sum = 0.0;
-    float average = 0.0;
+    float averageVerticalVelocity = 0.0;
     for (int i = 0; i < 10; i++)
     {
-        sum += transitionBuffVerticalVelocity[i];
+        sum += verticalVelocityBuffer[i];
     }
-    average = sum / 10.0;
+    averageVerticalVelocity = sum / 10.0;
 
-    transitionBuffIndexVerticalVelocity = (transitionBuffIndexVerticalVelocity + 1) % 10;
+    bufferIndex = (bufferIndex + 1) % 10;
 
-    // if the average vertical velocity is less that the expected velocity at main deploy, swap states
-    drogueDescentRateMatched = drogueDescentDebouncer.checkOut(average <= MAIN_DEPLOY_VELOCITY);
+    // if the average vertical velocity is less that the expected velocity at main deploy for 30 cycles, main has deployed
+    mainDeployVelocityReached = drogueDescentDebouncer.checkOut(averageVerticalVelocity <= MAIN_DEPLOY_VELOCITY);
 }
 
 State *DrogueDescent::nextState_impl()
 {
-    if (drogueDescentRateMatched)
+    // Transition state if condition met
+    if (mainDeployVelocityReached)
     {
         return new MainDescent(sensors, stateEstimator);
     }

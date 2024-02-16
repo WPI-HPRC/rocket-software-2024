@@ -16,9 +16,15 @@ void State::loop() {
 	this->deltaTime = now - this->lastLoopTime;
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
-  if (this->stateEstimatorInitialized) {
-    this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
-  }
+	if (this->stateEstimatorInitialized) {
+		this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
+
+		this->telemPacket.w = this->x_state(0);
+		this->telemPacket.i = this->x_state(1);
+		this->telemPacket.j = this->x_state(2);
+		this->telemPacket.k = this->x_state(3);
+	}
+	
 	loop_impl();
 	this->lastLoopTime = millis();
 	

@@ -1,13 +1,13 @@
 #include "XBeeProSX.h"
 
 XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin) {
-    subscribers = (uint64_t *)malloc(sizeof(uint64_t));
+    subscribers = new uint64_t[MAX_SUBSCRIBER_COUNT]
     num_subscribers = 0;
 }
 
 void XbeeProSX::add_subscriber(uint64_t address) {
     subscribers[num_subscribers] = address;
-    subscribers = (uint64_t *)realloc(subscribers, ++num_subscribers * sizeof(uint64_t));
+    num_subscribers++;
 }
 
 void XbeeProSX::begin() {
@@ -180,7 +180,6 @@ void XbeeProSX::updateSubscribers() {
 
 
 void XbeeProSX::sendToSubscribers(const void *data, size_t size) {
-
     for (uint i = 0; i < num_subscribers; i++) {
         send(subscribers[i], data, size);
     }

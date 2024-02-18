@@ -6,6 +6,8 @@
 #include <string>
 #include <algorithm>
 
+#define MAX_SUBSCRIBER_COUNT 8
+
 struct ReceivePacket {
     size_t length;
     uint64_t address;
@@ -34,7 +36,7 @@ private:
 
     uint8_t _cs_pin;
 
-    uint64_t *subscribers;
+    uint64_t[] subscribers;
 
     uint num_subscribers;
 

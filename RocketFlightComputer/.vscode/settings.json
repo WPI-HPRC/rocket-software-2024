@@ -66,5 +66,6 @@
         "typeinfo": "cpp",
         "mstd_iterator": "cpp"
     },
-    "stm32-for-vscode.makePath": false
+    "stm32-for-vscode.makePath": false,
+    "cmake.sourceDirectory": "/Users/will/Documents/GitHub/HPRC/rocket-software/RocketFlightComputer/.pio/libdeps/pico/Adafruit BusIO"
 }

@@ -65,12 +65,12 @@ void State::loop() {
     this->telemPacket.timestamp = millis();
 
     /** Loop Radio and Send Data */
-    // xbee->updateSubscribers();
+    xbee->updateSubscribers();
 
     xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
 
-    Serial.print("Packet Success: ");
-    Serial.println(millis());
+    // Serial.print("Packet Success: ");
+    // Serial.println(millis());
 
     // Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
     // Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));

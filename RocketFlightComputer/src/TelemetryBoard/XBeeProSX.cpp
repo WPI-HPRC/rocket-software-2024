@@ -1,7 +1,7 @@
 #include "XBeeProSX.h"
 
 XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin) {
-    subscribers = new uint64_t[MAX_SUBSCRIBER_COUNT]
+    // subscribers = new uint64_t[MAX_SUBSCRIBER_COUNT];
     num_subscribers = 0;
 }
 
@@ -99,44 +99,64 @@ void XbeeProSX::send(uint64_t address, const void * data, size_t size_bytes) {
 }
 
 ReceivePacket *XbeeProSX::receive() {
-
+    Serial.println("Here 3");
+    uint64_t tempChecksum = 0;
+    uint8_t currentByte = 0;
     ReceivePacket *packet = (ReceivePacket *)calloc(1, sizeof(ReceivePacket));
     digitalWrite(_cs_pin, LOW);  // Asserts module to receive
+
+    Serial.println("Here 4");
 
     // Read length high and low byte
     uint16_t length = SPI.transfer(0x00) << 8;
     length |= SPI.transfer(0x00);
 
-    // Read frame type, skip if not 0x90
-    if (SPI.transfer(0x00) != 0x90) {
-        digitalWrite(_cs_pin, HIGH);  // De-asserts module
-
-        return packet;
-    }
+    uint8_t frameType = SPI.transfer(0x00);
 
     packet->length = length - 12;
     packet->data = new uint8_t[length - 12];
 
+    Serial.println("Here 2");
+
     // Read and store source address (64-bit)
     for (int i = 0; i < 8; i++) {
-        packet->address |= (SPI.transfer(0x00) << (i * 8));
+        currentByte = SPI.transfer(0x00);
+        tempChecksum += currentByte;
+        packet->address |= (currentByte << (i * 8));
     }
 
     // Skip reserved bytes
-    SPI.transfer(0x00); 
-    SPI.transfer(0x00);
+    tempChecksum += SPI.transfer(0x00); 
+    tempChecksum += SPI.transfer(0x00);
 
     // Recieve Options
-    SPI.transfer(0x00);
+    tempChecksum += SPI.transfer(0x00);
 
     // Read the message data
     for (int i = 0; i < packet->length; ++i) {  // 12 bytes already read (Frame type, ID, address, reserved)
-        packet->data[i] = SPI.transfer(0x00);
+        currentByte = SPI.transfer(0x00);
+        tempChecksum += currentByte;
+        packet->data[i] = currentByte;
     }
 
-    // Skip checksum
-    SPI.transfer(0x00);
+    Serial.println("Here 1");
+
+    uint8_t checksum = 0xFF - (tempChecksum & 0xFF);
+    uint8_t receivedChecksum = SPI.transfer(0x00);
     digitalWrite(_cs_pin, HIGH);  // De-asserts module
+
+    if(checksum != receivedChecksum) {
+        Serial.print("Wrong checksum! Received "); Serial.print(receivedChecksum); Serial.print(", calculated "); Serial.print(checksum);
+    }
+    else {
+        Serial.print("Received message, right checksum!");
+    }
+
+        // Read frame type, skip if not 0x90
+    if (frameType != 0x90) {
+          Serial.println("Wrong frame type received");
+        // return packet;
+    }
 
     // Serial.println(*packet->data);
 
@@ -159,6 +179,8 @@ void XbeeProSX::updateSubscribers() {
     if (!isDataAvailable())
         return;
 
+    Serial.println("Data available!");
+
     ReceivePacket *message = receive();
 
     if(message->length != 9) {// Length of the word "subscribe"
@@ -166,6 +188,8 @@ void XbeeProSX::updateSubscribers() {
     } else {
         Serial.print("Unknown Message: "); Serial.println(*message->data);
     }
+
+    return;
 
     for (uint i = 0; i < num_subscribers; i++) {
         if(subscribers[i] == message->address)

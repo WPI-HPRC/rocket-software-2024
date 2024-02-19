@@ -36,7 +36,7 @@ private:
 
     uint8_t _cs_pin;
 
-    uint64_t[] subscribers;
+    uint64_t subscribers[MAX_SUBSCRIBER_COUNT];
 
     uint num_subscribers;
 

@@ -2,7 +2,7 @@
 // Abort state
 // This state will close any control surfaces and slowly log data
 
-#include "Abort.h"
+#include "06-Abort.h"
 #include "State.h"
 
 Abort::Abort(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}

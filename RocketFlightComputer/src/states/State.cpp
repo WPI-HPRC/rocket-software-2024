@@ -11,19 +11,31 @@ void State::initialize()
     xbee->begin();
 }
 
-void State::loop()
-{
-    long long now = millis();
-    this->currentTime = now - this->startTime;
-    this->deltaTime = now - this->lastLoopTime;
-    this->loopCount++;
-    this->sensorPacket = this->sensors->readSensors();
-    if (this->stateEstimatorInitialized)
-    {
-        this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
-    }
-    loop_impl();
-    this->lastLoopTime = millis();
+void State::loop() {
+	long long now = millis();
+	this->currentTime = now - this->startTime;
+	this->deltaTime = now - this->lastLoopTime;
+	this->loopCount++;
+	this->sensorPacket = this->sensors->readSensors();
+	if (this->stateEstimatorInitialized) {
+		this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
+
+		this->telemPacket.w = this->x_state(0);
+		this->telemPacket.i = this->x_state(1);
+		this->telemPacket.j = this->x_state(2);
+		this->telemPacket.k = this->x_state(3);
+	}
+	
+	loop_impl();
+	this->lastLoopTime = millis();
+	
+	/**
+	 * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
+	*/
+  this->telemPacket.state = this->getId();
+	this->telemPacket.accelX = this->sensorPacket.accelX;
+	this->telemPacket.accelY = this->sensorPacket.accelY;
+	this->telemPacket.accelZ = this->sensorPacket.accelZ;
 
     /**
      * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop

@@ -25,7 +25,7 @@ class StateEstimator {
     const float magVariance = 0.008; // [T]
     const float accelVariance = 0.00069/sqrt(40); // [m/s/s]
 
-    float dt = 0.025;
+    float dt = 1 / LOOP_RATE;
 
     // Low Pass Filter Definitions
     const float alpha = 0.2;

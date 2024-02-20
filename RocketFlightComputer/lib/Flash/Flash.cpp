@@ -28,7 +28,7 @@ int FlashChip::rememberAddress() {
     for(int i=0; i < maxPage; i++) {
         uint32_t pageAddress = 0 + (i * 256);
 
-        uint8_t * buffer = new uint8_t[255];
+        uint8_t buffer[255];
 
         for(int j=0; j < 255; j++) {
             buffer[j] = flash->readByte(pageAddress + j);
@@ -42,8 +42,6 @@ int FlashChip::rememberAddress() {
                 break;
             }
         }
-        
-        delete[] buffer;
 
         if(isUnwritten) {
             nextAddress = pageAddress;

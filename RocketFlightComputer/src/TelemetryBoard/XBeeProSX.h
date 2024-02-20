@@ -32,7 +32,7 @@ private:
     uint8_t _cs_pin;
 
     uint64_t subscribers[64];
-    uint num_subscribers;
+    size_t num_subscribers;
 
     void add_subscriber(uint64_t address);
 };

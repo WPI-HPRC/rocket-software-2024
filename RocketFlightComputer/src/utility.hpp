@@ -3,6 +3,8 @@
 // #define DEBUG_MODE 
 #define LOOP_RATE 40
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
 class Utility
 {
 public:

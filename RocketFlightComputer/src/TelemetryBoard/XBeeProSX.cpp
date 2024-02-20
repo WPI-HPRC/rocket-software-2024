@@ -1,25 +1,29 @@
 #include "XBeeProSX.h"
+#include "utility.hpp"
 
 XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin)
 {
-    subscribers = (uint64_t *)malloc(sizeof(uint64_t));
     num_subscribers = 0;
 }
 
-void XbeeProSX::add_subscriber(uint64_t address) {
-    subscribers[num_subscribers] = address;
-    subscribers = (uint64_t *)realloc(subscribers, ++num_subscribers * sizeof(uint64_t));
+void XbeeProSX::add_subscriber(uint64_t address)
+{
+    if (this->num_subscribers < ARRAY_SIZE(this->subscribers))
+    {
+        this->subscribers[this->num_subscribers++] = address;
+    }
+    else {
+        Serial.println("Tried to overcommit subscribers to XBeeProSX!");
+    }
 }
 
 void XbeeProSX::begin()
 {
-
     pinMode(_cs_pin, OUTPUT);
 }
 
 bool XbeeProSX::isDataAvailable()
 {
-
     digitalWrite(_cs_pin, LOW); // Asserts module to check data
 
     bool available = (SPI.transfer(0x00) == 0x7E); // Check if start delimiter is present
@@ -31,10 +35,9 @@ bool XbeeProSX::isDataAvailable()
 
 void XbeeProSX::send(uint64_t address, const void *data, size_t size_bytes)
 {
-
     size_t contentLength = size_bytes + 14; // +4 for start delimiter, length, and checksum, +8 for address
 
-    uint8_t *packet = (uint8_t*)calloc(contentLength, 1);
+    uint8_t* packet = (uint8_t*)alloca(contentLength);
 
     size_t index = 0;
 
@@ -96,15 +99,10 @@ void XbeeProSX::send(uint64_t address, const void *data, size_t size_bytes)
     //     Serial.print(" ");
     // }
     // Serial.println();
-
-    free(packet);
-
 }
 
 ReceivePacket *XbeeProSX::receive()
 {
-
-    ReceivePacket *packet = (ReceivePacket *)calloc(1, sizeof(ReceivePacket));
     digitalWrite(_cs_pin, LOW);  // Asserts module to receive
 
     // Read length high and low byte
@@ -116,15 +114,18 @@ ReceivePacket *XbeeProSX::receive()
     {
         digitalWrite(_cs_pin, HIGH); // De-asserts module
 
-        return packet;
+        return NULL;
     }
 
-    packet->length = length - 12;
-    packet->data = new uint8_t[length - 12];
+    size_t data_length = length - 12;
+
+    // allocate receive packet + data for it and set to zero
+    ReceivePacket* packet = (ReceivePacket*)calloc(1, sizeof(ReceivePacket) + (data_length));
+    packet->length = data_length;
+    packet->data = (uint8_t*)(packet + 1);
 
     // Read and store source address (64-bit)
-    for (int i = 0; i < 8; i++)
-    {
+    for (int i = 0; i < 8; i++) {  
         packet->address |= (SPI.transfer(0x00) << (i * 8));
     }
 
@@ -132,11 +133,11 @@ ReceivePacket *XbeeProSX::receive()
     SPI.transfer(0x00);
     SPI.transfer(0x00);
 
-    // Recieve Options
+    // Receive Options
     SPI.transfer(0x00);
 
     // Read the message data
-    for (int i = 0; i < packet->length; ++i)
+    for (size_t i = 0; i < packet->length; ++i)
     { // 12 bytes already read (Frame type, ID, address, reserved)
         packet->data[i] = SPI.transfer(0x00);
     }
@@ -146,9 +147,9 @@ ReceivePacket *XbeeProSX::receive()
     SPI.transfer(0x00);
     digitalWrite(_cs_pin, HIGH); // De-asserts module
 
-    // Serial.println(*packet->data);
+    // Serial.println(*packet.data);
 
-    for (int i = 0; i < packet->length; i++)
+    for (size_t i = 0; i < packet->length; i++)
     {
         Serial.println(packet->data[i]);
     }
@@ -168,7 +169,7 @@ void XbeeProSX::updateSubscribers()
     if (!isDataAvailable())
         return;
 
-    ReceivePacket *message = receive();
+    ReceivePacket* message = receive();
 
     if (message->length != 9)
     { // Length of the word "subscribe"
@@ -180,7 +181,7 @@ void XbeeProSX::updateSubscribers()
     //     Serial.println(*message->data);
     // }
 
-    for (int i = 0; i < num_subscribers; i++)
+    for (size_t i = 0; i < num_subscribers; i++)
     {
         if (subscribers[i] == message->address)
             return;
@@ -188,14 +189,12 @@ void XbeeProSX::updateSubscribers()
 
     add_subscriber(message->address);
 
-    delete[] message->data;
     free(message);
 }
 
-void XbeeProSX::sendToSubscribers(const void *data, size_t size)
+void XbeeProSX::sendToSubscribers(const void *data, size_t size) 
 {
-
-    for (int i = 0; i < num_subscribers; i++)
+    for (size_t i = 0; i < num_subscribers; i++)
     {
         send(subscribers[i], data, size);
     }

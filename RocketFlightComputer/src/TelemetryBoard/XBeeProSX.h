@@ -13,9 +13,7 @@ struct ReceivePacket {
 };
 
 class XbeeProSX {
-
 public:
-
     XbeeProSX(uint8_t cs_pin);
 
     void begin();
@@ -31,13 +29,10 @@ public:
     void sendToSubscribers(const void *data, size_t size);
 
 private:
-
     uint8_t _cs_pin;
 
-    uint64_t *subscribers;
-
-    uint num_subscribers;
+    uint64_t subscribers[64];
+    size_t num_subscribers;
 
     void add_subscriber(uint64_t address);
-
 };

@@ -11,7 +11,7 @@ public:
 
 private:
     float verticalVelocityBuffer[10] = {0};
-    int bufferIndex = 0;
+    size_t bufferIndex = 0;
     float lastAltitude = 0;
     bool landed = false;
     Debouncer landedDebouncer = Debouncer(30);

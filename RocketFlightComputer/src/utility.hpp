@@ -1,14 +1,36 @@
 #pragma once
 
-// #define DEBUG_MODE 
+#define DEBUG_MODE false
 #define LOOP_RATE 40
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
-class Utility
-{
-public:
-    static float pressureToAltitude(float pressure)
+namespace Utility {
+    /** @brief Averages an array of floats
+      * @param len The size of the array
+      * @param arr The array
+      * @returns The average of the values in the array
+      */
+    inline float average(size_t len, float *arr) {
+        float sum = 0.;
+        for (size_t i = 0; i < len; i ++) {
+            sum += arr[i];
+        }
+        return sum / (float)len;
+    }
+
+    /** @brief Inserts a new value into a buffer, and then increments the index, wrapping it around if necessary
+      * @param len The length of the array
+      * @param arr The array
+      * @param idx A pointer to the current index, will be read and changed
+      * @param value The value to insert into `arr` at `*idx`
+      */
+    inline void circBufInsert(size_t len, float *arr, size_t *idx, float value) {
+        arr[*idx] = value;
+        *idx = (*idx + 1) % len;
+    }
+    
+    inline float pressureToAltitude(float pressure)
     {
         // physical parameters for model
         const float pb = 101325;   // [Pa] pressure at sea level
@@ -50,7 +72,7 @@ public:
         float gpsAltAGL;
         uint32_t epochTime;
         uint8_t satellites;
-        boolean gpsLock = false;
+        bool gpsLock = false;
 
         uint32_t timestamp;
     };
@@ -100,14 +122,14 @@ public:
         float gpsAltAGL = 0.0f;
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
-        boolean gpsLock = false;
+        bool gpsLock = false;
 
         uint32_t timestamp = 0;
     };
     #pragma pack(pop)
 
 #if 0 // NOTE: REMOVES FLASH CODE
-    static void logData(FlashChip *flash, SensorPacket sensorPacket)
+    inline void logData(FlashChip *flash, SensorPacket sensorPacket)
     {
         String structString = String(sensorPacket.accelX) + "," +
                               String(sensorPacket.accelY) + "," +
@@ -139,8 +161,8 @@ public:
 #endif // NOTE: REMOVES FLASH CODE
 
     // WGS84 Ellipsoid Model
-    constexpr static float a_earth = 6378137.0;       // [m] Semi-major axis of Earth
-    constexpr static float b_earth = 6356752.3142;    // [m] Semi-Minor axis of Earth
-    constexpr static float e_earth = 0.0818191908426; // Eccentricity of Earth
-    constexpr static float r_earth = 6378137; // [m] Radius of Earth
-};
+    constexpr float a_earth = 6378137.0;       // [m] Semi-major axis of Earth
+    constexpr float b_earth = 6356752.3142;    // [m] Semi-Minor axis of Earth
+    constexpr float e_earth = 0.0818191908426; // Eccentricity of Earth
+    constexpr float r_earth = 6378137; // [m] Radius of Earth
+}

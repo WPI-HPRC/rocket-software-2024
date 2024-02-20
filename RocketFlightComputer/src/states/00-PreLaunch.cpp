@@ -1,23 +1,10 @@
 #include "00-PreLaunch.h"
 #include "State.h"
 #include "01-Launch.h"
-#include "07-Debug.h"
 #include "Sensors.h"
+#include "utility.hpp"
 
 PreLaunch::PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
-
-float PreLaunch::avgAccelZ()
-{
-    float sum = 0;
-    uint8_t len = sizeof(this->accelReadingBuffer) / sizeof(float);
-
-    for (uint8_t i = 0; i < len; i++)
-    {
-        sum += this->accelReadingBuffer[i];
-    }
-
-    return sum / len;
-}
 
 void PreLaunch::initialize_impl()
 {
@@ -25,19 +12,12 @@ void PreLaunch::initialize_impl()
 
 void PreLaunch::loop_impl()
 {
-    if (!sensorPacket.gpsLock)
+    if (!this->sensorPacket.gpsLock)
     {
         Serial.println("[PreLaunch] Gps Lock Failed...");
 
         // delay(100);
         // return;
-    }
-
-    if (this->stateEstimatorInitialized)
-    {
-        this->accelReadingBuffer[this->buffIdx++] = this->sensorPacket.accelZ;
-        this->buffIdx %= sizeof(this->accelReadingBuffer) / sizeof(float);
-        return;
     }
 
     // float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
@@ -62,29 +42,30 @@ void PreLaunch::loop_impl()
     // Serial.println(">");
 
     // Intialize EKF
-    if (!this->stateEstimatorInitialized)
-    {
+    if (this->stateEstimatorInitialized) {
+        size_t buffLen = ARRAY_SIZE(this->accelerationBuffer);
+        Utility::circBufInsert(buffLen, this->accelerationBuffer, &this->bufferIndex, this->sensorPacket.accelZ);
+        this->launched = this->launchDebouncer.checkOut(Utility::average(buffLen, this->accelerationBuffer) > LAUNCH_ACCEL_THRESHOLD);
+    } else {
         BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         this->stateEstimator = new StateEstimator(x_0, 0.025);
         this->stateEstimatorInitialized = true;
     }
-
-    launched = launchDebouncer.checkOut(this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD);
 }
 
 State *PreLaunch::nextState_impl()
 {
 
-#ifdef DEBUG_MODE
-    if (sensorPacket.gpsLock)
+#if DEBUG_MODE
+    if (this->sensorPacket.gpsLock)
     {
-        return new Debug(this->sensors, this->ekf);
+        return new Debug(this->sensors, this->stateEstimator);
     }
 #endif
 
-    if (launched)
+    if (this->launched)
     {
-        return new Launch(sensors, stateEstimator);
+        return new Launch(this->sensors, this->stateEstimator);
     }
 
     return nullptr;

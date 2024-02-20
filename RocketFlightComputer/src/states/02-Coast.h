@@ -10,9 +10,9 @@ public:
     Coast(struct Sensors *sensors, StateEstimator *stateEstimator);
 
 private:
-    boolean apogeePassed = false;
+    bool apogeePassed = false;
     float verticalVelocityBuffer[10] = {0};
-    int bufferIndex = 0;
+    size_t bufferIndex = 0;
     float lastAltitude = 0;
     Debouncer apogeeDebouncer = Debouncer(30);
 };

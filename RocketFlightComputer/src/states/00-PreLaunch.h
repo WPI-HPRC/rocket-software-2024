@@ -8,9 +8,8 @@ class PreLaunch : public State {
 	public:
 		PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator);
 	private:
-		float accelReadingBuffer[10] = {0};
-		uint8_t buffIdx = 0;
-		float avgAccelZ();
-        bool launched = false;
-        Debouncer launchDebouncer = Debouncer(30);
+		float accelerationBuffer[10] = {0};
+		size_t bufferIndex = 0;
+    bool launched = false;
+    Debouncer launchDebouncer = Debouncer(30);
 };

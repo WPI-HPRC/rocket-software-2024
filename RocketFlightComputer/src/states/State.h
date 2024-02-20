@@ -25,8 +25,7 @@ enum StateId
     ID_DrogueDescent,
     ID_MainDescent,
     ID_Recovery,
-    ID_Abort,
-    ID_Debug,
+    ID_Abort
 };
 
 /**

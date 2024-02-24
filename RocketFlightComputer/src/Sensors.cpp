@@ -38,6 +38,13 @@ Utility::SensorPacket Sensors::readSensors() {
   sensorPacket.magY = magnetometerData.y;
   sensorPacket.magZ = magnetometerData.z;
 
+  sensorPacket.magX = magnetometerData.x - 135180.0;
+  sensorPacket.magX /= 135180.0;
+  sensorPacket.magY = magnetometerData.y - 132860.0;
+  sensorPacket.magY /= 132860.0;
+  sensorPacket.magZ = magnetometerData.z - 138400.0;
+  sensorPacket.magZ /= 138400.0;
+
   // sensorPacket.magX = magnetometerData.x - 134960.0;
   // sensorPacket.magY /= 134960.0;
   // sensorPacket.magZ = magnetometerData.y - 132340.0;
@@ -45,9 +52,9 @@ Utility::SensorPacket Sensors::readSensors() {
   // sensorPacket.magY = magnetometerData.z - 138560.0;
   // sensorPacket.magZ /= 138560.0;
 
-  // sensorPacket.magX *= 8; // [T]
-  // sensorPacket.magY *= 8; // [T]
-  // sensorPacket.magZ *= 8; // [T]
+  sensorPacket.magX *= 8; // [T]
+  sensorPacket.magY *= 8; // [T]
+  sensorPacket.magZ *= 8; // [T]
 
   sensorPacket.gpsLock = gnss->getLockStatus();
 

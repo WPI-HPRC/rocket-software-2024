@@ -2,7 +2,6 @@
 #include "03-DrogueDescent.h"
 #include "04-MainDescent.h"
 #include "06-Abort.h"
-#include "Sensors.h"
 
 DrogueDescent::DrogueDescent(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 

@@ -1,7 +1,6 @@
 #include "00-PreLaunch.h"
 #include "State.h"
 #include "01-Launch.h"
-#include "Sensors.h"
 
 PreLaunch::PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
@@ -63,7 +62,7 @@ void PreLaunch::loop_impl()
     // Intialize EKF
     if (!this->stateEstimatorInitialized)
     {
-        BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Vector<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         this->stateEstimator = new StateEstimator(x_0, 0.025);
         this->stateEstimatorInitialized = true;
     }

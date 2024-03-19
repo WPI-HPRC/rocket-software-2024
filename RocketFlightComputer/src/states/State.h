@@ -1,18 +1,9 @@
 #pragma once
-#include "Sensors.h"
 #include "FlightParams.hpp"
 #include "utility.hpp"
-
-#define _STATE_CLASS_IMPLS_           \
-private:                              \
-    void initialize_impl() override;  \
-    void loop_impl() override;        \
-    State *nextState_impl() override; \
-    StateId getId() override;
-
+#include "Sensors.h"
 #include "Arduino.h"
-#include "../utility.hpp"
-#include <BasicLinearAlgebra.h>
+#include <ArduinoEigen.h>
 #include <TelemetryBoard/XBeeProSX.h>
 #include <EKF.h>
 
@@ -27,6 +18,14 @@ enum StateId
     ID_Recovery,
     ID_Abort
 };
+
+#define _STATE_CLASS_IMPLS_           \
+private:                              \
+    void initialize_impl() override;  \
+    void loop_impl() override;        \
+    State *nextState_impl() override; \
+    StateId getId() override;
+
 
 /**
  * @brief Abstract class representing a rocket state.
@@ -57,7 +56,7 @@ public:
     Utility::TelemPacket telemPacket;
 
     // Eigen::Vector<float, 10> x_state;
-    BLA::Matrix<10> x_state;
+    Vector<10> x_state;
 
 protected:
     //! @note Constructor to be called from subclasses to initialize the `sensors` object

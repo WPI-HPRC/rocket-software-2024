@@ -1,8 +1,14 @@
 #pragma once
 
 #include "Arduino.h"
-#include <BasicLinearAlgebra.h>
+#include <ArduinoEigen.h>
 #include "../../src/utility.hpp"
+
+template<int M, int N>
+using Matrix = Eigen::Matrix<double, M, N>;
+
+template<int N>
+using Vector = Eigen::Vector<double, N>;
 
 /**
  * @author @frostydev99 - Daniel Pearson
@@ -11,11 +17,11 @@
 class StateEstimator {
     public:
 
-    StateEstimator(BLA::Matrix<10> initialOrientation, float dt);
+    StateEstimator(Vector<10> initialOrientation, float dt);
 
-    BLA::Matrix<10> onLoop(Utility::SensorPacket sensorPacket);
+    Vector<10> onLoop(Utility::SensorPacket sensorPacket);
 
-    BLA::Matrix<3,3> quat2rotm(BLA::Matrix<4> q);
+    Matrix<3, 3> quat2rotm(Vector<4> q);
     
     private:
     constexpr static int initialLoopIters = 1000;
@@ -40,88 +46,89 @@ class StateEstimator {
     // float inclination = 66.546;
     float inclination = 66.546 * (PI/180); // [Rad]
 
-    BLA::Matrix<10,10> P = {
-        1,0,0,0,0,0,0,0,0,0,
-        0,1,0,0,0,0,0,0,0,0,
-        0,0,1,0,0,0,0,0,0,0,
-        0,0,0,1,0,0,0,0,0,0,
-        0,0,0,0,1,0,0,0,0,0,
-        0,0,0,0,0,1,0,0,0,0,
-        0,0,0,0,0,0,1,0,0,0,
-        0,0,0,0,0,0,0,1,0,0,
-        0,0,0,0,0,0,0,0,1,0,
-        0,0,0,0,0,0,0,0,0,1,
+    Matrix<10, 10> P {
+        {1,0,0,0,0,0,0,0,0,0},
+        {0,1,0,0,0,0,0,0,0,0},
+        {0,0,1,0,0,0,0,0,0,0},
+        {0,0,0,1,0,0,0,0,0,0},
+        {0,0,0,0,1,0,0,0,0,0},
+        {0,0,0,0,0,1,0,0,0,0},
+        {0,0,0,0,0,0,1,0,0,0},
+        {0,0,0,0,0,0,0,1,0,0},
+        {0,0,0,0,0,0,0,0,1,0},
+        {0,0,0,0,0,0,0,0,0,1}
     }; // Process Error Covariance
 
-    BLA::Matrix<10,10> P_min = {
-        1,0,0,0,0,0,0,0,0,0,
-        0,1,0,0,0,0,0,0,0,0,
-        0,0,1,0,0,0,0,0,0,0,
-        0,0,0,1,0,0,0,0,0,0,
-        0,0,0,0,1,0,0,0,0,0,
-        0,0,0,0,0,1,0,0,0,0,
-        0,0,0,0,0,0,1,0,0,0,
-        0,0,0,0,0,0,0,1,0,0,
-        0,0,0,0,0,0,0,0,1,0,
-        0,0,0,0,0,0,0,0,0,1,
+    Matrix<10, 10> P_min {
+        {1,0,0,0,0,0,0,0,0,0},
+        {0,1,0,0,0,0,0,0,0,0},
+        {0,0,1,0,0,0,0,0,0,0},
+        {0,0,0,1,0,0,0,0,0,0},
+        {0,0,0,0,1,0,0,0,0,0},
+        {0,0,0,0,0,1,0,0,0,0},
+        {0,0,0,0,0,0,1,0,0,0},
+        {0,0,0,0,0,0,0,1,0,0},
+        {0,0,0,0,0,0,0,0,1,0},
+        {0,0,0,0,0,0,0,0,0,1}
     }; // Process Error Covariance
 
-    const BLA::Matrix<6,6> R = {
-        accelVariance*accelVariance, 0, 0, 0, 0, 0,
-        0, accelVariance*accelVariance, 0, 0, 0, 0,
-        0, 0, accelVariance*accelVariance, 0, 0, 0,
-        0, 0, 0, magVariance*magVariance, 0, 0,
-        0, 0, 0, 0, magVariance*magVariance, 0,
-        0, 0, 0, 0, 0, magVariance*magVariance,
+    const Matrix<6, 6> R {
+        {accelVariance*accelVariance, 0, 0, 0, 0, 0},
+        {0, accelVariance*accelVariance, 0, 0, 0, 0},
+        {0, 0, accelVariance*accelVariance, 0, 0, 0},
+        {0, 0, 0, magVariance*magVariance, 0, 0},
+        {0, 0, 0, 0, magVariance*magVariance, 0},
+        {0, 0, 0, 0, 0, magVariance*magVariance}
     }; // Sensor Noise Covariance - Accel and Mag
 
-    const BLA::Matrix<6,6> gyroAccelVar = {
-        gyroVariance*gyroVariance, 0, 0, 0, 0, 0,
-        0, gyroVariance*gyroVariance, 0, 0, 0, 0,
-        0, 0, gyroVariance*gyroVariance, 0, 0, 0,
-        0, 0, 0, accelVariance*accelVariance, 0, 0,
-        0, 0, 0, 0, accelVariance*accelVariance, 0,
-        0, 0, 0, 0, 0, accelVariance*accelVariance
+    const Matrix<6, 6> gyroAccelVar {
+        {gyroVariance*gyroVariance, 0, 0, 0, 0, 0},
+        {0, gyroVariance*gyroVariance, 0, 0, 0, 0},
+        {0, 0, gyroVariance*gyroVariance, 0, 0, 0},
+        {0, 0, 0, accelVariance*accelVariance, 0, 0},
+        {0, 0, 0, 0, accelVariance*accelVariance, 0},
+        {0, 0, 0, 0, 0, accelVariance*accelVariance}
     };
 
-    const BLA::Matrix<10,10> Q_Inertial = {
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0.7,0,0,0,0,0,
-        0,0,0,0,0,0.7,0,0,0,0,
-        0,0,0,0,0,0,0.7,0,0,0,
-        0,0,0,0,0,0,0,0.7,0,0,
-        0,0,0,0,0,0,0,0,0.7,0,
-        0,0,0,0,0,0,0,0,0,0.7,
+    const Matrix<10, 10> Q_Inertial {
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0.7,0,0,0,0,0},
+        {0,0,0,0,0,0.7,0,0,0,0},
+        {0,0,0,0,0,0,0.7,0,0,0},
+        {0,0,0,0,0,0,0,0.7,0,0},
+        {0,0,0,0,0,0,0,0,0.7,0},
+        {0,0,0,0,0,0,0,0,0,0.7}
     }; // 10 Element Identity Matrix
     
-    const BLA::Matrix<10,10> eye10 = {
-        1,0,0,0,0,0,0,0,0,0,
-        0,1,0,0,0,0,0,0,0,0,
-        0,0,1,0,0,0,0,0,0,0,
-        0,0,0,1,0,0,0,0,0,0,
-        0,0,0,0,1,0,0,0,0,0,
-        0,0,0,0,0,1,0,0,0,0,
-        0,0,0,0,0,0,1,0,0,0,
-        0,0,0,0,0,0,0,1,0,0,
-        0,0,0,0,0,0,0,0,1,0,
-        0,0,0,0,0,0,0,0,0,1,
-    }; // 10 Element Identity Matrix
+    const Matrix<10, 10> eye10 = Matrix<10, 10>::Identity();
+    // const BLA::Matrix<10,10> eye10 {
+    //     1,0,0,0,0,0,0,0,0,0,
+    //     0,1,0,0,0,0,0,0,0,0,
+    //     0,0,1,0,0,0,0,0,0,0,
+    //     0,0,0,1,0,0,0,0,0,0,
+    //     0,0,0,0,1,0,0,0,0,0,
+    //     0,0,0,0,0,1,0,0,0,0,
+    //     0,0,0,0,0,0,1,0,0,0,
+    //     0,0,0,0,0,0,0,1,0,0,
+    //     0,0,0,0,0,0,0,0,1,0,
+    //     0,0,0,0,0,0,0,0,0,1,
+    // }; // 10 Element Identity Matrix
 
-    BLA::Matrix<10> measurementFunction(Utility::SensorPacket sensorPacket);
-    BLA::Matrix<10,10> measurementJacobian(Utility::SensorPacket sensorPacket);
+    Vector<10> measurementFunction(Utility::SensorPacket sensorPacket);
+    Matrix<10, 10> measurementJacobian(Utility::SensorPacket sensorPacket);
 
-    BLA::Matrix<6> updateFunction(Utility::SensorPacket sensorPacket);
-    BLA::Matrix<6,10> updateJacobian(Utility::SensorPacket sensorPacket);
+    Vector<6> updateFunction(Utility::SensorPacket sensorPacket);
+    Matrix<6, 10> updateJacobian(Utility::SensorPacket sensorPacket);
 
-    BLA::Matrix<10,6> updateModelCovariance(Utility::SensorPacket sensorPacket);
+    Matrix<10, 6> updateModelCovariance(Utility::SensorPacket sensorPacket);
 
-    BLA::Matrix<10> x;
-    BLA::Matrix<10> x_min;
+    Vector<10> x;
+    Vector<10> x_min;
 
     float g = 9.80665;
 
-    BLA::Matrix<4> quaternionMultiplication(BLA::Matrix<4> q1, BLA::Matrix<4> q2);
+    Vector<4> quaternionMultiplication(Vector<4> q1, Vector<4> q2);
 };

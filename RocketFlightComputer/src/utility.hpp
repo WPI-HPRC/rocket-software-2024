@@ -1,4 +1,6 @@
 #pragma once
+#include <math.h>
+#include <stdint.h>
 
 // #define DEBUG_MODE 
 #define LOOP_RATE 40
@@ -50,7 +52,7 @@ public:
         float gpsAltAGL;
         uint32_t epochTime;
         uint8_t satellites;
-        boolean gpsLock = false;
+        bool gpsLock = false;
 
         uint32_t timestamp;
     };
@@ -100,7 +102,7 @@ public:
         float gpsAltAGL = 0.0f;
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
-        boolean gpsLock = false;
+        bool gpsLock = false;
 
         uint32_t timestamp = 0;
     };

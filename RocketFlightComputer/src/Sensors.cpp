@@ -1,7 +1,4 @@
 #include "Sensors.h"
-#include "Accelerometer.h"
-#include "Barometer.h"
-#include "Magnetometer.h"
 #include "utility.hpp"
 #include <Arduino.h>
 

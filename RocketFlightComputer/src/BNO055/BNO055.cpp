@@ -2,7 +2,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
-#include <BNO055.h>
+#include "BNO055.h"
 
 BNO055::BNO055(int32_t sensorID)
 {

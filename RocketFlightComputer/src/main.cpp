@@ -12,13 +12,9 @@
 #include <states/State.h>
 #include <states/00-PreLaunch.h>
 
-#include <Barometer.h>
-#include <BNO055.h>
-#include <GNSS.h>
-#include <Accelerometer.h>
-#include <Magnetometer.h>
-
 #include <TelemetryBoard/XBeeProSX.h>
+
+#include <Sensors.h>
 
 Metro timer = Metro(1000 / LOOP_RATE);
 

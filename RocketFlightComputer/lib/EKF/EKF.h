@@ -21,8 +21,8 @@ class StateEstimator {
     constexpr static int initialLoopIters = 1000;
 
     // Input variance from sensor data sheet
-    const float gyroVariance = 0.00489/sqrt(40); // [Rad/s]
-    const float magVariance = 0.008; // [T]
+    const float gyroVariance = 0.00489/sqrt(40); // [Rad/s] 
+    const float magVariance = 0.04; // [uT] Magnetometer RMS Noise
     const float accelVariance = 0.00069/sqrt(40); // [m/s/s]
 
     float dt = 1.0 / LOOP_RATE;
@@ -38,7 +38,7 @@ class StateEstimator {
 
     /* Magnetic Field Constants for Earth at WPI */
     // float inclination = 66.546;
-    float inclination = 66.546 * (PI/180); // [Rad]
+    float inclination = -11.90 * (PI/180); // [Rad]
 
     BLA::Matrix<10,10> P = {
         1,0,0,0,0,0,0,0,0,0,
@@ -84,18 +84,18 @@ class StateEstimator {
         0, 0, 0, 0, 0, accelVariance*accelVariance
     };
 
-    const BLA::Matrix<10,10> Q_Inertial = {
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0.7,0,0,0,0,0,
-        0,0,0,0,0,0.7,0,0,0,0,
-        0,0,0,0,0,0,0.7,0,0,0,
-        0,0,0,0,0,0,0,0.7,0,0,
-        0,0,0,0,0,0,0,0,0.7,0,
-        0,0,0,0,0,0,0,0,0,0.7,
-    }; // 10 Element Identity Matrix
+    // const BLA::Matrix<10,10> Q = {
+    //     0.07,0,0,0,0,0,0,0,0,0,
+    //     0,0.07,0,0,0,0,0,0,0,0,
+    //     0,0,0.07,0,0,0,0,0,0,0,
+    //     0,0,0,0.07,0,0,0,0,0,
+    //     0,0,0,0,0,0,0,0,0,0,
+    //     0,0,0,0,0,0,0,0,0,0,
+    //     0,0,0,0,0,0,0,0,0,0,
+    //     0,0,0,0,0,0,0,0,0,0,
+    //     0,0,0,0,0,0,0,0,0,0,
+    //     0,0,0,0,0,0,0,0,0,0,
+    // }; // 10 Element Identity Matrix
     
     const BLA::Matrix<10,10> eye10 = {
         1,0,0,0,0,0,0,0,0,0,

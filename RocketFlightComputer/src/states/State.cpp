@@ -20,6 +20,11 @@ void State::loop() {
 	if (this->stateEstimatorInitialized) {
 		this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
 
+        Serial.print("QUAT|"); Serial.print(x_state(0)); Serial.print(",");
+        Serial.print(x_state(1)); Serial.print(",");
+        Serial.print(x_state(2)); Serial.print(",");
+        Serial.println(x_state(3));
+
 		this->telemPacket.w = this->x_state(0);
 		this->telemPacket.i = this->x_state(1);
 		this->telemPacket.j = this->x_state(2);
@@ -32,7 +37,7 @@ void State::loop() {
 	/**
 	 * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
 	*/
-  this->telemPacket.state = this->getId();
+    this->telemPacket.state = this->getId();
 	this->telemPacket.accelX = this->sensorPacket.accelX;
 	this->telemPacket.accelY = this->sensorPacket.accelY;
 	this->telemPacket.accelZ = this->sensorPacket.accelZ;
@@ -67,10 +72,10 @@ void State::loop() {
     /** Loop Radio and Send Data */
     // xbee->updateSubscribers();
 
-    xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
+    // xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
 
-    Serial.print("Packet Success: ");
-    Serial.println(millis());
+    // Serial.print("Packet Success: ");
+    // Serial.println(millis());
 
     // Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
     // Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));

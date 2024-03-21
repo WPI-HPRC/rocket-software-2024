@@ -15,8 +15,8 @@ MMC_data Magnetometer::read() {
   uint32_t x, y, z;
   this->mag.getMeasurementXYZ(&x, &y, &z);
   return MMC_data {
-    .x = x,
-    .y = y,
-    .z = z,
+    .x = ((x - 131072.0f) / 131072.0f) * 800.0f, // [uT]
+    .y = ((y - 131072.0f) / 131072.0f) * 800.0f, // [uT]
+    .z = ((z - 131072.0f) / 131072.0f) * 800.0f  // [uT]
   };
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <BasicLinearAlgebra.h>
+
 // #define DEBUG_MODE 
 #define LOOP_RATE 40
 

@@ -6,7 +6,7 @@
 #include "03-DrogueDescent.h"
 #include "06-Abort.h"
 #include "State.h"
-#include "Sensors.h"
+// #include "Sensors.h"
 
 Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 

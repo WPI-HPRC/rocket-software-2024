@@ -2,9 +2,9 @@
 #include <SparkFun_MMC5983MA_Arduino_Library.h>
 
 typedef struct {
-  uint32_t x;
-  uint32_t y;
-  uint32_t z;
+  float x;
+  float y;
+  float z;
 } MMC_data;
 
 class Magnetometer {

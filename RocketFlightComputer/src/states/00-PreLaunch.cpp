@@ -26,7 +26,7 @@ void PreLaunch::loop_impl()
 {
     if (!sensorPacket.gpsLock)
     {
-        Serial.println("[PreLaunch] Gps Lock Failed...");
+        // Serial.println("[PreLaunch] Gps Lock Failed...");
 
         // delay(100);
         // return;

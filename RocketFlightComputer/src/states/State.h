@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include <ArduinoEigen.h>
 #include <TelemetryBoard/XBeeProSX.h>
-#include <EKF.h>
+#include <EKF/EKF.h>
 
 //! @brief Enum representing the id of the state, to be used in logging and communication with ground station
 enum StateId

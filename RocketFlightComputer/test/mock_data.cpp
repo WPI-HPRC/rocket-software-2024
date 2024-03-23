@@ -3,8 +3,15 @@
 
 using namespace fakeit;
 
-int main() {
+void setUp() {
+  ArduinoFakeReset();
+}
+
+void test_basic() {
+}
+
+int main(int argc, char** argv) {
   UNITY_BEGIN();
 
-  UNITY_END();
+  return UNITY_END();
 }

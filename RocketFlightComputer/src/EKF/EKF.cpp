@@ -1,4 +1,5 @@
 #include "EKF.h"
+#include <Arduino.h>
 
 // TODO: Fix comments, do be wrong - Dan Pearson
 
@@ -8,7 +9,7 @@
  * @param initialOrientation
  * @param dt
  */
-StateEstimator::StateEstimator(Vector<10> initialOrientation, float dt)
+StateEstimator::StateEstimator(const Vector<10>& initialOrientation, float dt)
 {
     this->x = initialOrientation;
     this->x_min = initialOrientation;
@@ -96,16 +97,16 @@ Vector<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
 
     // Apply Soft and Hard Iron Calibration to magnetometer data
     // **IMPORTANT** THIS MAY NEED TO BE RE-CALIBRATED UPON POSITION CHANGE
-    Vector<3> magVector = {
+    Vector<3> magVector {
         sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
 
-    Vector<3> accelVector = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
+    Vector<3> accelVector {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
     // Normalize Accel and Mag for use in correction step
     magVector.normalize();
     accelVector.normalize();
 
     // Calculate update function with magnetometer readings to correct orientation
-    Vector<6> z = {
+    Vector<6> z {
         accelVector(0), accelVector(1), accelVector(2), magVector(0), magVector(1), magVector(2)};
 
     Vector<6> h = updateFunction(sensorPacket);
@@ -163,21 +164,21 @@ Vector<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacke
     float p = sensorPacket.gyroX;
     float q = sensorPacket.gyroY;
     float r = sensorPacket.gyroZ;
-    Vector<3> accelR = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ}; // Accel Readings
+    Vector<3> accelR {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ}; // Accel Readings
 
     // Update function for quaternion prediction
-    Vector<4> f_q = {
+    Vector<4> f_q {
         x(0) - (dt / 2) * p * x(1) - (dt / 2) * q * x(2) - (dt / 2) * r * x(3),
         x(1) + (dt / 2) * p * x(0) - (dt / 2) * q * x(3) + (dt / 2) * r * x(2),
         x(2) + (dt / 2) * p * x(3) + (dt / 2) * q * x(0) - (dt / 2) * r * x(1),
         x(3) - (dt / 2) * p * x(2) + (dt / 2) * q * x(1) + (dt / 2) * r * x(0)};
 
     // Calculate linear accelerations in the NED Frame
-    Vector<4> quat = {x(0), x(1), x(2), x(3)};
+    Vector<4> quat {x(0), x(1), x(2), x(3)};
     Matrix<3, 3> R_BT = quat2rotm(quat);
 
     // Apply Gravity Compensation
-    Vector<3> gravNED = {0, 0, -g};
+    Vector<3> gravNED {0, 0, -g};
     Vector<3> gravB = R_BT.transpose() * gravNED; // Gravity in body frame
     Vector<3> accelB = accelR - gravB;                                         // Linear Accelartions in body frame
 
@@ -206,8 +207,8 @@ Vector<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacke
     //     x(9) + accelT(2)*dt
     // };
 
-    Vector<3> f_v = {0, 0, 0};
-    Vector<3> f_p = {0, 0, 0};
+    Vector<3> f_v {0, 0, 0};
+    Vector<3> f_p {0, 0, 0};
 
     Vector<10> f = {
         f_q(0),
@@ -248,7 +249,7 @@ Matrix<10, 10> StateEstimator::measurementJacobian(Utility::SensorPacket sensorP
 
 Vector<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket)
 {
-    Vector<3> r = {
+    Vector<3> r {
         cos(inclination), 0, sin(inclination)};
 
     // Must normalize vector for corrections step
@@ -261,7 +262,7 @@ Vector<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket)
     G.normalize();
 
     // Normalize quaternion prior to calculation
-    Vector<4> q = {x_min(0), x_min(1), x_min(2), x_min(3)};
+    Vector<4> q {x_min(0), x_min(1), x_min(2), x_min(3)};
     q.normalize();
 
     Matrix<3, 3> quatRotm = quat2rotm(q);
@@ -295,7 +296,7 @@ Matrix<6, 10> StateEstimator::updateJacobian(Utility::SensorPacket sensorPacket)
     G.normalize();
 
     // Normalize quaternion prior to calculation
-    Vector<4> q = {x_min(0), x_min(1), x_min(2), x_min(3)};
+    Vector<4> q {x_min(0), x_min(1), x_min(2), x_min(3)};
     q.normalize();
 
     float rx = r(0);
@@ -358,7 +359,7 @@ Matrix<10, 6> StateEstimator::updateModelCovariance(Utility::SensorPacket sensor
     return W * (dt / 2);
 };
 
-Matrix<3, 3> StateEstimator::quat2rotm(Vector<4> q)
+Matrix<3, 3> StateEstimator::quat2rotm(const Vector<4>& q)
 {
     // q = q / BLA::Norm(q);
 
@@ -375,7 +376,7 @@ Matrix<3, 3> StateEstimator::quat2rotm(Vector<4> q)
     return rotm;
 };
 
-Vector<4> StateEstimator::quaternionMultiplication(Vector<4> q1, Vector<4> q2)
+Vector<4> StateEstimator::quaternionMultiplication(const Vector<4>& q1, const Vector<4>& q2)
 {
 
     float w1 = q1(0);

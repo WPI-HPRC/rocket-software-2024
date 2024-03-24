@@ -62,7 +62,7 @@ void PreLaunch::loop_impl()
     // Intialize EKF
     if (!this->stateEstimatorInitialized)
     {
-        Vector<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Vector<10> x_0 {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         this->stateEstimator = new StateEstimator(x_0, 0.025);
         this->stateEstimatorInitialized = true;
     }
@@ -72,14 +72,6 @@ void PreLaunch::loop_impl()
 
 State *PreLaunch::nextState_impl()
 {
-
-#ifdef DEBUG_MODE
-    if (sensorPacket.gpsLock)
-    {
-        return new Debug(this->sensors, this->ekf);
-    }
-#endif
-
     if (launched)
     {
         return new Launch(sensors, stateEstimator);

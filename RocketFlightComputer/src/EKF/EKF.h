@@ -17,11 +17,11 @@ using Vector = Eigen::Vector<double, N>;
 class StateEstimator {
     public:
 
-    StateEstimator(Vector<10> initialOrientation, float dt);
+    StateEstimator(const Vector<10>& initialOrientation, float dt);
 
     Vector<10> onLoop(Utility::SensorPacket sensorPacket);
 
-    Matrix<3, 3> quat2rotm(Vector<4> q);
+    Matrix<3, 3> quat2rotm(const Vector<4>& q);
     
     private:
     constexpr static int initialLoopIters = 1000;
@@ -130,5 +130,5 @@ class StateEstimator {
 
     float g = 9.80665;
 
-    Vector<4> quaternionMultiplication(Vector<4> q1, Vector<4> q2);
+    Vector<4> quaternionMultiplication(const Vector<4>& q1, const Vector<4>& q2);
 };

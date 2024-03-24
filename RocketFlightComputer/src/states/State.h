@@ -3,7 +3,6 @@
 #include "utility.hpp"
 #include "Sensors.h"
 #include "Arduino.h"
-#include <ArduinoEigen.h>
 #include <TelemetryBoard/XBeeProSX.h>
 #include <EKF/EKF.h>
 
@@ -56,7 +55,7 @@ public:
     Utility::TelemPacket telemPacket;
 
     // Eigen::Vector<float, 10> x_state;
-    Vector<10> x_state;
+    // Vector<10> x_state;
 
 protected:
     //! @note Constructor to be called from subclasses to initialize the `sensors` object

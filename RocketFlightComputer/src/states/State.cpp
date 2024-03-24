@@ -18,25 +18,17 @@ void State::loop() {
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
 	if (this->stateEstimatorInitialized) {
-		this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
+		Vector<10> x_state = this->stateEstimator->onLoop(this->sensorPacket);
 
-		this->telemPacket.w = this->x_state(0);
-		this->telemPacket.i = this->x_state(1);
-		this->telemPacket.j = this->x_state(2);
-		this->telemPacket.k = this->x_state(3);
+		this->telemPacket.w = x_state(0);
+		this->telemPacket.i = x_state(1);
+		this->telemPacket.j = x_state(2);
+		this->telemPacket.k = x_state(3);
 	}
 	
 	loop_impl();
-	this->lastLoopTime = millis();
+	this->lastLoopTime = millis(); //FIXME: THIS IS WRONG, PUT IT ABOVE
 	
-	/**
-	 * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
-	*/
-  this->telemPacket.state = this->getId();
-	this->telemPacket.accelX = this->sensorPacket.accelX;
-	this->telemPacket.accelY = this->sensorPacket.accelY;
-	this->telemPacket.accelZ = this->sensorPacket.accelZ;
-
     /**
      * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
      */
@@ -62,15 +54,22 @@ void State::loop() {
     this->telemPacket.epochTime = this->sensorPacket.epochTime;
     this->telemPacket.satellites = this->sensorPacket.satellites;
     this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
-    this->telemPacket.timestamp = millis();
+		this->telemPacket.loopCount = this->loopCount;
+    this->telemPacket.timestamp = millis(); // FIXME: maybe use `now` for this
+
+#ifdef SERIAL_TELEMETRY
+    this->telemPacket.debugPrint();
+#endif
 
     /** Loop Radio and Send Data */
     // xbee->updateSubscribers();
 
+#ifndef NO_XBEE
     xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
 
     Serial.print("Packet Success: ");
     Serial.println(millis());
+#endif
 
     // Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
     // Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));
@@ -78,5 +77,9 @@ void State::loop() {
 
 State *State::nextState()
 {
+#ifndef NO_TRANSITION
     return nextState_impl();
+#else
+		return nullptr;
+#endif
 }

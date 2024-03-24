@@ -19,6 +19,7 @@ void State::loop() {
 	this->sensorPacket = this->sensors->readSensors();
 	if (this->stateEstimatorInitialized) {
 		Vector<10> x_state = this->stateEstimator->onLoop(this->sensorPacket);
+    Serial.println(millis() - now);
 
 		this->telemPacket.w = x_state(0);
 		this->telemPacket.i = x_state(1);

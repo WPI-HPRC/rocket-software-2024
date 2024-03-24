@@ -5,10 +5,12 @@
 #include "../../src/utility.hpp"
 
 template<int M, int N>
-using Matrix = Eigen::Matrix<double, M, N>;
+using Matrix = Eigen::Matrix<float, M, N>;
 
 template<int N>
-using Vector = Eigen::Vector<double, N>;
+using Vector = Eigen::Vector<float, N>;
+
+using Quaternion = Eigen::Quaternion<float>;
 
 /**
  * @author @frostydev99 - Daniel Pearson
@@ -21,7 +23,7 @@ class StateEstimator {
 
     Vector<10> onLoop(Utility::SensorPacket sensorPacket);
 
-    Matrix<3, 3> quat2rotm(const Vector<4>& q);
+    // Matrix<3, 3> quat2rotm(const Vector<4>& q);
     
     private:
     constexpr static int initialLoopIters = 1000;
@@ -35,11 +37,11 @@ class StateEstimator {
 
     // Low Pass Filter Definitions
     const float alpha = 0.2;
-    const int bufferSize = 10;
+    constexpr static int bufferSize = 10;
 
-    float * accelXBuffer;
-    float * accelYBuffer;
-    float * accelZBuffer;
+    float accelXBuffer[bufferSize];
+    float accelYBuffer[bufferSize];
+    float accelZBuffer[bufferSize];
     int bufferIndex;
 
     /* Magnetic Field Constants for Earth at WPI */
@@ -72,23 +74,23 @@ class StateEstimator {
         {0,0,0,0,0,0,0,0,0,1}
     }; // Process Error Covariance
 
-    const Matrix<6, 6> R {
-        {accelVariance*accelVariance, 0, 0, 0, 0, 0},
-        {0, accelVariance*accelVariance, 0, 0, 0, 0},
-        {0, 0, accelVariance*accelVariance, 0, 0, 0},
-        {0, 0, 0, magVariance*magVariance, 0, 0},
-        {0, 0, 0, 0, magVariance*magVariance, 0},
-        {0, 0, 0, 0, 0, magVariance*magVariance}
-    }; // Sensor Noise Covariance - Accel and Mag
+    const Matrix<6, 6> R = Matrix<6, 6>::Identity() * (accelVariance * accelVariance);
+    //     {accelVariance*accelVariance, 0, 0, 0, 0, 0},
+    //     {0, accelVariance*accelVariance, 0, 0, 0, 0},
+    //     {0, 0, accelVariance*accelVariance, 0, 0, 0},
+    //     {0, 0, 0, magVariance*magVariance, 0, 0},
+    //     {0, 0, 0, 0, magVariance*magVariance, 0},
+    //     {0, 0, 0, 0, 0, magVariance*magVariance}
+    // }; // Sensor Noise Covariance - Accel and Mag
 
-    const Matrix<6, 6> gyroAccelVar {
-        {gyroVariance*gyroVariance, 0, 0, 0, 0, 0},
-        {0, gyroVariance*gyroVariance, 0, 0, 0, 0},
-        {0, 0, gyroVariance*gyroVariance, 0, 0, 0},
-        {0, 0, 0, accelVariance*accelVariance, 0, 0},
-        {0, 0, 0, 0, accelVariance*accelVariance, 0},
-        {0, 0, 0, 0, 0, accelVariance*accelVariance}
-    };
+    const Matrix<6, 6> gyroAccelVar = Matrix<6, 6>::Identity() * (gyroVariance * gyroVariance);
+    //     {gyroVariance*gyroVariance, 0, 0, 0, 0, 0},
+    //     {0, gyroVariance*gyroVariance, 0, 0, 0, 0},
+    //     {0, 0, gyroVariance*gyroVariance, 0, 0, 0},
+    //     {0, 0, 0, accelVariance*accelVariance, 0, 0},
+    //     {0, 0, 0, 0, accelVariance*accelVariance, 0},
+    //     {0, 0, 0, 0, 0, accelVariance*accelVariance}
+    // };
 
     const Matrix<10, 10> Q_Inertial {
         {0,0,0,0,0,0,0,0,0,0},
@@ -128,7 +130,8 @@ class StateEstimator {
     Vector<10> x;
     Vector<10> x_min;
 
-    float g = 9.80665;
+    const float g = 9.80665;
+    const Vector<3> G = Vector<3>(0, 0, -g).normalized();
 
-    Vector<4> quaternionMultiplication(const Vector<4>& q1, const Vector<4>& q2);
+    // Vector<4> quaternionMultiplication(const Vector<4>& q1, const Vector<4>& q2);
 };

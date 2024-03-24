@@ -16,9 +16,9 @@ StateEstimator::StateEstimator(const Vector<10>& initialOrientation, float dt)
     this->dt = dt;
 
     // C++ was mad at me so I had to dynamically allocate outside of header
-    accelXBuffer = new float[bufferSize];
-    accelYBuffer = new float[bufferSize];
-    accelZBuffer = new float[bufferSize];
+    // accelXBuffer = new float[bufferSize];
+    // accelYBuffer = new float[bufferSize];
+    // accelZBuffer = new float[bufferSize];
     bufferIndex = 0;
 };
 
@@ -123,7 +123,7 @@ Vector<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
     x = x_min + K * v;
 
     // Update error covariance matrix
-    P = (Matrix<10, 10>::Identity() - K * H) * P_min;
+    P = (eye10 - K * H) * P_min;
 
     // Serial.println("<----- State ----->");
     // for (int i = 0; i < x.Rows; i++) {
@@ -174,15 +174,20 @@ Vector<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacke
         x(3) - (dt / 2) * p * x(2) + (dt / 2) * q * x(1) + (dt / 2) * r * x(0)};
 
     // Calculate linear accelerations in the NED Frame
-    Vector<4> quat {x(0), x(1), x(2), x(3)};
-    Matrix<3, 3> R_BT = quat2rotm(quat);
+    // Vector<4> quat {x(0), x(1), x(2), x(3)};
+    Vector<4> quatV {x(3), x(0), x(1), x(2)};
+    quatV.normalize();
+    Quaternion quat (quatV);
+    // Matrix<3, 3> R_BT = quat2rotm(quat);
 
     // Apply Gravity Compensation
     Vector<3> gravNED {0, 0, -g};
-    Vector<3> gravB = R_BT.transpose() * gravNED; // Gravity in body frame
+    // Vector<3> gravB = R_BT.transpose() * gravNED; // Gravity in body frame
+    Vector<3> gravB = quat * gravNED;
     Vector<3> accelB = accelR - gravB;                                         // Linear Accelartions in body frame
 
-    Vector<3> accelT = R_BT.transpose() * accelB;
+    // Vector<3> accelT = R_BT.transpose() * accelB;
+    Vector<3> accelT = quat * accelB;
 
     // Serial.println("<----- Linear Accel ----->");
     // for (int i = 0; i < accelT.Rows; i++) {
@@ -253,22 +258,26 @@ Vector<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket)
         cos(inclination), 0, sin(inclination)};
 
     // Must normalize vector for corrections step
-    r.normalize();
+    // r.normalize();
 
-    Vector<3> G = {
-        0, 0, -g}; // NED Gravity Vector
+    // Vector<3> G = {
+    //     0, 0, -g}; // NED Gravity Vector
 
-    // Must normalize vector for correction step
-    G.normalize();
+    // // Must normalize vector for correction step
+    // G.normalize();
 
     // Normalize quaternion prior to calculation
-    Vector<4> q {x_min(0), x_min(1), x_min(2), x_min(3)};
+    // Vector<4> q {x_min(0), x_min(1), x_min(2), x_min(3)};
+    Vector<4> q {x_min(3), x_min(0), x_min(1), x_min(2)};
     q.normalize();
 
-    Matrix<3, 3> quatRotm = quat2rotm(q);
+    // Matrix<3, 3> quatRotm = quat2rotm(q);
+    Quaternion quat (q);
 
-    Vector<3> a_hat = quatRotm.transpose() * G;
-    Vector<3> m_hat = quatRotm.transpose() * r;
+    // Vector<3> a_hat = quatRotm.transpose() * G;
+    // Vector<3> m_hat = quatRotm.transpose() * r;
+    Vector<3> a_hat = quat * G;
+    Vector<3> m_hat = quat * r;
 
     Vector<6> h = {
         a_hat(0),
@@ -287,16 +296,17 @@ Matrix<6, 10> StateEstimator::updateJacobian(Utility::SensorPacket sensorPacket)
         cos(inclination), 0, sin(inclination)}; // NED Mag vector
 
     // Must normalize vector for corrections step
-    r.normalize();
+    // r.normalize();
 
-    Vector<3> G = {
-        0, 0, -g}; // NED Gravity Vector
+    // Vector<3> G = {
+    //     0, 0, -g}; // NED Gravity Vector
 
-    // Must normalize vector for correction step
-    G.normalize();
+    // // Must normalize vector for correction step
+    // G.normalize();
 
     // Normalize quaternion prior to calculation
-    Vector<4> q {x_min(0), x_min(1), x_min(2), x_min(3)};
+    // Vector<4> q {x_min(0), x_min(1), x_min(2), x_min(3)};
+    Vector<4> q {x_min(3), x_min(0), x_min(1), x_min(2)};
     q.normalize();
 
     float rx = r(0);
@@ -359,42 +369,42 @@ Matrix<10, 6> StateEstimator::updateModelCovariance(Utility::SensorPacket sensor
     return W * (dt / 2);
 };
 
-Matrix<3, 3> StateEstimator::quat2rotm(const Vector<4>& q)
-{
-    // q = q / BLA::Norm(q);
+// Matrix<3, 3> StateEstimator::quat2rotm(const Vector<4>& q)
+// {
+//     // q = q / BLA::Norm(q);
 
-    float qw = q(0);
-    float qx = q(1);
-    float qy = q(2);
-    float qz = q(3);
+//     float qw = q(0);
+//     float qx = q(1);
+//     float qy = q(2);
+//     float qz = q(3);
 
-    Matrix<3, 3> rotm {
-        {pow(qw, 2) + pow(qx, 2) - pow(qy, 2) - pow(qz, 2), 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy)},
-        {2 * (qx * qy + qw * qz), pow(qw, 2) - pow(qx, 2) + pow(qy, 2) - pow(qz, 2), 2 * (qy * qz - qw * qz)},
-        {2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), pow(qw, 2) - pow(qx, 2) - pow(qy, 2) + pow(qz, 2)}};
+//     Matrix<3, 3> rotm {
+//         {pow(qw, 2) + pow(qx, 2) - pow(qy, 2) - pow(qz, 2), 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy)},
+//         {2 * (qx * qy + qw * qz), pow(qw, 2) - pow(qx, 2) + pow(qy, 2) - pow(qz, 2), 2 * (qy * qz - qw * qz)},
+//         {2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), pow(qw, 2) - pow(qx, 2) - pow(qy, 2) + pow(qz, 2)}};
 
-    return rotm;
-};
+//     return rotm;
+// };
 
-Vector<4> StateEstimator::quaternionMultiplication(const Vector<4>& q1, const Vector<4>& q2)
-{
+// Vector<4> StateEstimator::quaternionMultiplication(const Vector<4>& q1, const Vector<4>& q2)
+// {
 
-    float w1 = q1(0);
-    float i1 = q1(1);
-    float j1 = q1(2);
-    float k1 = q1(3);
+//     float w1 = q1(0);
+//     float i1 = q1(1);
+//     float j1 = q1(2);
+//     float k1 = q1(3);
 
-    float w2 = q2(0);
-    float i2 = q2(1);
-    float j2 = q2(2);
-    float k2 = q2(3);
+//     float w2 = q2(0);
+//     float i2 = q2(1);
+//     float j2 = q2(2);
+//     float k2 = q2(3);
 
-    Vector<4> res;
+//     Vector<4> res;
 
-    res(0) = w1 * w2 - i1 * i2 - j1 * j2 - k1 * k2;
-    res(1) = w1 * i2 + i1 * w2 + j1 * k2 - k1 * j2;
-    res(2) = w1 * j2 - i1 * k2 + j1 * w2 + k1 * i2;
-    res(3) = w1 * k2 + i1 * j2 - j1 * i2 + k1 * w2;
+//     res(0) = w1 * w2 - i1 * i2 - j1 * j2 - k1 * k2;
+//     res(1) = w1 * i2 + i1 * w2 + j1 * k2 - k1 * j2;
+//     res(2) = w1 * j2 - i1 * k2 + j1 * w2 + k1 * i2;
+//     res(3) = w1 * k2 + i1 * j2 - j1 * i2 + k1 * w2;
 
-    return res;
-};
+//     return res;
+// };

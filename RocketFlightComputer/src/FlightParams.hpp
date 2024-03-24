@@ -1,8 +1,8 @@
 #pragma once
 
 // Debug things
-// #define DEBUG
-#ifdef DEBUG
+// #define DEBUG_MODE
+#ifdef DEBUG_MODE
 #define NO_TRANSITION
 #define NO_FLASH
 #define NO_XBEE

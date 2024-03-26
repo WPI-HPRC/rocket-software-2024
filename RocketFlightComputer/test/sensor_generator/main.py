@@ -1,6 +1,11 @@
 import random
+import sys
 
-keyframes = open("keyframes.csv", "r")
+if len(sys.argv) < 2:
+    print("Please provide a keyframes csv file")
+    exit(1)
+
+keyframes = open(sys.argv[1], "r")
 keyframes = list(map(lambda str: str[:-1].split(","), keyframes.readlines()))
 
 

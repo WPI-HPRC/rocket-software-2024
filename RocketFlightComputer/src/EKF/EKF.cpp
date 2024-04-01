@@ -1,5 +1,4 @@
 #include "EKF.h"
-#include <Arduino.h>
 
 // TODO: Fix comments, do be wrong - Dan Pearson
 
@@ -9,7 +8,7 @@
  * @param initialOrientation
  * @param dt
  */
-StateEstimator::StateEstimator(const Vector<10>& initialOrientation, float dt)
+StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt)
 {
     this->x = initialOrientation;
     this->x_min = initialOrientation;
@@ -28,7 +27,7 @@ StateEstimator::StateEstimator(const Vector<10>& initialOrientation, float dt)
  * @param sensorPacket Sensor Frame
  * @return BLA::Matrix<4> State Vector
  */
-Vector<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
+void StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
 {
     /* Read Data from Sensors and Convert to SI Units */
     // Convert Accel values to m/s/s
@@ -84,40 +83,40 @@ Vector<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
     x_min = measurementFunction(sensorPacket);
 
     // Take the jacobian to obtain the covariance of the prediction step
-    Matrix<10, 10> A = measurementJacobian(sensorPacket);
+    BLA::Matrix<10, 10> A = measurementJacobian(sensorPacket);
 
     // Update model covariance from previous state
-    Matrix<10, 6> W = updateModelCovariance(sensorPacket);
+    BLA::Matrix<10, 6> W = updateModelCovariance(sensorPacket);
 
     // Apply updated model covariance to process noise covariance matrix
-    Matrix<10, 10> Q = W * gyroAccelVar * W.transpose();
+    BLA::Matrix<10, 10> Q = W * gyroAccelVar * BLA::MatrixTranspose<BLA::Matrix<10, 6>>(W);
 
     // Update Priori Error Covariance
-    P_min = A * P * A.transpose() + Q;
+    P_min = A * P * BLA::MatrixTranspose<BLA::Matrix<10, 10>>(A) + Q;
 
     // Apply Soft and Hard Iron Calibration to magnetometer data
     // **IMPORTANT** THIS MAY NEED TO BE RE-CALIBRATED UPON POSITION CHANGE
-    Vector<3> magVector {
+    BLA::Matrix<3> magVector = {
         sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
 
-    Vector<3> accelVector {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
+    BLA::Matrix<3> accelVector = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
     // Normalize Accel and Mag for use in correction step
-    magVector.normalize();
-    accelVector.normalize();
+    magVector = magVector / BLA::Norm(magVector);
+    accelVector = accelVector / BLA::Norm(accelVector);
 
     // Calculate update function with magnetometer readings to correct orientation
-    Vector<6> z {
+    BLA::Matrix<6> z = {
         accelVector(0), accelVector(1), accelVector(2), magVector(0), magVector(1), magVector(2)};
 
-    Vector<6> h = updateFunction(sensorPacket);
+    BLA::Matrix<6> h = updateFunction(sensorPacket);
 
     // Take the jacobian to obtain the covariance of the correction function
-    Matrix<6, 10> H = updateJacobian(sensorPacket);
+    BLA::Matrix<6, 10> H = updateJacobian(sensorPacket);
 
     // Compute the kalman gain from the magnetometer covariance readings
-    Vector<6> v = z - h;
-    Matrix<6, 6> S = H * P_min * H.transpose() + R;
-    Matrix<10, 6> K = P_min * H.transpose() * S.inverse();
+    BLA::Matrix<6> v = z - h;
+    BLA::Matrix<6, 6> S = H * P_min * BLA::MatrixTranspose<BLA::Matrix<6, 10>>(H) + R;
+    BLA::Matrix<10, 6> K = P_min * BLA::MatrixTranspose<BLA::Matrix<6, 10>>(H) * BLA::Inverse(S);
 
     // Use our kalman gain and magnetometer readings to correct priori orientation
     x = x_min + K * v;
@@ -155,39 +154,32 @@ Vector<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
     // x(4) = X_NEW;
     // x(5) = Y_NEW;
     // x(6) = Z_NEW;
-
-    return this->x;
 }
 
-Vector<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacket)
+BLA::Matrix<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacket)
 {
     float p = sensorPacket.gyroX;
     float q = sensorPacket.gyroY;
     float r = sensorPacket.gyroZ;
-    Vector<3> accelR {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ}; // Accel Readings
+    BLA::Matrix<3> accelR = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ}; // Accel Readings
 
     // Update function for quaternion prediction
-    Vector<4> f_q {
+    BLA::Matrix<4> f_q = {
         x(0) - (dt / 2) * p * x(1) - (dt / 2) * q * x(2) - (dt / 2) * r * x(3),
         x(1) + (dt / 2) * p * x(0) - (dt / 2) * q * x(3) + (dt / 2) * r * x(2),
         x(2) + (dt / 2) * p * x(3) + (dt / 2) * q * x(0) - (dt / 2) * r * x(1),
         x(3) - (dt / 2) * p * x(2) + (dt / 2) * q * x(1) + (dt / 2) * r * x(0)};
 
     // Calculate linear accelerations in the NED Frame
-    // Vector<4> quat {x(0), x(1), x(2), x(3)};
-    Vector<4> quatV {x(3), x(0), x(1), x(2)};
-    quatV.normalize();
-    Quaternion quat (quatV);
-    // Matrix<3, 3> R_BT = quat2rotm(quat);
+    BLA::Matrix<4> quat = {x(0), x(1), x(2), x(3)};
+    BLA::Matrix<3, 3> R_BT = quat2rotm(quat);
 
     // Apply Gravity Compensation
-    Vector<3> gravNED {0, 0, -g};
-    // Vector<3> gravB = R_BT.transpose() * gravNED; // Gravity in body frame
-    Vector<3> gravB = quat * gravNED;
-    Vector<3> accelB = accelR - gravB;                                         // Linear Accelartions in body frame
+    BLA::Matrix<3> gravNED = {0, 0, -g};
+    BLA::Matrix<3> gravB = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * gravNED; // Gravity in body frame
+    BLA::Matrix<3> accelB = accelR - gravB;                                         // Linear Accelartions in body frame
 
-    // Vector<3> accelT = R_BT.transpose() * accelB;
-    Vector<3> accelT = quat * accelB;
+    BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * accelB;
 
     // Serial.println("<----- Linear Accel ----->");
     // for (int i = 0; i < accelT.Rows; i++) {
@@ -198,7 +190,7 @@ Vector<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacke
     // }
 
     // Normalize Quaternion Function
-    f_q.normalize();
+    f_q = f_q / BLA::Norm(f_q);
 
     // BLA::Matrix<3> f_p = {
     //     x(4) + (x(7)*dt + 0.5*accelT(0)*(dt*dt)),
@@ -212,10 +204,10 @@ Vector<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacke
     //     x(9) + accelT(2)*dt
     // };
 
-    Vector<3> f_v {0, 0, 0};
-    Vector<3> f_p {0, 0, 0};
+    BLA::Matrix<3> f_v = {0, 0, 0};
+    BLA::Matrix<3> f_p = {0, 0, 0};
 
-    Vector<10> f = {
+    BLA::Matrix<10> f = {
         f_q(0),
         f_q(1),
         f_q(2),
@@ -230,56 +222,52 @@ Vector<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacke
     return f;
 };
 
-Matrix<10, 10> StateEstimator::measurementJacobian(Utility::SensorPacket sensorPacket)
+BLA::Matrix<10, 10> StateEstimator::measurementJacobian(Utility::SensorPacket sensorPacket)
 {
     float p = sensorPacket.gyroX;
     float q = sensorPacket.gyroY;
     float r = sensorPacket.gyroZ;
 
-    Matrix<10, 10> A {
-        {1, -(dt / 2) * p, -(dt / 2) * q, -(dt / 2) * r, 0, 0, 0, 0, 0, 0},
-        {(dt / 2) * p, 1, (dt / 2) * r, -(dt / 2) * q, 0, 0, 0, 0, 0, 0},
-        {(dt / 2) * q, -(dt / 2) * r, 1, (dt / 2) * p, 0, 0, 0, 0, 0, 0},
-        {(dt / 2) * r, (dt / 2) * q, -(dt / 2) * p, 1, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 1, 0, 0, dt, 0, 0},
-        {0, 0, 0, 0, 0, 1, 0, 0, dt, 0},
-        {0, 0, 0, 0, 0, 0, 1, 0, 0, dt},
-        {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    BLA::Matrix<10, 10> A = {
+        1, -(dt / 2) * p, -(dt / 2) * q, -(dt / 2) * r, 0, 0, 0, 0, 0, 0,
+        (dt / 2) * p, 1, (dt / 2) * r, -(dt / 2) * q, 0, 0, 0, 0, 0, 0,
+        (dt / 2) * q, -(dt / 2) * r, 1, (dt / 2) * p, 0, 0, 0, 0, 0, 0,
+        (dt / 2) * r, (dt / 2) * q, -(dt / 2) * p, 1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 0, 0, dt, 0, 0,
+        0, 0, 0, 0, 0, 1, 0, 0, dt, 0,
+        0, 0, 0, 0, 0, 0, 1, 0, 0, dt,
+        0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     };
 
     return A;
 }
 
-Vector<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket)
+BLA::Matrix<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket)
 {
-    Vector<3> r {
+    BLA::Matrix<3> r = {
         cos(inclination), 0, sin(inclination)};
 
     // Must normalize vector for corrections step
-    // r.normalize();
+    r = r / BLA::Norm(r);
 
-    // Vector<3> G = {
-    //     0, 0, -g}; // NED Gravity Vector
+    BLA::Matrix<3> G = {
+        0, 0, -g}; // NED Gravity Vector
 
-    // // Must normalize vector for correction step
-    // G.normalize();
+    // Must normalize vector for correction step
+    G = G / BLA::Norm(G);
 
     // Normalize quaternion prior to calculation
-    // Vector<4> q {x_min(0), x_min(1), x_min(2), x_min(3)};
-    Vector<4> q {x_min(3), x_min(0), x_min(1), x_min(2)};
-    q.normalize();
+    BLA::Matrix<4> q = {x_min(0), x_min(1), x_min(2), x_min(3)};
+    q = q / BLA::Norm(q);
 
-    // Matrix<3, 3> quatRotm = quat2rotm(q);
-    Quaternion quat (q);
+    BLA::Matrix<3, 3> quatRotm = quat2rotm(q);
 
-    // Vector<3> a_hat = quatRotm.transpose() * G;
-    // Vector<3> m_hat = quatRotm.transpose() * r;
-    Vector<3> a_hat = quat * G;
-    Vector<3> m_hat = quat * r;
+    BLA::Matrix<3> a_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * G;
+    BLA::Matrix<3> m_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * r;
 
-    Vector<6> h = {
+    BLA::Matrix<6> h = {
         a_hat(0),
         a_hat(1),
         a_hat(2),
@@ -290,24 +278,23 @@ Vector<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket)
     return h;
 };
 
-Matrix<6, 10> StateEstimator::updateJacobian(Utility::SensorPacket sensorPacket)
+BLA::Matrix<6, 10> StateEstimator::updateJacobian(Utility::SensorPacket sensorPacket)
 {
-    Vector<3> r = {
+    BLA::Matrix<3> r = {
         cos(inclination), 0, sin(inclination)}; // NED Mag vector
 
     // Must normalize vector for corrections step
-    // r.normalize();
+    r = r / BLA::Norm(r);
 
-    // Vector<3> G = {
-    //     0, 0, -g}; // NED Gravity Vector
+    BLA::Matrix<3> G = {
+        0, 0, -g}; // NED Gravity Vector
 
-    // // Must normalize vector for correction step
-    // G.normalize();
+    // Must normalize vector for correction step
+    G = G / BLA::Norm(G);
 
     // Normalize quaternion prior to calculation
-    // Vector<4> q {x_min(0), x_min(1), x_min(2), x_min(3)};
-    Vector<4> q {x_min(3), x_min(0), x_min(1), x_min(2)};
-    q.normalize();
+    BLA::Matrix<4> q = {x_min(0), x_min(1), x_min(2), x_min(3)};
+    q = q / BLA::Norm(q);
 
     float rx = r(0);
     float ry = r(1);
@@ -338,73 +325,73 @@ Matrix<6, 10> StateEstimator::updateJacobian(Utility::SensorPacket sensorPacket)
     //     sigma4, 2*rx*qz-2*ry*qw-2*rx*qx, sigma2, sigma1, 0,0,0,0,0,0,
     // };
 
-    Matrix<6, 10> H {
-        {gx * qw + gy * qz - gz * qy, gx * qx + gy * qy + gz * qz, -gx * qy + gy * qx - gz * qw, -gx * qz + gy * qw + gz * qx, 0, 0, 0, 0, 0, 0},
-        {-gx * qz + gy * qw + gz * qx, gx * qy - gy * qx + gz * qw, gx * qx + gy * qy + gz * qz, -gx * qw - gy * qz + gz * qy, 0, 0, 0, 0, 0, 0},
-        {gx * qy - gy * qx + gz * qw, gx * qz - gy * qw - gz * qx, gx * qw + gy * qz - gz * qy, gx * qx + gy * qy + gz * qz, 0, 0, 0, 0, 0, 0},
-        {rx * qw + ry * qz - rz * qy, rx * qy + ry * qy + rz * qz, -rx * qy + ry * qx - rz * qw, -rx * qz + ry * qw + rz * qx, 0, 0, 0, 0, 0, 0},
-        {-rx * qz + ry * qw + rz * qx, rx * qy - ry * qx + rz * qw, rx * qx + ry * qy + rz * qz, -rx * qw - ry * qz + rz * qy, 0, 0, 0, 0, 0, 0},
-        {rx * qy - ry * qx + rz * qw, rx * qz - ry * qw - rz * qx, rx * qw + ry * qz - rz * qy, rx * qx + ry * qy + rz * qz, 0, 0, 0, 0, 0, 0},
+    BLA::Matrix<6, 10> H = {
+        gx * qw + gy * qz - gz * qy, gx * qx + gy * qy + gz * qz, -gx * qy + gy * qx - gz * qw, -gx * qz + gy * qw + gz * qx, 0, 0, 0, 0, 0, 0,
+        -gx * qz + gy * qw + gz * qx, gx * qy - gy * qx + gz * qw, gx * qx + gy * qy + gz * qz, -gx * qw - gy * qz + gz * qy, 0, 0, 0, 0, 0, 0,
+        gx * qy - gy * qx + gz * qw, gx * qz - gy * qw - gz * qx, gx * qw + gy * qz - gz * qy, gx * qx + gy * qy + gz * qz, 0, 0, 0, 0, 0, 0,
+        rx * qw + ry * qz - rz * qy, rx * qy + ry * qy + rz * qz, -rx * qy + ry * qx - rz * qw, -rx * qz + ry * qw + rz * qx, 0, 0, 0, 0, 0, 0,
+        -rx * qz + ry * qw + rz * qx, rx * qy - ry * qx + rz * qw, rx * qx + ry * qy + rz * qz, -rx * qw - ry * qz + rz * qy, 0, 0, 0, 0, 0, 0,
+        rx * qy - ry * qx + rz * qw, rx * qz - ry * qw - rz * qx, rx * qw + ry * qz - rz * qy, rx * qx + ry * qy + rz * qz, 0, 0, 0, 0, 0, 0,
     };
 
     return H;
 };
 
-Matrix<10, 6> StateEstimator::updateModelCovariance(Utility::SensorPacket sensorPacket)
+BLA::Matrix<10, 6> StateEstimator::updateModelCovariance(Utility::SensorPacket sensorPacket)
 {
 
-    Matrix<10, 6> W {
-        {-x(1), -x(2), -x(3), 0, 0, 0},
-        {x(0), -x(3), x(2), 0, 0, 0},
-        {x(3), x(0), -x(1), 0, 0, 0},
-        {-x(2), x(1), x(0), 0, 0, 0},
-        {0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0},
+    BLA::Matrix<10, 6> W = {
+        -x(1), -x(2), -x(3), 0, 0, 0,
+        x(0), -x(3), x(2), 0, 0, 0,
+        x(3), x(0), -x(1), 0, 0, 0,
+        -x(2), x(1), x(0), 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
     };
 
     return W * (dt / 2);
 };
 
-// Matrix<3, 3> StateEstimator::quat2rotm(const Vector<4>& q)
-// {
-//     // q = q / BLA::Norm(q);
+BLA::Matrix<3, 3> StateEstimator::quat2rotm(BLA::Matrix<4> q)
+{
+    // q = q / BLA::Norm(q);
 
-//     float qw = q(0);
-//     float qx = q(1);
-//     float qy = q(2);
-//     float qz = q(3);
+    float qw = q(0);
+    float qx = q(1);
+    float qy = q(2);
+    float qz = q(3);
 
-//     Matrix<3, 3> rotm {
-//         {pow(qw, 2) + pow(qx, 2) - pow(qy, 2) - pow(qz, 2), 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy)},
-//         {2 * (qx * qy + qw * qz), pow(qw, 2) - pow(qx, 2) + pow(qy, 2) - pow(qz, 2), 2 * (qy * qz - qw * qz)},
-//         {2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), pow(qw, 2) - pow(qx, 2) - pow(qy, 2) + pow(qz, 2)}};
+    BLA::Matrix<3, 3> rotm = {
+        pow(qw, 2) + pow(qx, 2) - pow(qy, 2) - pow(qz, 2), 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy),
+        2 * (qx * qy + qw * qz), pow(qw, 2) - pow(qx, 2) + pow(qy, 2) - pow(qz, 2), 2 * (qy * qz - qw * qz),
+        2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), pow(qw, 2) - pow(qx, 2) - pow(qy, 2) + pow(qz, 2)};
 
-//     return rotm;
-// };
+    return rotm;
+};
 
-// Vector<4> StateEstimator::quaternionMultiplication(const Vector<4>& q1, const Vector<4>& q2)
-// {
+BLA::Matrix<4> StateEstimator::quaternionMultiplication(BLA::Matrix<4> q1, BLA::Matrix<4> q2)
+{
 
-//     float w1 = q1(0);
-//     float i1 = q1(1);
-//     float j1 = q1(2);
-//     float k1 = q1(3);
+    float w1 = q1(0);
+    float i1 = q1(1);
+    float j1 = q1(2);
+    float k1 = q1(3);
 
-//     float w2 = q2(0);
-//     float i2 = q2(1);
-//     float j2 = q2(2);
-//     float k2 = q2(3);
+    float w2 = q2(0);
+    float i2 = q2(1);
+    float j2 = q2(2);
+    float k2 = q2(3);
 
-//     Vector<4> res;
+    BLA::Matrix<4> res;
 
-//     res(0) = w1 * w2 - i1 * i2 - j1 * j2 - k1 * k2;
-//     res(1) = w1 * i2 + i1 * w2 + j1 * k2 - k1 * j2;
-//     res(2) = w1 * j2 - i1 * k2 + j1 * w2 + k1 * i2;
-//     res(3) = w1 * k2 + i1 * j2 - j1 * i2 + k1 * w2;
+    res(0) = w1 * w2 - i1 * i2 - j1 * j2 - k1 * k2;
+    res(1) = w1 * i2 + i1 * w2 + j1 * k2 - k1 * j2;
+    res(2) = w1 * j2 - i1 * k2 + j1 * w2 + k1 * i2;
+    res(3) = w1 * k2 + i1 * j2 - j1 * i2 + k1 * w2;
 
-//     return res;
-// };
+    return res;
+};

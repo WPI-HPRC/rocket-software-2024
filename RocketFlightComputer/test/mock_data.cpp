@@ -2,14 +2,13 @@
 #include <unistd.h>
 #include <utility.hpp>
 #include <cstdio>
-#include <libgen.h>
 #include "unity.h"
 
 using namespace fakeit;
 
 void setUp() {
   ArduinoFakeReset();
-  chdir("test");
+  (void)chdir("test");
 }
 
 int parse_line(FILE *data_file, Utility::SensorPacket *packet) {

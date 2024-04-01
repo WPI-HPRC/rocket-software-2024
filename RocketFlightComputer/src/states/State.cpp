@@ -18,12 +18,12 @@ void State::loop() {
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
 	if (this->stateEstimatorInitialized) {
-		Vector<10> x_state = this->stateEstimator->onLoop(this->sensorPacket);
+		this->stateEstimator->onLoop(this->sensorPacket);
 
-		this->telemPacket.w = x_state(0);
-		this->telemPacket.i = x_state(1);
-		this->telemPacket.j = x_state(2);
-		this->telemPacket.k = x_state(3);
+		this->telemPacket.w = this->stateEstimator->x(0);
+		this->telemPacket.i = this->stateEstimator->x(1);
+		this->telemPacket.j = this->stateEstimator->x(2);
+		this->telemPacket.k = this->stateEstimator->x(3);
 	}
 	
 	loop_impl();

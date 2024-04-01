@@ -1,8 +1,8 @@
 #pragma once
-#include <stdint.h>
-#include <FlightParams.hpp>
-#include <Arduino.h>
 
+#include <Arduino.h>
+#include <cstdint>
+#include <cmath>
 
 // #define DEBUG_MODE 
 #define LOOP_RATE 40
@@ -48,12 +48,12 @@ public:
         float altitude = 0.0;
 
         // GPS Inputs
-        float gpsLat = 0.0;
-        float gpsLong = 0.0;
-        float gpsAltMSL = 0.0;
-        float gpsAltAGL = 0.0;
-        uint32_t epochTime = 0;
-        uint8_t satellites = 0;
+        float gpsLat;
+        float gpsLong;
+        float gpsAltMSL;
+        float gpsAltAGL;
+        uint32_t epochTime;
+        uint8_t satellites;
         bool gpsLock = false;
 
         uint32_t timestamp = 0;

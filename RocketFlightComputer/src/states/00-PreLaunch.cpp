@@ -62,7 +62,7 @@ void PreLaunch::loop_impl()
     // Intialize EKF
     if (!this->stateEstimatorInitialized)
     {
-        Vector<10> x_0 {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         this->stateEstimator = new StateEstimator(x_0, 0.025);
         this->stateEstimatorInitialized = true;
     }

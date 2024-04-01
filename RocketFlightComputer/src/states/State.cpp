@@ -27,8 +27,8 @@ void State::loop() {
 	}
 	
 	loop_impl();
-	this->lastLoopTime = millis(); //FIXME: THIS IS WRONG, PUT IT ABOVE
-	
+	this->lastLoopTime = now;
+
     /**
      * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
      */
@@ -55,7 +55,7 @@ void State::loop() {
     this->telemPacket.satellites = this->sensorPacket.satellites;
     this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
 		this->telemPacket.loopCount = this->loopCount;
-    this->telemPacket.timestamp = millis(); // FIXME: maybe use `now` for this
+    this->telemPacket.timestamp = now;
 
 #ifdef SERIAL_TELEMETRY
     this->telemPacket.debugPrint();
@@ -68,7 +68,7 @@ void State::loop() {
     xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
 
     Serial.print("Packet Success: ");
-    Serial.println(millis());
+    Serial.println(now);
 #endif
 
     // Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));

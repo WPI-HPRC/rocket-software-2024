@@ -27,15 +27,7 @@ void State::loop() {
 	}
 	
 	loop_impl();
-	this->lastLoopTime = millis();
-	
-	/**
-	 * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
-	*/
-  this->telemPacket.state = this->getId();
-	this->telemPacket.accelX = this->sensorPacket.accelX;
-	this->telemPacket.accelY = this->sensorPacket.accelY;
-	this->telemPacket.accelZ = this->sensorPacket.accelZ;
+	this->lastLoopTime = now;
 
     /**
      * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
@@ -62,7 +54,7 @@ void State::loop() {
     this->telemPacket.epochTime = this->sensorPacket.epochTime;
     this->telemPacket.satellites = this->sensorPacket.satellites;
     this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
-    this->telemPacket.timestamp = millis();
+    this->telemPacket.timestamp = now;
 
     /** Loop Radio and Send Data */
     // xbee->updateSubscribers();
@@ -70,7 +62,7 @@ void State::loop() {
     xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
 
     Serial.print("Packet Success: ");
-    Serial.println(millis());
+    Serial.println(now);
 
     // Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
     // Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));

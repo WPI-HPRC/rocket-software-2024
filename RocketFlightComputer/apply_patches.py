@@ -8,7 +8,7 @@ PATCHES_DIR = "patches"
 for patch in os.listdir(PATCHES_DIR):
     patch_path = os.path.join(PATCHES_DIR, patch)
 
-    parts = os.path.splitext(patch)[0].split("-")
+    parts = os.path.splitext(patch)[0].split("--")
 
     environ = parts[1]
     library = parts[2]

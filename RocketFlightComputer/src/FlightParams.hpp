@@ -1,4 +1,15 @@
 #pragma once
+
+// Debug things
+// #define DEBUG_MODE
+#ifdef DEBUG_MODE
+#define NO_TRANSITION
+#define NO_FLASH
+#define NO_XBEE
+#define SERIAL_TELEMETRY
+#define WAIT_FOR_SERIAL
+#endif
+
 // These constants define transitions between states and the conditions for those transitions
 
 // PreLaunch -------------------------

@@ -13,9 +13,11 @@ class StateEstimator {
 
     StateEstimator(BLA::Matrix<10> initialOrientation, float dt);
 
-    BLA::Matrix<10> onLoop(Utility::SensorPacket sensorPacket);
+    void onLoop(Utility::SensorPacket sensorPacket);
 
     BLA::Matrix<3,3> quat2rotm(BLA::Matrix<4> q);
+
+    BLA::Matrix<10> x;
     
     private:
     constexpr static int initialLoopIters = 1000;
@@ -29,11 +31,11 @@ class StateEstimator {
 
     // Low Pass Filter Definitions
     const float alpha = 0.2;
-    const int bufferSize = 10;
+    constexpr static int bufferSize = 10;
 
-    float * accelXBuffer;
-    float * accelYBuffer;
-    float * accelZBuffer;
+    float accelXBuffer[bufferSize];
+    float accelYBuffer[bufferSize];
+    float accelZBuffer[bufferSize];
     int bufferIndex;
 
     /* Magnetic Field Constants for Earth at WPI */
@@ -118,7 +120,6 @@ class StateEstimator {
 
     BLA::Matrix<10,6> updateModelCovariance(Utility::SensorPacket sensorPacket);
 
-    BLA::Matrix<10> x;
     BLA::Matrix<10> x_min;
 
     float g = 9.80665;

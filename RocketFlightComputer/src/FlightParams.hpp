@@ -1,4 +1,10 @@
 #pragma once
+
+// Control System Constants
+
+constexpr static float AHRS_GAIN = 0.65f;
+constexpr static float magneticDip = -11.90 * (PI/180); // [Rad] Magnetic Dip
+
 // These constants define transitions between states and the conditions for those transitions
 
 // PreLaunch -------------------------

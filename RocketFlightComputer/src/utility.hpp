@@ -145,4 +145,5 @@ public:
     constexpr static float b_earth = 6356752.3142;    // [m] Semi-Minor axis of Earth
     constexpr static float e_earth = 0.0818191908426; // Eccentricity of Earth
     constexpr static float r_earth = 6378137; // [m] Radius of Earth
+    constexpr static float g = 9.80665; // [m/s/s] Grav Acceleration of Earth
 };

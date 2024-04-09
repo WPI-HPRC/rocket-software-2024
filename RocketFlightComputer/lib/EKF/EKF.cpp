@@ -13,12 +13,6 @@ StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt)
     this->x = initialOrientation;
     this->x_min = initialOrientation;
     this->dt = dt;
-
-    // C++ was mad at me so I had to dynamically allocate outside of header
-    accelXBuffer = new float[bufferSize];
-    accelYBuffer = new float[bufferSize];
-    accelZBuffer = new float[bufferSize];
-    bufferIndex = 0;
 };
 
 /**
@@ -30,88 +24,55 @@ StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt)
 BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
 {
     /* Read Data from Sensors and Convert to SI Units */
-    
+
     // Convert Accel values to m/s/s
-    sensorPacket.accelX = sensorPacket.accelX * g;
-    sensorPacket.accelY = sensorPacket.accelY * g;
-    sensorPacket.accelZ = sensorPacket.accelZ * g;
+    float accX = sensorPacket.accelX * g;
+    float accY = sensorPacket.accelY * g;
+    float accZ = sensorPacket.accelZ * g;
 
     // Convert gyro values from deg/s to rad/s
-    sensorPacket.gyroX = sensorPacket.gyroX * (PI / 180);
-    sensorPacket.gyroY = sensorPacket.gyroY * (PI / 180);
-    sensorPacket.gyroZ = sensorPacket.gyroZ * (PI / 180);
+    float gyrX = sensorPacket.gyroX * (PI / 180);
+    float gyrY = sensorPacket.gyroY * (PI / 180);
+    float gyrZ = sensorPacket.gyroZ * (PI / 180);
 
-    // Convert Gauss to microTesla
-    // sensorPacket.magX = sensorPacket.magX * 100000;
-    // sensorPacket.magY = sensorPacket.magY * 100000;
-    // sensorPacket.magZ = sensorPacket.magZ * 100000;
+    float magX = sensorPacket.magX;
+    float magY = sensorPacket.magY;
+    float magZ = sensorPacket.magZ;
 
-    // float filteredAccelX = sensorPacket.accelX;
-    // float filteredAccelY = sensorPacket.accelY;
-    // float filteredAccelZ = sensorPacket.accelZ;
-
-    // /* APPLY LOW PASS FILTER */
-    // accelXBuffer[bufferIndex] = sensorPacket.accelX;
-    // accelYBuffer[bufferIndex] = sensorPacket.accelY;
-    // accelZBuffer[bufferIndex] = sensorPacket.accelZ;
-
-    // // Increment buffer index (wrap around if necessary)
-    // bufferIndex = (bufferIndex + 1) % bufferSize;
-
-    // // Apply low-pass filter using circular buffer for each accelerometer component
-    // for (int i = 0; i < bufferSize; ++i) {
-    //     filteredAccelX = alpha * accelXBuffer[i] + (1 - alpha) * filteredAccelX;
-    //     filteredAccelY = alpha * accelYBuffer[i] + (1 - alpha) * filteredAccelY;
-    //     filteredAccelZ = alpha * accelZBuffer[i] + (1 - alpha) * filteredAccelZ;
-    // }
-
-    // Update sensorPacket with filtered accelerometer readings
-    // sensorPacket.accelX = filteredAccelX;
-    // sensorPacket.accelY = filteredAccelY;
-    // sensorPacket.accelZ = filteredAccelZ;
-
-    // Serial.println("<--- Acceleration Filtered ---> ");
-    // Serial.print("Accel X: "); Serial.println(sensorPacket.accelX);
-    // Serial.print("Accel Y: "); Serial.println(sensorPacket.accelY);
-    // Serial.print("Accel Z: "); Serial.println(sensorPacket.accelZ);
-
-    /* PREDICTION STEP
-    x_min = f(x,dt)
-    A = df(x,dt) / dx
-    P_min = A*P*A' + sigma_gyr^2*W*W'
-    */
+    BLA::Matrix<6> u = {accX, accY, accZ, gyrX, gyrY, gyrZ};
 
     // Apply measurement function to predict priori state of the system
-    x_min = measurementFunction(sensorPacket);
+    x_min = measurementFunction(u);
 
     // Take the jacobian to obtain the covariance of the prediction step
-    BLA::Matrix<10, 10> A = measurementJacobian(sensorPacket);
+    BLA::Matrix<10, 10> A = measurementJacobian(u);
 
     // Update model covariance from previous state
     BLA::Matrix<10, 6> W = updateModelCovariance(sensorPacket);
 
     // Apply updated model covariance to process noise covariance matrix
-    // BLA::Matrix<10, 10> Q = W * gyroAccelVar * BLA::MatrixTranspose<BLA::Matrix<10, 6>>(W);
+    BLA::Matrix<10, 10> Q = W * gyroAccelVar * BLA::MatrixTranspose<BLA::Matrix<10, 6>>(W);
 
     // Update Priori Error Covariance
-    P_min = A * P * BLA::MatrixTranspose<BLA::Matrix<10, 10>>(A);
+    P_min = A * P * BLA::MatrixTranspose<BLA::Matrix<10, 10>>(A) + Q;
 
-    BLA::Matrix<3> magVector = {
-        sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
+    BLA::Matrix<3> magVector = {magX, magY, magZ};
 
-    BLA::Matrix<3> accelVector = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
+    BLA::Matrix<3> accelVector = {accX, accY, accZ};
+
     // Normalize Accel and Mag for use in correction step
     magVector = magVector / BLA::Norm(magVector);
+
     accelVector = accelVector / BLA::Norm(accelVector);
 
     // Calculate update function with magnetometer readings to correct orientation
     BLA::Matrix<6> z = {
         accelVector(0), accelVector(1), accelVector(2), magVector(0), magVector(1), magVector(2)};
 
-    BLA::Matrix<6> h = updateFunction(sensorPacket);
+    BLA::Matrix<6> h = updateFunction();
 
     // Take the jacobian to obtain the covariance of the correction function
-    BLA::Matrix<6, 10> H = updateJacobian(sensorPacket);
+    BLA::Matrix<6, 10> H = updateJacobian();
 
     // Compute the kalman gain from the magnetometer covariance readings
     BLA::Matrix<6> v = z - h;
@@ -142,41 +103,52 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
     return this->x;
 }
 
-BLA::Matrix<10> StateEstimator::measurementFunction(Utility::SensorPacket sensorPacket)
+BLA::Matrix<10> StateEstimator::measurementFunction(BLA::Matrix<6> u)
 {
-    float p = sensorPacket.gyroX;
-    float q = sensorPacket.gyroY;
-    float r = sensorPacket.gyroZ;
-    BLA::Matrix<3> accelR = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ}; // Accel Readings
+    float p = u(3);
+    float q = u(4);
+    float r = u(5);
+    BLA::Matrix<3> accelR = {u(0), u(1), u(2)}; // Accel Readings
+
+    float qw = x(0);
+    float qx = x(1);
+    float qy = x(2);
+    float qz = x(3);
+
+    BLA::Matrix<4> f_q = {
+        qw - (dt/2.0f)*p*qx - (dt/2.0f)*q*qy - (dt/2.0f)*r*qz,
+        qx + (dt/2.0f)*p*qw - (dt/2.0f)*q*qz - (dt/2.0f)*r*qy,
+        qy + (dt/2.0f)*p*qz + (dt/2.0f)*q*qw - (dt/2.0f)*r*qx,
+        qz - (dt/2.0f)*p*qy + (dt/2.0f)*q*qx - (dt/2.0f)*r*qw
+    };
 
     // Update function for quaternion prediction
-    BLA::Matrix<4> f_q = {
-        x(0) - (dt / 2) * p * x(1) - (dt / 2) * q * x(2) - (dt / 2) * r * x(3),
-        x(1) + (dt / 2) * p * x(0) - (dt / 2) * q * x(3) + (dt / 2) * r * x(2),
-        x(2) + (dt / 2) * p * x(3) + (dt / 2) * q * x(0) - (dt / 2) * r * x(1),
-        x(3) - (dt / 2) * p * x(2) + (dt / 2) * q * x(1) + (dt / 2) * r * x(0)};
+    // BLA::Matrix<4> f_q = {
+    //     x(0) - (dt / 2) * p * x(1) - (dt / 2) * q * x(2) - (dt / 2) * r * x(3),
+    //     x(1) + (dt / 2) * p * x(0) - (dt / 2) * q * x(3) + (dt / 2) * r * x(2),
+    //     x(2) + (dt / 2) * p * x(3) + (dt / 2) * q * x(0) - (dt / 2) * r * x(1),
+    //     x(3) - (dt / 2) * p * x(2) + (dt / 2) * q * x(1) + (dt / 2) * r * x(0)
+    // };
 
     // Calculate linear accelerations in the NED Frame
-    BLA::Matrix<4> quat = {x(0), x(1), x(2), x(3)};
-    BLA::Matrix<3, 3> R_BT = quat2rotm(quat);
+    // BLA::Matrix<4> quat = {x(0), x(1), x(2), x(3)};
+
+
+    // BLA::Matrix<3, 3> R_BT = quat2rotm(quat);
+
+    // Rotate Acceleration into NED
+
+    // BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3,3>>(R_BT) * accelR;
 
     // Apply Gravity Compensation
-    BLA::Matrix<3> gravNED = {0, 0, -g};
-    BLA::Matrix<3> gravB = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * gravNED; // Gravity in body frame
-    BLA::Matrix<3> accelB = accelR - gravB;                                         // Linear Accelartions in body frame
+    // BLA::Matrix<3> gravNED = {0, 0, -g};
+    // BLA::Matrix<3> gravB = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * gravNED; // Gravity in body frame
+    // BLA::Matrix<3> accelB = accelR - gravB;                                         // Linear Accelartions in body frame
 
-    BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * accelB;
+    // BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * accelB;
 
-    // Serial.println("<----- Linear Accel ----->");
-    // for (int i = 0; i < accelT.Rows; i++) {
-    //     for (int j = 0; j < accelT.Cols; j++) {
-    //         Serial.print(String(accelT(i,j)) + "\t");
-    //     }
-    //     Serial.println("");
-    // }
-
-    // Normalize Quaternion Function
-    f_q = f_q / BLA::Norm(f_q);
+    // Normalize Quaternion Derivative Function
+    // f_q = f_q / BLA::Norm(f_q);
 
     // BLA::Matrix<3> f_p = {
     //     x(4) + (x(7)*dt + 0.5*accelT(0)*(dt*dt)),
@@ -208,17 +180,17 @@ BLA::Matrix<10> StateEstimator::measurementFunction(Utility::SensorPacket sensor
     return f;
 };
 
-BLA::Matrix<10, 10> StateEstimator::measurementJacobian(Utility::SensorPacket sensorPacket)
+BLA::Matrix<10, 10> StateEstimator::measurementJacobian(BLA::Matrix<6> u)
 {
-    float p = sensorPacket.gyroX;
-    float q = sensorPacket.gyroY;
-    float r = sensorPacket.gyroZ;
+    float p = u(3);
+    float q = u(4);
+    float r = u(5);
 
     BLA::Matrix<10, 10> A = {
-        1, -(dt/2)*p, -(dt/2)*q, -(dt/2)*r, 0,0,0,0,0,0,
-        (dt/2)*p, 1, (dt/2)*r, -(dt/2)*q, 0,0,0,0,0,0,
-        (dt/2)*q, -(dt/2)*r, 1, (dt/2)*p, 0,0,0,0,0,0,
-        (dt/2)*r, (dt/2)*q, -(dt/2)*p, 1, 0,0,0,0,0,0,
+        1, -(dt/2.0f)*p, -(dt/2.0f)*q, -(dt/2.0f)*r, 0,0,0,0,0,0,
+        (dt/2.0f)*p, 1, (dt/2.0f)*r, -(dt/2.0f)*q, 0,0,0,0,0,0,
+        (dt/2.0f)*q, -(dt/2.0f)*r, 1, (dt/2.0f)*p, 0,0,0,0,0,0,
+        (dt/2.0f)*r, (dt/2.0f)*q, -(dt/2.0f)*p, 1, 0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,
@@ -230,10 +202,11 @@ BLA::Matrix<10, 10> StateEstimator::measurementJacobian(Utility::SensorPacket se
     return A;
 }
 
-BLA::Matrix<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket)
+BLA::Matrix<6> StateEstimator::updateFunction()
 {
     BLA::Matrix<3> r = {
-        cos(inclination), 0, sin(inclination)};
+        cos(magneticDip), 0, sin(magneticDip)
+    };
 
     // Must normalize vector for corrections step
     r = r / BLA::Norm(r);
@@ -250,6 +223,7 @@ BLA::Matrix<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket
     BLA::Matrix<3, 3> quatRotm = quat2rotm(q);
 
     BLA::Matrix<3> a_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * G;
+    
     BLA::Matrix<3> m_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * r;
 
     BLA::Matrix<6> h = {
@@ -264,10 +238,11 @@ BLA::Matrix<6> StateEstimator::updateFunction(Utility::SensorPacket sensorPacket
     return h;
 };
 
-BLA::Matrix<6, 10> StateEstimator::updateJacobian(Utility::SensorPacket sensorPacket)
+BLA::Matrix<6, 10> StateEstimator::updateJacobian()
 {
     BLA::Matrix<3> r = {
-        cos(inclination), 0, sin(inclination)}; // NED Mag vector
+        cos(magneticDip), 0, sin(magneticDip)
+        }; // NED Mag vector
 
     // Must normalize vector for corrections step
     r = r / BLA::Norm(r);
@@ -321,7 +296,7 @@ BLA::Matrix<10, 6> StateEstimator::updateModelCovariance(Utility::SensorPacket s
         0, 0, 0, 0, 0, 0,
     };
 
-    return W * (dt / 2);
+    return W * (dt / 2.0f);
 };
 
 BLA::Matrix<3, 3> StateEstimator::quat2rotm(BLA::Matrix<4> q)
@@ -333,9 +308,10 @@ BLA::Matrix<3, 3> StateEstimator::quat2rotm(BLA::Matrix<4> q)
     float qz = q(3);
 
     BLA::Matrix<3, 3> rotm = {
-        pow(qw, 2) + pow(qx, 2) - pow(qy, 2) - pow(qz, 2), 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy),
-        2 * (qx * qy + qw * qz), pow(qw, 2) - pow(qx, 2) + pow(qy, 2) - pow(qz, 2), 2 * (qy * qz - qw * qz),
-        2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), pow(qw, 2) - pow(qx, 2) - pow(qy, 2) + pow(qz, 2)};
+        qw*qw + qx*qx - qy*qy - qz*qz, 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy),
+        2 * (qx * qy + qw * qz), qw*qw - qx*qx + qy*qy - qz*qz, 2 * (qy * qz - qw * qx),
+        2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), qw*qw - qx*qx - qy*qy + qz*qz
+    };
 
     return rotm;
 };

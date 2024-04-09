@@ -107,8 +107,6 @@ void loop()
         // Reads sensors, logs to flash chip, loops the state
         state->loop();
 
-        // Utility::debugPrint();
-
         State *nextState = state->nextState();
         if (nextState != nullptr)
         {
@@ -117,4 +115,4 @@ void loop()
             state->initialize();
         }
     }
-};
+}

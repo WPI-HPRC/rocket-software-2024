@@ -10,8 +10,8 @@ void MainDescent::initialize_impl() {}
 void MainDescent::loop_impl()
 {
     // calculate vertical velocity
-    float verticalVelocity = (sensorPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
-    lastAltitude = sensorPacket.altitude;
+    float verticalVelocity = (telemPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
+    lastAltitude = telemPacket.altitude;
 
     // add vertical velocity to cyclic buffer
     verticalVelocityBuffer[bufferIndex] = verticalVelocity;

@@ -41,7 +41,7 @@ while time <= int(keyframes[-1][-1]):
                 timestep[i] = int(timestep[i] > 0.5)
 
     timestep.append(time)
-            
-                
+
+    
     print(",".join(map(str, timestep)))
     time += 25

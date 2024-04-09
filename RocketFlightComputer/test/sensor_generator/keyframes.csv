@@ -1,6 +1,6 @@
-accelX,accelY,accelZ,gyroX,gyroY,gyroZ,magX,magY,pressure,altitude,gpsLat,gpsLong,gpsAltMsl,gpsAltAgl,epochTime,satellites,gpsLock,timestamp
+accelX,accelY,accelZ,gyroX,gyroY,gyroZ,magX,magY,magZ,pressure,altitude,gpsLat,gpsLong,gpsAltMsl,gpsAltAgl,epochTime,satellites,gpsLock,timestamp
 float,float,float,float,float,float,float,float,float,float,float,float,float,float,int,int,bool,int
-0.2,0,20,1,1,1,1,1,400,1,125,1,1,1,1,1,0,0
-1,1,2244,26,1,1,0,1,1,1,1,1,1,1,1,1,0,0
-1,1,241,1,1,502,1,1,125,1,125,1,1,1,1,1,0,500
-1,1,0,1,1,-400,1,1,5239,1,-702,1,1,1,1,1,0,1500
+0.2,0,20,1,1,1,1,1,1,400,1,125,1,1,1,1,1,0,0
+1,1,2244,26,1,1,0,1,1,1,1,1,1,1,1,1,1,0,0
+1,1,241,1,1,502,1,1,10,125,1,125,1,1,1,1,1,0,500
+1,1,0,1,1,-400,1,1,1000,5239,1,-702,1,1,1,1,1,0,1500

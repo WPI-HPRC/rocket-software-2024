@@ -1,0 +1,6 @@
+accelX,accelY,accelZ,gyroX,gyroY,gyroZ,magX,magY,magZ,pressure,gpsLat,gpsLong,gpsAltMsl,gpsAltAgl,epochTime,satellites,gpsLock,timestamp
+float,float,float,float,float,float,float,float,float,float,float,float,float,int,int,bool,int
+0,0,0.2,0.1,0.1,0.1,0,0,0,10,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,999,0,0,0,0,0,0,0,0
+0,0,8,0,0,0,0,0,0,980,0,0,0,0,0,0,0,1000
+0,0,0,0,0,0,0,0,0,600,0,0,0,0,0,0,0,4500

@@ -35,7 +35,7 @@ bool XbeeProSX::isDataAvailable()
 
 void XbeeProSX::send(uint64_t address, const void *data, size_t size_bytes)
 {
-    size_t contentLength = size_bytes + 14; // +4 for start delimiter, length, and checksum, +8 for address
+    size_t contentLength = size_bytes + 17; // +4 for start delimiter, length, and checksum, +8 for address
 
     uint8_t* packet = (uint8_t*)alloca(contentLength);
 

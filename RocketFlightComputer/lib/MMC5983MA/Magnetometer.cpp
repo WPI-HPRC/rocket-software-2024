@@ -8,6 +8,7 @@ bool Magnetometer::init() {
   }
 
   this->mag.softReset();
+  this->mag.setFilterBandwidth(400); // Filter Bandwith - BITS 1 | 0 (400Hz - 0.8 mG RMS Noise)
   return true;
 }
 

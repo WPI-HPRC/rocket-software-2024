@@ -21,9 +21,13 @@ class StateEstimator {
     constexpr static int initialLoopIters = 1000;
 
     // Input variance from sensor data sheet
-    const float gyroVariance = 0.00489/sqrt(40); // [Rad/s] 
-    const float magVariance = 0.04; // [uT] Magnetometer RMS Noise
-    const float accelVariance = 0.00069/sqrt(40); // [m/s/s]
+    // const float gyroVariance = 0.00489/sqrt(40); // [Rad/s]
+    // const float magVariance = 0.008; // [T]
+    // const float accelVariance = 0.00069/sqrt(40); // [m/s/s]
+    const float accelXY_Var = 0.65; // [mg] - 100Hz bandwidth
+    const float accelZ_Var = 0.7; // [mg] - 100Hz bandwidth
+    const float gyroVar = 0.028; // [d/s] - 100Hz bandiwdth
+    const float magVar = 0.8; // [mG] - 400Hz bandwidth
 
     float dt = 1.0 / LOOP_RATE;
 
@@ -38,7 +42,7 @@ class StateEstimator {
 
     /* Magnetic Field Constants for Earth at WPI */
     // float inclination = 66.546;
-    float inclination = -11.90 * (PI/180); // [Rad]
+    float inclination = 66.546 * (PI/180); // [Rad]
 
     BLA::Matrix<10,10> P = {
         1,0,0,0,0,0,0,0,0,0,
@@ -67,35 +71,35 @@ class StateEstimator {
     }; // Process Error Covariance
 
     const BLA::Matrix<6,6> R = {
-        accelVariance*accelVariance, 0, 0, 0, 0, 0,
-        0, accelVariance*accelVariance, 0, 0, 0, 0,
-        0, 0, accelVariance*accelVariance, 0, 0, 0,
-        0, 0, 0, magVariance*magVariance, 0, 0,
-        0, 0, 0, 0, magVariance*magVariance, 0,
-        0, 0, 0, 0, 0, magVariance*magVariance,
+        accelXY_Var*accelXY_Var, 0, 0, 0, 0, 0,
+        0, accelXY_Var*accelXY_Var, 0, 0, 0, 0,
+        0, 0, accelZ_Var*accelZ_Var, 0, 0, 0,
+        0, 0, 0, magVar*magVar, 0, 0,
+        0, 0, 0, 0, magVar*magVar, 0,
+        0, 0, 0, 0, 0, magVar*magVar,
     }; // Sensor Noise Covariance - Accel and Mag
 
     const BLA::Matrix<6,6> gyroAccelVar = {
-        gyroVariance*gyroVariance, 0, 0, 0, 0, 0,
-        0, gyroVariance*gyroVariance, 0, 0, 0, 0,
-        0, 0, gyroVariance*gyroVariance, 0, 0, 0,
-        0, 0, 0, accelVariance*accelVariance, 0, 0,
-        0, 0, 0, 0, accelVariance*accelVariance, 0,
-        0, 0, 0, 0, 0, accelVariance*accelVariance
+        gyroVar*gyroVar, 0, 0, 0, 0, 0,
+        0, gyroVar*gyroVar, 0, 0, 0, 0,
+        0, 0, gyroVar*gyroVar, 0, 0, 0,
+        0, 0, 0, accelXY_Var*accelXY_Var, 0, 0,
+        0, 0, 0, 0, accelXY_Var*accelXY_Var, 0,
+        0, 0, 0, 0, 0, accelZ_Var*accelZ_Var
     };
 
-    // const BLA::Matrix<10,10> Q = {
-    //     0.07,0,0,0,0,0,0,0,0,0,
-    //     0,0.07,0,0,0,0,0,0,0,0,
-    //     0,0,0.07,0,0,0,0,0,0,0,
-    //     0,0,0,0.07,0,0,0,0,0,
-    //     0,0,0,0,0,0,0,0,0,0,
-    //     0,0,0,0,0,0,0,0,0,0,
-    //     0,0,0,0,0,0,0,0,0,0,
-    //     0,0,0,0,0,0,0,0,0,0,
-    //     0,0,0,0,0,0,0,0,0,0,
-    //     0,0,0,0,0,0,0,0,0,0,
-    // }; // 10 Element Identity Matrix
+    const BLA::Matrix<10,10> Q_Inertial = {
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0.7,0,0,0,0,0,
+        0,0,0,0,0,0.7,0,0,0,0,
+        0,0,0,0,0,0,0.7,0,0,0,
+        0,0,0,0,0,0,0,0.7,0,0,
+        0,0,0,0,0,0,0,0,0.7,0,
+        0,0,0,0,0,0,0,0,0,0.7,
+    }; // 10 Element Identity Matrix
     
     const BLA::Matrix<10,10> eye10 = {
         1,0,0,0,0,0,0,0,0,0,

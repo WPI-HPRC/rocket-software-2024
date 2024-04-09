@@ -16,5 +16,5 @@ class Accelerometer {
     bool init();
     ICM_data read();
   private:
-    ICM42688 icm2688;
+    ICM42688 icm42688;
 };

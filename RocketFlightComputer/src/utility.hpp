@@ -28,6 +28,14 @@ public:
         return hb + (Tb / Lb) * (pow((pressure_Pa / pb), (-R * Lb / (g0 * M))) - 1);
     };
 
+    static BLA::Matrix<3> crossProduct(const BLA::Matrix<3>& vec1, const BLA::Matrix<3>& vec2) {
+        BLA::Matrix<3> result;
+        result(0) = vec1(1) * vec2(2) - vec1(2) * vec2(1);
+        result(1) = vec1(2) * vec2(0) - vec1(0) * vec2(2);
+        result(2) = vec1(0) * vec2(1) - vec1(1) * vec2(0);
+        return result;
+    }
+
     struct SensorPacket
     {
         // Raw Sensor Readings
@@ -145,4 +153,5 @@ public:
     constexpr static float b_earth = 6356752.3142;    // [m] Semi-Minor axis of Earth
     constexpr static float e_earth = 0.0818191908426; // Eccentricity of Earth
     constexpr static float r_earth = 6378137; // [m] Radius of Earth
+    constexpr static float g = 9.80665; // [m/s/s] Grav Acceleration of Earth
 };

@@ -15,6 +15,7 @@ private:                              \
 #include <BasicLinearAlgebra.h>
 #include <TelemetryBoard/XBeeProSX.h>
 #include <EKF.h>
+#include <AHRS/MadgwickOrientation.h>
 
 //! @brief Enum representing the id of the state, to be used in logging and communication with ground station
 enum StateId
@@ -58,6 +59,7 @@ public:
 
     // Eigen::Vector<float, 10> x_state;
     BLA::Matrix<10> x_state;
+    Eigen::Vector<float, 4> quat;
 
 protected:
     //! @note Constructor to be called from subclasses to initialize the `sensors` object
@@ -71,6 +73,8 @@ protected:
     //! @brief "global" sensors object
     struct Sensors *sensors;
     StateEstimator *stateEstimator;
+    Madgwick *madgwick;
+
     bool stateEstimatorInitialized = false;
 
     XbeeProSX *xbee = new XbeeProSX(17); // CS GPIO17

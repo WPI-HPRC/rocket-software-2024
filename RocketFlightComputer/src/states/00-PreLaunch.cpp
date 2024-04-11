@@ -63,8 +63,43 @@ void PreLaunch::loop_impl()
     // Intialize EKF
     if (!this->stateEstimatorInitialized)
     {
-        BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        // Calculate Initial Quaternion using Accel and Mag
+
+        // Normalize Acceleration Vector
+        BLA::Matrix<3> a = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
+        a /= BLA::Norm(a);
+
+        // Normalize Magnetometer Vector
+        BLA::Matrix<3> m = {sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
+        m /= BLA::Norm(m);
+
+        // Observation Matrix
+
+        BLA::Matrix<3> crossProd1 = Utility::crossProduct(a, m);
+        BLA::Matrix<3> crossProd2 = Utility::crossProduct(a,crossProd1); 
+
+        BLA::Matrix<4> q_0 = {
+        0.5 * sqrt(1 + a(0) + crossProd1(1) + crossProd2(2)),
+        0.5 * std::copysign(sqrt(1 + a(0) - crossProd1(1) - crossProd2(2)), crossProd2(1) - crossProd1(2)),
+        0.5 * std::copysign(sqrt(1 - a(0) + crossProd1(1) - crossProd2(2)), crossProd1(2) - crossProd2(1)),
+        0.5 * std::copysign(sqrt(1 - a(0) - crossProd1(1) + crossProd2(2)), crossProd2(0) - crossProd1(1) + crossProd1(0) - crossProd2(0))
+        };
+
+        Serial.println("<----- Initial Quaternion ----->");
+        for (int i = 0; i < q_0.Rows; i++) {
+            for (int j = 0; j < q_0.Cols; j++) {
+                Serial.print(String(q_0(i,j)) + "\t");
+            }
+            Serial.println("");
+        }
+
+        BLA::Matrix<10> x_0 = {q_0(0), q_0(1), q_0(2), q_0(3), 0, 0, 0, 0, 0, 0};
+
+        // BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        // Eigen::Vector<float, 4> x_0 {1,0,0,0};
         this->stateEstimator = new StateEstimator(x_0, 0.025);
+        // this->madgwick = new Madgwick(x_0, AHRS_GAIN);
+        Serial.println("[Prelaunch] Initialized EKF");
         this->stateEstimatorInitialized = true;
     }
 

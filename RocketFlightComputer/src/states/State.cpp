@@ -20,23 +20,23 @@ void State::loop() {
 	if (this->stateEstimatorInitialized) {
         // this->quat = this->madgwick->onLoop(this->sensorPacket);
 
-		// this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
+		this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
 
-        Serial.print(sensorPacket.accelX); Serial.print(",");
-        Serial.print(sensorPacket.accelY); Serial.print(",");
-        Serial.print(sensorPacket.accelZ); Serial.print(",");
-        Serial.print(sensorPacket.gyroX); Serial.print(",");
-        Serial.print(sensorPacket.gyroY); Serial.print(",");
-        Serial.print(sensorPacket.gyroZ); Serial.print(",");
-        Serial.print(sensorPacket.magX); Serial.print(",");
-        Serial.print(sensorPacket.magY); Serial.print(",");
-        Serial.println(sensorPacket.magZ);
+        // Serial.print(sensorPacket.accelX); Serial.print(",");
+        // Serial.print(sensorPacket.accelY); Serial.print(",");
+        // Serial.print(sensorPacket.accelZ); Serial.print(",");
+        // Serial.print(sensorPacket.gyroX); Serial.print(",");
+        // Serial.print(sensorPacket.gyroY); Serial.print(",");
+        // Serial.print(sensorPacket.gyroZ); Serial.print(",");
+        // Serial.print(sensorPacket.magX); Serial.print(",");
+        // Serial.print(sensorPacket.magY); Serial.print(",");
+        // Serial.println(sensorPacket.magZ);
         
 
-        // Serial.print("QUAT|"); Serial.print(x_state(0)); Serial.print(",");
-        // Serial.print(x_state(1)); Serial.print(",");
-        // Serial.print(x_state(2)); Serial.print(",");
-        // Serial.println(x_state(3));
+        Serial.print("QUAT|"); Serial.print(x_state(0)); Serial.print(",");
+        Serial.print(x_state(1)); Serial.print(",");
+        Serial.print(x_state(2)); Serial.print(",");
+        Serial.println(x_state(3));
 
         // float hdg = atan2(sensorPafcket.magY, sensorPacket.magX) * (180/PI);
         /*

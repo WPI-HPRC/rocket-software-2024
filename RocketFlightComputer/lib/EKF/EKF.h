@@ -32,8 +32,8 @@ class StateEstimator {
     // const float accelVariance = 0.0006864655 * sqrt(40);
     const float accelXY_Var = 0.65;
     const float accelZ_Var = 0.7;
-    const float gyroVar = 0.028;
-    const float magVar = 0.8;
+    const float gyroVar = 0.28;
+    const float magVar = 1.2;
 
     float dt = 1.0 / LOOP_RATE;
 

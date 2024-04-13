@@ -55,20 +55,20 @@ Utility::SensorPacket Sensors::readSensors() {
     0.0070,   -0.2353,    0.9428,
   };
 
-  BLA::Matrix<3> hardIronCal = {-2.8686, -3.4458, 0.4693};
+  // BLA::Matrix<3> hardIronCal = {-2.8686, -3.4458, 0.4693};
 
-  BLA::Matrix<3> magVector = {sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
+  // BLA::Matrix<3> magVector = {sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
 
-  BLA::Matrix<3> magCal = softIronCal * (magVector - hardIronCal);
+  // BLA::Matrix<3> magCal = softIronCal * (magVector - hardIronCal);
 
   // Update sensor packet with the calibrated values
   sensorPacket.accelX = accelCal(0);
   sensorPacket.accelY = accelCal(1);
   sensorPacket.accelZ = accelCal(2);
 
-  sensorPacket.magX = magCal(0);
-  sensorPacket.magY = magCal(1);
-  sensorPacket.magZ = magCal(2);
+  // sensorPacket.magX = magCal(0);
+  // sensorPacket.magY = magCal(1);
+  // sensorPacket.magZ = magCal(2);
 
   // Serial.print(sensorPacket.magX, 5); Serial.print(",");
   // Serial.print(sensorPacket.magY, 5); Serial.print(",");

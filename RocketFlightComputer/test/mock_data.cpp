@@ -53,6 +53,7 @@ void test_basic() {
   When(Method(ArduinoFake(), millis)).AlwaysDo([&data](){ return data.timestamp; });
   When(Method(ArduinoFake(), pinMode)).AlwaysReturn();
   When(Method(ArduinoFake(), digitalWrite)).AlwaysReturn();
+  When(Method(ArduinoFake(), delay)).AlwaysReturn();
   When(OverloadedMethod(ArduinoFake(Serial), print, unsigned long (char const *))).AlwaysReturn();
   When(OverloadedMethod(ArduinoFake(Serial), println, unsigned long (char const *))).AlwaysReturn();
   When(OverloadedMethod(ArduinoFake(Serial), println, unsigned long (long, int))).AlwaysReturn();

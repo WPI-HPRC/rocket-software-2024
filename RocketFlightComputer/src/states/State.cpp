@@ -9,6 +9,8 @@ void State::initialize()
     initialize_impl();
 
     xbee->begin();
+
+    apogeeEstimator = new ApogeeEstimation();
 }
 
 void State::loop() {
@@ -22,16 +24,22 @@ void State::loop() {
 
 		this->x_state = this->stateEstimator->onLoop(this->sensorPacket);
 
-        Serial.print(sensorPacket.accelX); Serial.print(",");
-        Serial.print(sensorPacket.accelY); Serial.print(",");
-        Serial.print(sensorPacket.accelZ); Serial.print(",");
-        Serial.print(sensorPacket.gyroX); Serial.print(",");
-        Serial.print(sensorPacket.gyroY); Serial.print(",");
-        Serial.print(sensorPacket.gyroZ); Serial.print(",");
-        Serial.print(sensorPacket.magX); Serial.print(",");
-        Serial.print(sensorPacket.magY); Serial.print(",");
-        Serial.print(sensorPacket.magZ); Serial.print(",");
-        Serial.println(sensorPacket.timestamp);
+        BLA::Matrix<10> testState = {x_state(0), x_state(1), x_state(2), x_state(3), 0, 0, -305, 0, 0, 0};
+
+        // float apogee = apogeeEstimator->estimate(testState, sensorPacket);
+
+        // Serial.print("[Apogee Estimator] Estimate: "); Serial.println(apogee);
+
+        // Serial.print(sensorPacket.accelX); Serial.print(",");
+        // Serial.print(sensorPacket.accelY); Serial.print(",");
+        // Serial.print(sensorPacket.accelZ); Serial.print(",");
+        // Serial.print(sensorPacket.gyroX); Serial.print(",");
+        // Serial.print(sensorPacket.gyroY); Serial.print(",");
+        // Serial.print(sensorPacket.gyroZ); Serial.print(",");
+        // Serial.print(sensorPacket.magX); Serial.print(",");
+        // Serial.print(sensorPacket.magY); Serial.print(",");
+        // Serial.print(sensorPacket.magZ); Serial.print(",");
+        // Serial.println(sensorPacket.timestamp);
 
         // double magNorm = sqrt(sensorPacket.magX*sensorPacket.magX + sensorPacket.magY*sensorPacket.magY + sensorPacket.magZ*sensorPacket.magZ);
 
@@ -44,10 +52,10 @@ void State::loop() {
 
         
 
-        // Serial.print("QUAT|"); Serial.print(x_state(0)); Serial.print(",");
-        // Serial.print(x_state(1)); Serial.print(",");
-        // Serial.print(x_state(2)); Serial.print(",");
-        // Serial.println(x_state(3));
+        Serial.print("QUAT|"); Serial.print(x_state(0)); Serial.print(",");
+        Serial.print(x_state(1)); Serial.print(",");
+        Serial.print(x_state(2)); Serial.print(",");
+        Serial.println(x_state(3));
 
         // float hdg = atan2(sensorPafcket.magY, sensorPacket.magX) * (180/PI);
         /*
@@ -55,10 +63,6 @@ void State::loop() {
 angle = angle * (180 / Math.PI)
 angle = angle + 90
 angle = (angle +360) % 360*/
-
-        if(sensorPacket.gpsLock) {
-            Serial.print("Time: ");  Serial.println(sensorPacket.epochTime);
-        };
 
 		this->telemPacket.w = this->x_state(0);
 		this->telemPacket.i = this->x_state(1);

@@ -97,7 +97,7 @@ class StateEstimator {
     BLA::Matrix<10> x;
     BLA::Matrix<10> x_min;
 
-    float g = 9.80665;
+    float g = Utility::g;
 
     BLA::Matrix<4> quaternionMultiplication(BLA::Matrix<4> q1, BLA::Matrix<4> q2);
 };

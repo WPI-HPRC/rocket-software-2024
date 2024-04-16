@@ -27,15 +27,14 @@ StateEstimator *stateEstimator = nullptr;
 // Start in pre-launch
 State *state = new PreLaunch(&sensors, stateEstimator);
 
-void handleMagInterrupt() {
-    sensors.mag->handleInterrupt();
-}
+// void handleMagInterrupt() {
+//     sensors.mag->handleInterrupt();
+// }
 
 void setup()
 {
     Serial.begin(115200);
-    // while (!Serial)
-    //     ;
+    while (!Serial);
     Serial.println("Beginning Flight Computer");
 
     Wire.begin();
@@ -92,8 +91,8 @@ void setup()
         Serial.println("[Sensorboard] NEOM10S GPS Detected");
     }
 
-    pinMode(magInterruptPin, INPUT);
-    attachInterrupt(digitalPinToInterrupt(magInterruptPin), handleMagInterrupt, RISING);
+    // pinMode(magInterruptPin, INPUT);
+    // attachInterrupt(digitalPinToInterrupt(magInterruptPin), handleMagInterrupt, RISING);
 
     delay(150);
     
@@ -109,6 +108,8 @@ void loop()
 {
     if (timer.check() == 1)
     {
+        Serial.print("dt: "); Serial.println(millis() - previousTime);
+
         previousTime = millis();
         
         // Reads sensors, logs to flash chip, loops the state

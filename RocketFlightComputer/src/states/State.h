@@ -16,6 +16,7 @@ private:                              \
 #include <TelemetryBoard/XBeeProSX.h>
 #include <EKF.h>
 #include <AHRS/MadgwickOrientation.h>
+#include <Controls/ApogeeEstimation.h>
 
 //! @brief Enum representing the id of the state, to be used in logging and communication with ground station
 enum StateId
@@ -74,6 +75,7 @@ protected:
     struct Sensors *sensors;
     StateEstimator *stateEstimator;
     Madgwick *madgwick;
+    ApogeeEstimation *apogeeEstimator;
 
     bool stateEstimatorInitialized = false;
 

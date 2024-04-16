@@ -10,8 +10,7 @@
 class Utility
 {
 public:
-    static float pressureToAltitude(float pressure)
-    {
+    static float pressureToAltitude(float pressure) {
         // physical parameters for model
         const float pb = 101325;   // [Pa] pressure at sea level
         const float Tb = 288.15;   // [K] temperature at seal level
@@ -26,6 +25,31 @@ public:
 
         // compute altitude from formula
         return hb + (Tb / Lb) * (pow((pressure_Pa / pb), (-R * Lb / (g0 * M))) - 1);
+    };
+
+    static BLA::Matrix<3,3> quat2rotm(BLA::Matrix<4> q) {
+        float qw = q(0);
+        float qx = q(1);
+        float qy = q(2);
+        float qz = q(3);
+
+        BLA::Matrix<3, 3> rotm = {
+            qw*qw + qx*qx - qy*qy - qz*qz, 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy),
+            2 * (qx * qy + qw * qz), qw*qw - qx*qx + qy*qy - qz*qz, 2 * (qy * qz - qw * qx),
+            2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), qw*qw - qx*qx - qy*qy + qz*qz
+        };
+
+        return rotm;
+    };
+
+    float densityAtAltitude(float altitude) {
+
+        return rho_sl * pow(temperatureAtAltitude(altitude) / t_sl, -1 - (g / (a_1 / R)));
+    };
+
+    float temperatureAtAltitude(float altitude) {
+
+        return t_sl + a_1*altitude;
     };
 
     static BLA::Matrix<3> crossProduct(const BLA::Matrix<3>& vec1, const BLA::Matrix<3>& vec2) {
@@ -148,10 +172,18 @@ public:
     }
 #endif // NOTE: REMOVES FLASH CODE
 
-    // WGS84 Ellipsoid Model
+
+    /** -----EARTH CONSTANTS----- **/
+    // WGS84 Ellipsoid Model Constants
     constexpr static float a_earth = 6378137.0;       // [m] Semi-major axis of Earth
     constexpr static float b_earth = 6356752.3142;    // [m] Semi-Minor axis of Earth
     constexpr static float e_earth = 0.0818191908426; // Eccentricity of Earth
     constexpr static float r_earth = 6378137; // [m] Radius of Earth
     constexpr static float g = 9.80665; // [m/s/s] Grav Acceleration of Earth
+
+    // Standard Atmospheric Model Constants
+    constexpr static float rho_sl = 1.225; // [kg/m^3] Density at Sea Level
+    constexpr static float t_sl = 288.16; // [K] Temperature at Sea Level
+    constexpr static float a_1 = -6.5e-3; // [K/m] Temperature Gradient
+    constexpr static float R = 287; // [J/kgK] Universal Gas Constant
 };

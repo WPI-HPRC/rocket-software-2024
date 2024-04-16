@@ -64,7 +64,6 @@ void PreLaunch::loop_impl()
     if (!this->stateEstimatorInitialized)
     {
         // Calculate Initial Quaternion using Accel and Mag
-
         // Normalize Acceleration Vector
         BLA::Matrix<3> a = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
         a /= BLA::Norm(a);
@@ -94,6 +93,13 @@ void PreLaunch::loop_impl()
         }
 
         BLA::Matrix<10> x_0 = {q_0(0), q_0(1), q_0(2), q_0(3), 0, 0, 0, 0, 0, 0};
+
+        
+
+        BLA::Matrix<10> testState = {1,0,0,0,0,0,-305,0,0,0};
+
+        // float apogeeEstimate = apogeeEstimator.estimate(testState, sensorPacket);
+        // Serial.println("Test Apogee Estimate: ");
 
         // BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         // Eigen::Vector<float, 4> x_0 {1,0,0,0};

@@ -1,3 +1,0 @@
-[submodule "RocketFlightComputer/src/TelemetryBoard/xbee"]
-	path = RocketFlightComputer/src/TelemetryBoard/xbee
-	url = https://bitbucket.org/wpi-hprc/xbee/

@@ -29,7 +29,7 @@ void DrogueDescent::loop_impl()
     bufferIndex = (bufferIndex + 1) % 10;
 
     // if the average vertical velocity is less that the expected velocity at main deploy for 30 cycles, main has deployed
-    mainDeployVelocityReached = drogueDescentDebouncer.checkOut(averageVerticalVelocity <= MAIN_DEPLOY_VELOCITY);
+    mainDeployVelocityReached = drogueDescentDebouncer.checkOut(abs(averageVerticalVelocity) <= MAIN_DEPLOY_VELOCITY);
 }
 
 State *DrogueDescent::nextState_impl()

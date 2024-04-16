@@ -28,7 +28,7 @@ void MainDescent::loop_impl()
     bufferIndex = (bufferIndex + 1) % 10;
 
     // if the average vertical velocity is less than the expected landing velocity for 30 cycles, the rocket has landed
-    landed = landedDebouncer.checkOut(averageVerticalVelocity < LANDING_VELOCITY);
+    landed = landedDebouncer.checkOut(abs(averageVerticalVelocity) < LANDING_VELOCITY);
 }
 
 State *MainDescent::nextState_impl()

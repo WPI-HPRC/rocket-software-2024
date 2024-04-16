@@ -30,7 +30,8 @@ void State::loop() {
         Serial.print(sensorPacket.gyroZ); Serial.print(",");
         Serial.print(sensorPacket.magX); Serial.print(",");
         Serial.print(sensorPacket.magY); Serial.print(",");
-        Serial.println(sensorPacket.magZ);
+        Serial.print(sensorPacket.magZ); Serial.print(",");
+        Serial.println(sensorPacket.timestamp);
 
         // double magNorm = sqrt(sensorPacket.magX*sensorPacket.magX + sensorPacket.magY*sensorPacket.magY + sensorPacket.magZ*sensorPacket.magZ);
 

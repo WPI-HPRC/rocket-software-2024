@@ -27,6 +27,10 @@ StateEstimator *stateEstimator = nullptr;
 // Start in pre-launch
 State *state = new PreLaunch(&sensors, stateEstimator);
 
+void handleMagInterrupt() {
+    sensors.mag->handleInterrupt();
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -88,15 +92,11 @@ void setup()
         Serial.println("[Sensorboard] NEOM10S GPS Detected");
     }
 
+    pinMode(magInterruptPin, INPUT);
+    attachInterrupt(digitalPinToInterrupt(magInterruptPin), handleMagInterrupt, RISING);
+
     delay(150);
-
-    // Print GPS Configuration Information
-
-    // Serial.println("+=== GNSS SYSTEM ===+");
-    // Serial.print("Module: "); Serial.println(gps->getModuleName());
-    // Serial.print("Protocol Version: "); Serial.print(gps->getProtocolVersionHigh());
-    // Serial.print("."); Serial.println(gps->getProtocolVersionLow());
-
+    
     // Initialize starting state
     state->initialize();
 

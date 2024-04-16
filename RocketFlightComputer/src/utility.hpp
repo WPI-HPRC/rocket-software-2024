@@ -45,9 +45,9 @@ public:
         float gyroX;
         float gyroY;
         float gyroZ;
-        float magX;
-        float magY;
-        float magZ;
+        double magX;
+        double magY;
+        double magZ;
         float pressure;
 
         // Calculated Values

@@ -18,7 +18,7 @@ bool GNSS::init() {
     }
 
     this->gnss.setI2COutput(COM_TYPE_UBX);
-    this->gnss.setNavigationFrequency(40);
+    this->gnss.setNavigationFrequency(5);
     this->gnss.setAutoPVT(true);
 
     // Enable the jamming / interference monitor
@@ -75,20 +75,6 @@ float GNSS::getAltMSL() {
 float GNSS::getAltAGL() {
     return gnss.getAltitude();
 };
-
-String GNSS::getTime() {
-    String timeString;
-    
-    String hour = String(gnss.getHour());
-    String minute = String(gnss.getMinute());
-    String second = String(gnss.getSecond());
-
-    timeString += (hour + ":" + minute + ":" + second);
-
-    return timeString;
-}
-
-
 
 bool GNSS::dataReady() {
     return (gnss.getPVT() && (gnss.getInvalidLlh() == false));

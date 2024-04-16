@@ -122,17 +122,8 @@ BLA::Matrix<10> StateEstimator::measurementFunction(BLA::Matrix<6> u)
         qz - (dt/2.0f)*p*qy + (dt/2.0f)*q*qx - (dt/2.0f)*r*qw
     };
 
-    // Update function for quaternion prediction
-    // BLA::Matrix<4> f_q = {
-    //     x(0) - (dt / 2) * p * x(1) - (dt / 2) * q * x(2) - (dt / 2) * r * x(3),
-    //     x(1) + (dt / 2) * p * x(0) - (dt / 2) * q * x(3) + (dt / 2) * r * x(2),
-    //     x(2) + (dt / 2) * p * x(3) + (dt / 2) * q * x(0) - (dt / 2) * r * x(1),
-    //     x(3) - (dt / 2) * p * x(2) + (dt / 2) * q * x(1) + (dt / 2) * r * x(0)
-    // };
-
     // Calculate linear accelerations in the NED Frame
     // BLA::Matrix<4> quat = {x(0), x(1), x(2), x(3)};
-
 
     // BLA::Matrix<3, 3> R_BT = quat2rotm(quat);
 

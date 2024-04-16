@@ -12,8 +12,8 @@ bool Accelerometer::init() {
   this->icm42688.setAccelFS(ICM42688::gpm16);
   this->icm42688.setGyroFS(ICM42688::dps250);
 
-  this->icm42688.setAccelODR(ICM42688::odr50);
-  this->icm42688.setGyroODR(ICM42688::odr50);
+  this->icm42688.setAccelODR(ICM42688::odr100);
+  this->icm42688.setGyroODR(ICM42688::odr100);
 
   return true;
 }

@@ -31,6 +31,16 @@ void State::loop() {
         Serial.print(sensorPacket.magX); Serial.print(",");
         Serial.print(sensorPacket.magY); Serial.print(",");
         Serial.println(sensorPacket.magZ);
+
+        // double magNorm = sqrt(sensorPacket.magX*sensorPacket.magX + sensorPacket.magY*sensorPacket.magY + sensorPacket.magZ*sensorPacket.magZ);
+
+        // double heading = atan2((sensorPacket.magX / magNorm), 0 - (sensorPacket.magY / magNorm));
+        // heading /= PI;
+        // heading *= 180;
+        // heading += 180;
+        // Serial.print("Heading: "); Serial.println(heading);
+        // Serial.println(sensorPacket.timestamp);
+
         
 
         // Serial.print("QUAT|"); Serial.print(x_state(0)); Serial.print(",");

@@ -68,13 +68,6 @@ public:
     float getAltMSL();
 
     /**
-     * @brief Get the current time as a string
-     * 
-     * @return char* Time
-     */
-    String getTime();
-
-    /**
      * @brief Checks PVT and Fix Status to see if data is ready
      * 
      * @return true 

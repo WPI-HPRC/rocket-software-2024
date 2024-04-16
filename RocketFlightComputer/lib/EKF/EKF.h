@@ -23,10 +23,10 @@ class StateEstimator {
 
     // Declare sensor variance from datasheets
 
-    const float accelXY_Var = 0.65; // [mg]
-    const float accelZ_Var = 0.7; // [mg]
-    const float gyroVar = 0.28; // [d/s]
-    const float magVar = 1.2; // [mG]
+    const float accelXY_Var = 0.00637; // [m/s^2]
+    const float accelZ_Var = 0.00686; // [m/s^2]
+    const float gyroVar = 0.000489; // [rad/s]
+    const float magVar = 120; // [nT]
     float dt = 1.0 / LOOP_RATE;
 
     BLA::Matrix<10,10> P = {

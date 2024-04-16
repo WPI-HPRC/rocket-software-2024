@@ -12,8 +12,6 @@
 #include <states/State.h>
 #include <states/00-PreLaunch.h>
 
-#include <TelemetryBoard/XBeeProSX.h>
-
 #include <Sensors.h>
 
 Metro timer = Metro(1000 / LOOP_RATE);

@@ -11,8 +11,8 @@ void DrogueDescent::initialize_impl() {}
 void DrogueDescent::loop_impl()
 {
     // calculate vertical velocity
-    float verticalVelocity = (sensorPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
-    lastAltitude = sensorPacket.altitude;
+    float verticalVelocity = (telemPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
+    lastAltitude = telemPacket.altitude;
 
     // add vertical velocity to cyclic buffer
     verticalVelocityBuffer[bufferIndex] = verticalVelocity;
@@ -29,7 +29,7 @@ void DrogueDescent::loop_impl()
     bufferIndex = (bufferIndex + 1) % 10;
 
     // if the average vertical velocity is less that the expected velocity at main deploy for 30 cycles, main has deployed
-    mainDeployVelocityReached = drogueDescentDebouncer.checkOut(averageVerticalVelocity <= MAIN_DEPLOY_VELOCITY);
+    mainDeployVelocityReached = drogueDescentDebouncer.checkOut(abs(averageVerticalVelocity) <= MAIN_DEPLOY_VELOCITY);
 }
 
 State *DrogueDescent::nextState_impl()

@@ -19,6 +19,7 @@ struct Sensors {
 };
 #else
 struct Sensors {
-    virtual Utility::SensorPacket readSensors() { Utility::SensorPacket packet; return packet; }
+    // virtual Utility::SensorPacket readSensors() { Utility::SensorPacket packet; return packet; }
+    virtual Utility::SensorPacket readSensors() = 0;
 };
 #endif

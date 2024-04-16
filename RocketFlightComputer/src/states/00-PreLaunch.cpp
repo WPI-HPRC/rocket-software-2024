@@ -35,6 +35,7 @@ void PreLaunch::loop_impl()
     {
         this->accelReadingBuffer[this->buffIdx++] = this->sensorPacket.accelZ;
         this->buffIdx %= sizeof(this->accelReadingBuffer) / sizeof(float);
+        launched = launchDebouncer.checkOut(this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD);
         return;
     }
 
@@ -66,8 +67,6 @@ void PreLaunch::loop_impl()
         this->stateEstimator = new StateEstimator(x_0, 0.025);
         this->stateEstimatorInitialized = true;
     }
-
-    launched = launchDebouncer.checkOut(this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD);
 }
 
 State *PreLaunch::nextState_impl()

@@ -82,6 +82,8 @@ public:
         float magZ = 0.0f;
         float pressure = 0.0f;
 
+        uint32_t servoPosition = 0;
+
         // Calculated Values
         float altitude = 0.0f;
 

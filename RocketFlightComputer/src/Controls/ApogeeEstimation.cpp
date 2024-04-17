@@ -22,6 +22,8 @@ float ApogeeEstimation::estimate(BLA::Matrix<10> currentState, Utility::SensorPa
         currentState(6) // vz
     };
 
+    float rk4Vel = 0.0f;
+
     // Loop until the N_z velocity of the vehicle begins to drop
     for(int i = 1; rk4Vel <= 0; i++) {
 
@@ -36,8 +38,6 @@ float ApogeeEstimation::estimate(BLA::Matrix<10> currentState, Utility::SensorPa
 
         rk4Vel = x_t(12); // Z Velocity from Estimate
     }
-
-    rk4Vel = 0.0f;
 
     return x_t(6);
 }

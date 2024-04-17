@@ -19,12 +19,6 @@ private:
     const float t_0 = 0;
     const float t_max = 50; // [s] 50s max forward look
     const float numTimePts = t_max / dt+1;
-    
-    float rk4Vel = 0.0f;
-
 
     BLA::Matrix<13> systemDynamics(BLA::Matrix<13> x);
-
-    
-
 };

@@ -108,7 +108,7 @@ void loop()
 {
     if (timer.check() == 1)
     {
-        Serial.print("dt: "); Serial.println(millis() - previousTime);
+        // Serial.print("dt: "); Serial.println(millis() - previousTime);
 
         previousTime = millis();
         

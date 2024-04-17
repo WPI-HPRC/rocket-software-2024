@@ -90,21 +90,11 @@ void PreLaunch::loop_impl()
                 Serial.print(String(q_0(i,j)) + "\t");
             }
             Serial.println("");
-        }
+        };
 
-        BLA::Matrix<10> x_0 = {q_0(0), q_0(1), q_0(2), q_0(3), 0, 0, 0, 0, 0, 0};
-
-        
-
-        BLA::Matrix<10> testState = {1,0,0,0,0,0,-305,0,0,0};
-
-        // float apogeeEstimate = apogeeEstimator.estimate(testState, sensorPacket);
-        // Serial.println("Test Apogee Estimate: ");
-
-        // BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        // Eigen::Vector<float, 4> x_0 {1,0,0,0};
+        BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         this->stateEstimator = new StateEstimator(x_0, 0.025);
-        // this->madgwick = new Madgwick(x_0, AHRS_GAIN);
+        
         Serial.println("[Prelaunch] Initialized EKF");
         this->stateEstimatorInitialized = true;
     }

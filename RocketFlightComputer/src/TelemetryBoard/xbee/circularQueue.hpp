@@ -1,9 +1,7 @@
 //
 // Created by William Scheirey on 3/29/24.
 //
-
-#ifndef HPRC_CIRCULARQUEUE_HPP
-#define HPRC_CIRCULARQUEUE_HPP
+#pragma once
 
 #include <iostream>
 
@@ -129,5 +127,3 @@ inline bool isCircularQueueEmpty(CircularQueue<T> *queue)
 {
     return queue->readPtr == queue->dataPtr;
 }
-
-#endif //HPRC_CIRCULARQUEUE_HPP

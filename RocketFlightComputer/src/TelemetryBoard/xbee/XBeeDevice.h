@@ -1,9 +1,7 @@
 //
 // Created by William Scheirey on 3/12/24.
 //
-
-#ifndef HPRC_XBEEDEVICE_H
-#define HPRC_XBEEDEVICE_H
+#pragma once
 
 #include <queue>
 #include "XBeeUtility.h"
@@ -129,6 +127,3 @@ protected:
 
     static uint8_t calcChecksum(const uint8_t *packet, uint8_t size_bytes);
 };
-
-
-#endif //HPRC_XBEEDEVICE_H

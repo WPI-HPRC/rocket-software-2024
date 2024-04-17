@@ -1,9 +1,7 @@
 //
 // Created by William Scheirey on 3/18/24.
 //
-
-#ifndef HPRC_CIRCULARBUFFER_HPP
-#define HPRC_CIRCULARBUFFER_HPP
+#pragma once
 
 #include <cstdlib>
 #include <cstring>
@@ -55,5 +53,3 @@ inline void circularBufferAdd(CircularBuffer *buffer, uint8_t *data, size_t leng
         buffer->dataPtr += buffer->dataSize_bytes;
     }
 }
-
-#endif //HPRC_CIRCULARBUFFER_HPP

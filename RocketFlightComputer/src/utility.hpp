@@ -58,6 +58,7 @@ public:
 
     #pragma pack(push,1)
     struct TelemPacket {
+        uint8_t packetType = 0x01;
         // State Integer
         // 0 - PreLaunch
         // 1 - Launch

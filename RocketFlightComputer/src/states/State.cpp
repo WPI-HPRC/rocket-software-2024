@@ -3,12 +3,31 @@
 
 State::State(struct Sensors *sensors, StateEstimator *stateEstimator) : sensors(sensors), stateEstimator(stateEstimator) {}
 
+void break_uint16(uint16_t value, uint8_t *byte_array) {
+    byte_array[1] = (uint8_t)(value & 0xFF);        // Low byte
+    byte_array[0] = (uint8_t)((value >> 8) & 0xFF); // High byte
+}
+
 void State::initialize()
 {
     this->startTime = millis();
     initialize_impl();
 
-    xbee->begin();
+    xbee->start();
+
+/*
+
+    const uint16_t networkID = 0x4843;
+
+    uint8_t byte_array[2];
+    
+    break_uint16(networkID, byte_array);
+
+    xbee->setParameter(XBee::AtCommand::ApiOptions, 0x90);
+    xbee->setParameter(AsciiToUint16('I', 'D'), byte_array, 2);
+*/
+
+    // exit(0);
 }
 
 void State::loop() {
@@ -53,7 +72,7 @@ void State::loop() {
     this->telemPacket.epochTime = this->sensorPacket.epochTime;
     this->telemPacket.satellites = this->sensorPacket.satellites;
     this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
-		this->telemPacket.loopCount = this->loopCount;
+    this->telemPacket.loopCount = this->loopCount;
     this->telemPacket.timestamp = now;
 
 #ifdef SERIAL_TELEMETRY
@@ -61,17 +80,16 @@ void State::loop() {
 #endif
 
     /** Loop Radio and Send Data */
-    // xbee->updateSubscribers();
+
+    Serial.printf("Loop count: %d\n", this->loopCount);
 
 #ifndef NO_XBEE
-    xbee->send(0x0013A200423F474C, &telemPacket, sizeof(telemPacket));
 
-    Serial.print("Packet Success: ");
-    Serial.println(now);
+    xbee->sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket));
+
+    // Serial.print("Packet Success: ");
+    // Serial.println(now);
 #endif
-
-    // Serial.print("Packet Size: "); Serial.println(sizeof(telemPacket));
-    // Serial.print("Data Packet Size: "); Serial.println(sizeof(telemPacket));
 }
 
 State *State::nextState()

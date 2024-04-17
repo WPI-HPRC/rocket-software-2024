@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FS.h"
+#include "Servo.h"
 #include <Arduino.h>
 #include <cstdint>
 #include <cmath>
@@ -11,10 +12,12 @@
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 #define SERVO_FEEDBACK_GPIO 26
+#define SERVO_PWM_GPIO 25
 
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
 extern bool sdCardInitialized;
 extern fs::File dataFile;
+extern Servo airbrakesServo;
 
 class Utility
 {

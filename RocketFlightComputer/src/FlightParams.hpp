@@ -49,6 +49,12 @@ constexpr float MOTOR_BURN_TIME = 3.1 * 1000.0;
 // Each loop is about 25ms
 #define COAST_AIRBRAKE_INCREMENT_LOOPS 4
 
+#define AIRBRAKE_FULL_EXTENSION 180
+#define AIRBRAKE_75_EXTENSION 135
+#define AIRBRAKE_HALF_EXTENSION 90
+#define AIRBRAKE_25_EXTENSION 45
+#define AIRBRAKE_RETRACTED 0
+
 // seconds, OpenRocket for Test Launch 2/17
 constexpr float TIME_IN_COAST = 18.4 * 1000.0;
 

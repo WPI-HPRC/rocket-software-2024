@@ -16,13 +16,13 @@ private:
     int bufferIndex = 0;
     float lastAltitude = 0;
     Debouncer apogeeDebouncer = Debouncer(30);
-    Servo airbrakesServo = Servo();
 
     enum AirbrakeServoState {
         WAIT,
-        EXTEND_FULL,
-        EXTEND_HALF,
-        SWEEP_FORWARD,
-        SWEEP_BACKWARD,
+        FULL,
+        THREE_QUARTERS,
+        HALF,
+        ONE_QUARTER,
+        RETRACTED,
     } servoState;
 };

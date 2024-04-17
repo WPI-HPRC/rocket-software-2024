@@ -11,16 +11,10 @@
 Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
 Coast::~Coast() {
-    // I hope this drops causes the servo to lose its PWM signal, so we can configure it to retract in firmware
-    // TODO: HOWEVER, the servo is configured to go the the neutral position right now, which might not be retracted
-    // If we can't set a specific position on PWM loss in firmware, we need to set it to hold, and then set the position in this state,
-    // and NOT detatch until it reaches the target position
-    this->airbrakesServo.detach();
+    airbrakesServo.write(AIRBRAKE_RETRACTED);
 }
 
-void Coast::initialize_impl() {
-    this->airbrakesServo.attach(25);
-}
+void Coast::initialize_impl() {}
 
 void Coast::loop_impl()
 {
@@ -49,37 +43,37 @@ void Coast::loop_impl()
     // TODO: I don't really know which values correspond to which positions yet, so these values are subject to change
     switch (this->servoState) {
     case WAIT:
+        airbrakesServo.write(AIRBRAKE_RETRACTED);
         if (this->currentTime >= 1000) {
-            this->servoState = EXTEND_FULL;
+            this->servoState = FULL;
         }
         break;
-    case EXTEND_FULL:
-        this->airbrakesServo.write(180);
+    case FULL:
+        airbrakesServo.write(AIRBRAKE_FULL_EXTENSION);
+        if (this->currentTime >= 2000) {
+            this->servoState = THREE_QUARTERS;
+        }
+        break;
+    case THREE_QUARTERS:
+        airbrakesServo.write(AIRBRAKE_75_EXTENSION);
+        if (this->currentTime >= 3000) {
+            this->servoState = HALF;
+        }
+        break;
+    case HALF:
+        airbrakesServo.write(AIRBRAKE_HALF_EXTENSION);
         if (this->currentTime >= 4000) {
-            this->servoState = EXTEND_HALF;
+            this->servoState = ONE_QUARTER;
         }
         break;
-    case EXTEND_HALF:
-        this->airbrakesServo.write(0);
-        if (this->currentTime >= 6000) {
-            this->servoState = SWEEP_FORWARD;
+    case ONE_QUARTER:
+        airbrakesServo.write(AIRBRAKE_25_EXTENSION);
+        if (this->currentTime >= 5000) {
+            this->servoState = RETRACTED;
         }
         break;
-    case SWEEP_FORWARD:
-        if (this->airbrakesServo.read() >= 180) {
-            this->servoState = SWEEP_BACKWARD;
-        }
-        if (this->loopCount % COAST_AIRBRAKE_INCREMENT_LOOPS == 0) {
-            this->airbrakesServo.write(this->airbrakesServo.read() + COAST_AIRBRAKE_INCREMENT_ANGLE);
-        }
-        break;
-    case SWEEP_BACKWARD:
-        if (this->airbrakesServo.read() <= 0) {
-            this->servoState = SWEEP_FORWARD;
-        }
-        if (this->loopCount % COAST_AIRBRAKE_INCREMENT_LOOPS == 0) {
-            this->airbrakesServo.write(this->airbrakesServo.read() - COAST_AIRBRAKE_INCREMENT_ANGLE);
-        }
+    case RETRACTED:
+        airbrakesServo.write(AIRBRAKE_RETRACTED);
         break;
     }
 }

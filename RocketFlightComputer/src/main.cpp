@@ -1,4 +1,5 @@
 #include "EKF/EKF.h"
+#include "FlightParams.hpp"
 #include "utility.hpp"
 #include <Arduino.h>
 #include <Metro.h>
@@ -18,6 +19,7 @@
 
 bool sdCardInitialized = false;
 fs::File dataFile;
+Servo airbrakesServo = Servo();
 
 Metro timer = Metro(1000 / LOOP_RATE);
 
@@ -52,6 +54,8 @@ void setup()
         .acc = new Accelerometer(0x68),
     };
     pinMode(SERVO_FEEDBACK_GPIO, INPUT);
+    airbrakesServo.attach(SERVO_PWM_GPIO);
+    airbrakesServo.write(AIRBRAKE_RETRACTED);
 
     if(!sensors.bno055->init()) {
         Serial.println("[Sensorboard] No BNO055 Detected");

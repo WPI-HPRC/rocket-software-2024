@@ -1,4 +1,5 @@
 #include "State.h"
+#include "utility.hpp"
 #include <Arduino.h>
 
 State::State(struct Sensors *sensors, StateEstimator *stateEstimator) : sensors(sensors), stateEstimator(stateEstimator) {}
@@ -32,11 +33,13 @@ void State::initialize()
 
 void State::loop() {
 	long now = millis();
+  // These values may be used in the state code
 	this->currentTime = now - this->startTime;
 	this->deltaTime = now - this->lastLoopTime;
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
   this->telemPacket.altitude = Utility::pressureToAltitude(this->sensorPacket.pressure);
+  this->servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
 	if (this->stateEstimatorInitialized) {
 		this->stateEstimator->onLoop(this->sensorPacket);
 
@@ -48,32 +51,32 @@ void State::loop() {
 	
 	loop_impl();
 	this->lastLoopTime = now;
+  // These values are for logging, and should not be used in the state code without moving the corresponding line above loop_impl()
+  /**
+   * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
+   */
+  this->telemPacket.state = this->getId();
+  this->telemPacket.accelX = this->sensorPacket.accelX;
+  this->telemPacket.accelY = this->sensorPacket.accelY;
+  this->telemPacket.accelZ = this->sensorPacket.accelZ;
 
-    /**
-     * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
-     */
-    this->telemPacket.state = this->getId();
-    this->telemPacket.accelX = this->sensorPacket.accelX;
-    this->telemPacket.accelY = this->sensorPacket.accelY;
-    this->telemPacket.accelZ = this->sensorPacket.accelZ;
+  this->telemPacket.gyroX = this->sensorPacket.gyroX;
+  this->telemPacket.gyroY = this->sensorPacket.gyroY;
+  this->telemPacket.gyroZ = this->sensorPacket.gyroZ;
 
-    this->telemPacket.gyroX = this->sensorPacket.gyroX;
-    this->telemPacket.gyroY = this->sensorPacket.gyroY;
-    this->telemPacket.gyroZ = this->sensorPacket.gyroZ;
+  this->telemPacket.magX = this->sensorPacket.magX;
+  this->telemPacket.magY = this->sensorPacket.magY;
+  this->telemPacket.magZ = this->sensorPacket.magZ;
 
-    this->telemPacket.magX = this->sensorPacket.magX;
-    this->telemPacket.magY = this->sensorPacket.magY;
-    this->telemPacket.magZ = this->sensorPacket.magZ;
+  this->telemPacket.pressure = this->sensorPacket.pressure;
 
-    this->telemPacket.pressure = this->sensorPacket.pressure;
-
-    this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
-    this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
-    this->telemPacket.epochTime = this->sensorPacket.epochTime;
-    this->telemPacket.satellites = this->sensorPacket.satellites;
-    this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
-    this->telemPacket.loopCount = this->loopCount;
-    this->telemPacket.timestamp = now;
+  this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
+  this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
+  this->telemPacket.epochTime = this->sensorPacket.epochTime;
+  this->telemPacket.satellites = this->sensorPacket.satellites;
+  this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
+  this->telemPacket.loopCount = this->loopCount;
+  this->telemPacket.timestamp = now;
 
 #ifdef SERIAL_TELEMETRY
     this->telemPacket.debugPrint();
@@ -81,7 +84,7 @@ void State::loop() {
 
     /** Loop Radio and Send Data */
 
-    Serial.printf("Loop count: %d\n", this->loopCount);
+    Serial.printf("Loop count: %llu\n", this->loopCount);
 
 #ifndef NO_XBEE
 

@@ -42,6 +42,13 @@ constexpr float MOTOR_BURN_TIME = 3.1 * 1000.0;
 // Coast to Abort Conditions
     // time in Coast > 1.5 * TIME_IN_COAST
 
+// Angle in degrees to change the airbrake servo by every COAST_AIRBRAKE_INCREMENT_LOOPS loops while in sweep mode
+#define COAST_AIRBRAKE_INCREMENT_ANGLE 10
+
+// Number of loops to wait before incrementing the airbrake servo angle while in sweep mode
+// Each loop is about 25ms
+#define COAST_AIRBRAKE_INCREMENT_LOOPS 4
+
 // seconds, OpenRocket for Test Launch 2/17
 constexpr float TIME_IN_COAST = 18.4 * 1000.0;
 

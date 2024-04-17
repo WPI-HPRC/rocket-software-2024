@@ -5,11 +5,22 @@
 #include "02-Coast.h"
 #include "03-DrogueDescent.h"
 #include "06-Abort.h"
+#include "FlightParams.hpp"
 #include "State.h"
 
 Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
-void Coast::initialize_impl() {}
+Coast::~Coast() {
+    // I hope this drops causes the servo to lose its PWM signal, so we can configure it to retract in firmware
+    // TODO: HOWEVER, the servo is configured to go the the neutral position right now, which might not be retracted
+    // If we can't set a specific position on PWM loss in firmware, we need to set it to hold, and then set the position in this state,
+    // and NOT detatch until it reaches the target position
+    this->airbrakesServo.detach();
+}
+
+void Coast::initialize_impl() {
+    this->airbrakesServo.attach(25);
+}
 
 void Coast::loop_impl()
 {
@@ -33,6 +44,44 @@ void Coast::loop_impl()
     
     // If the average vertical velocity <= 0 for more than 30 cycles, rocket has passed apogee
     apogeePassed = apogeeDebouncer.checkOut(averageVerticalVelocity <= 0);
+
+    // Handle airbrake control
+    // TODO: I don't really know which values correspond to which positions yet, so these values are subject to change
+    switch (this->servoState) {
+    case WAIT:
+        if (this->currentTime >= 1000) {
+            this->servoState = EXTEND_FULL;
+        }
+        break;
+    case EXTEND_FULL:
+        this->airbrakesServo.write(180);
+        if (this->currentTime >= 4000) {
+            this->servoState = EXTEND_HALF;
+        }
+        break;
+    case EXTEND_HALF:
+        this->airbrakesServo.write(0);
+        if (this->currentTime >= 6000) {
+            this->servoState = SWEEP_FORWARD;
+        }
+        break;
+    case SWEEP_FORWARD:
+        if (this->airbrakesServo.read() >= 180) {
+            this->servoState = SWEEP_BACKWARD;
+        }
+        if (this->loopCount % COAST_AIRBRAKE_INCREMENT_LOOPS == 0) {
+            this->airbrakesServo.write(this->airbrakesServo.read() + COAST_AIRBRAKE_INCREMENT_ANGLE);
+        }
+        break;
+    case SWEEP_BACKWARD:
+        if (this->airbrakesServo.read() <= 0) {
+            this->servoState = SWEEP_FORWARD;
+        }
+        if (this->loopCount % COAST_AIRBRAKE_INCREMENT_LOOPS == 0) {
+            this->airbrakesServo.write(this->airbrakesServo.read() - COAST_AIRBRAKE_INCREMENT_ANGLE);
+        }
+        break;
+    }
 }
 
 //! @details max 8 seconds until deploy

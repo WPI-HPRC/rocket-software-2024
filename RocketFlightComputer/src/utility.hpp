@@ -9,6 +9,8 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
+#define SERVO_FEEDBACK_GPIO 26
+
 class Utility
 {
 public:

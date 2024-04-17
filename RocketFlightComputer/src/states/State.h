@@ -67,7 +67,7 @@ protected:
     struct Sensors *sensors;
     StateEstimator *stateEstimator;
     bool stateEstimatorInitialized = false;
-
+    uint32_t servoPosition = 0;
     XbeeProSX *xbee = new XbeeProSX(17); // CS GPIO17
 
 private:

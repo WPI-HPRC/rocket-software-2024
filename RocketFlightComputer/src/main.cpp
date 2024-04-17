@@ -1,3 +1,4 @@
+#include "utility.hpp"
 #include <Arduino.h>
 #include <Metro.h>
 #include <Wire.h>
@@ -43,6 +44,7 @@ void setup()
         .mag = new Magnetometer(),
         .acc = new Accelerometer(0x68),
     };
+    pinMode(SERVO_FEEDBACK_GPIO, INPUT);
 
     if(!sensors.bno055->init()) {
         Serial.println("[Sensorboard] No BNO055 Detected");

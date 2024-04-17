@@ -17,6 +17,7 @@
 #include <Sensors.h>
 
 bool sdCardInitialized = false;
+fs::File dataFile;
 
 Metro timer = Metro(1000 / LOOP_RATE);
 

@@ -5,8 +5,6 @@
 #include "XBeeDevice.h"
 #include <iostream>
 
-#define DEBUG true
-
 int goodFrameNumber = 0;
 
 uint8_t XBeeDevice::calcChecksum(const uint8_t *packet, uint8_t size_bytes)

@@ -31,11 +31,12 @@ void State::initialize()
 }
 
 void State::loop() {
-	long long now = millis();
+	long now = millis();
 	this->currentTime = now - this->startTime;
 	this->deltaTime = now - this->lastLoopTime;
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
+  this->telemPacket.altitude = Utility::pressureToAltitude(this->sensorPacket.pressure);
 	if (this->stateEstimatorInitialized) {
 		this->stateEstimator->onLoop(this->sensorPacket);
 
@@ -65,8 +66,6 @@ void State::loop() {
     this->telemPacket.magZ = this->sensorPacket.magZ;
 
     this->telemPacket.pressure = this->sensorPacket.pressure;
-
-    this->telemPacket.altitude = this->sensorPacket.altitude;
 
     this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
     this->telemPacket.gpsLong = this->sensorPacket.gpsLong;

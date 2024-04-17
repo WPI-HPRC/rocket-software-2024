@@ -44,9 +44,6 @@ public:
         float magZ = 0.0;
         float pressure = 0.0;
 
-        // Calculated Values
-        float altitude = 0.0;
-
         // GPS Inputs
         float gpsLat;
         float gpsLong;

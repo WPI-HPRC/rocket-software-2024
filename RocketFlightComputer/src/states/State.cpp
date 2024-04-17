@@ -40,7 +40,7 @@ void State::loop() {
 	this->sensorPacket = this->sensors->readSensors();
   this->telemPacket.altitude = Utility::pressureToAltitude(this->sensorPacket.pressure);
   this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
-	if (this->stateEstimatorInitialized) {
+	if (this->stateEstimator->initialized) {
 		this->stateEstimator->onLoop(this->sensorPacket);
 
 		this->telemPacket.w = this->stateEstimator->x(0);
@@ -77,6 +77,10 @@ void State::loop() {
   this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
   this->telemPacket.loopCount = this->loopCount;
   this->telemPacket.timestamp = now;
+
+  if (sdCardInitialized) {
+    dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
+  }
 
 #ifdef SERIAL_TELEMETRY
     this->telemPacket.debugPrint();

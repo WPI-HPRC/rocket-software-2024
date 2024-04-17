@@ -1,6 +1,7 @@
 #include "00-PreLaunch.h"
 #include "State.h"
 #include "01-Launch.h"
+#include "utility.hpp"
 
 PreLaunch::PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
@@ -31,7 +32,14 @@ void PreLaunch::loop_impl()
         // return;
     }
 
-    if (this->stateEstimatorInitialized)
+    if (!sdCardInitialized) {
+        if (SD.begin(9)) {
+            sdCardInitialized = true;
+            dataFile = SD.open("flightData.bin", FILE_WRITE);
+        }
+    }
+
+    if (this->stateEstimator->initialized)
     {
         this->accelReadingBuffer[this->buffIdx++] = this->sensorPacket.accelZ;
         this->buffIdx %= sizeof(this->accelReadingBuffer) / sizeof(float);
@@ -61,11 +69,10 @@ void PreLaunch::loop_impl()
     // Serial.println(">");
 
     // Intialize EKF
-    if (!this->stateEstimatorInitialized)
+    if (!this->stateEstimator->initialized)
     {
         BLA::Matrix<10> x_0 = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        this->stateEstimator = new StateEstimator(x_0, 0.025);
-        this->stateEstimatorInitialized = true;
+        this->stateEstimator->init(x_0, 0.025);
     }
 }
 

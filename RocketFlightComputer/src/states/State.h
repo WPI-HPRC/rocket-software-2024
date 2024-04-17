@@ -5,6 +5,7 @@
 #include "Arduino.h"
 #include <TelemetryBoard/XBeeProSX.h>
 #include <EKF/EKF.h>
+#include "SD.h"
 
 //! @brief Enum representing the id of the state, to be used in logging and communication with ground station
 enum StateId
@@ -66,7 +67,6 @@ protected:
     //! @brief "global" sensors object
     struct Sensors *sensors;
     StateEstimator *stateEstimator;
-    bool stateEstimatorInitialized = false;
     XbeeProSX *xbee = new XbeeProSX(17); // CS GPIO17
 
 private:

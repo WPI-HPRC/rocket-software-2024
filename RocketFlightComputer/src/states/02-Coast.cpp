@@ -6,7 +6,6 @@
 #include "03-DrogueDescent.h"
 #include "06-Abort.h"
 #include "State.h"
-// #include "Sensors.h"
 
 Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
@@ -15,8 +14,8 @@ void Coast::initialize_impl() {}
 void Coast::loop_impl()
 {
     // calculate vertical velocity
-    float verticalVelocity = (sensorPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
-    lastAltitude = sensorPacket.altitude;
+    float verticalVelocity = (telemPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
+    lastAltitude = telemPacket.altitude;
 
     // add vertical velocity to cyclic buffer
     verticalVelocityBuffer[bufferIndex] = verticalVelocity;

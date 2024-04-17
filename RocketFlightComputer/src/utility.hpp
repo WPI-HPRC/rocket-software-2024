@@ -1,6 +1,9 @@
 #pragma once
 
 #include <BasicLinearAlgebra.h>
+#include <Arduino.h>
+#include <cstdint>
+#include <cmath>
 
 // #define DEBUG_MODE 
 #define LOOP_RATE 40
@@ -63,19 +66,16 @@ public:
     struct SensorPacket
     {
         // Raw Sensor Readings
-        float accelX;
-        float accelY;
-        float accelZ;
-        float gyroX;
-        float gyroY;
-        float gyroZ;
-        double magX;
-        double magY;
-        double magZ;
-        float pressure;
-
-        // Calculated Values
-        float altitude;
+        float accelX = 0.0;
+        float accelY = 0.0;
+        float accelZ = 0.0;
+        float gyroX = 0.0;
+        float gyroY = 0.0;
+        float gyroZ = 0.0;
+        float magX = 0.0;
+        float magY = 0.0;
+        float magZ = 0.0;
+        float pressure = 0.0;
 
         // GPS Inputs
         float gpsLat;
@@ -84,13 +84,14 @@ public:
         float gpsAltAGL;
         uint32_t epochTime;
         uint8_t satellites;
-        boolean gpsLock = false;
+        bool gpsLock = false;
 
-        uint32_t timestamp;
+        uint32_t timestamp = 0;
     };
 
     #pragma pack(push,1)
     struct TelemPacket {
+        uint8_t packetType = 0x01;
         // State Integer
         // 0 - PreLaunch
         // 1 - Launch
@@ -99,7 +100,7 @@ public:
         // 4 - MainDescent
         // 5 - Recovery
         // 6 - Abort
-        uint8_t state;
+        uint8_t state = 0;
         // Raw Sensor Readings
         float accelX = 0.0f;
         float accelY = 0.0f;
@@ -134,9 +135,51 @@ public:
         float gpsAltAGL = 0.0f;
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
-        boolean gpsLock = false;
+        bool gpsLock = false;
 
+        uint32_t loopCount = 0;
         uint32_t timestamp = 0;
+
+#ifdef SERIAL_TELEMETRY
+        void debugPrint() {
+            Serial.println("state: " + String(state) + ", "
+
+                        + "accelX: " + String(accelX) + ", "
+                        + "accelY: " + String(accelY) + ", "
+                        + "accelZ: " + String(accelZ) + ", "
+                        + "gyroX: " + String(gyroX) + ", "
+                        + "gyroY: " + String(gyroY) + ", "
+                        + "gyroZ: " + String(gyroZ) + ", "
+                        + "magX: " + String(magX) + ", "
+                        + "magY: " + String(magY) + ", "
+                        + "magZ: " + String(magZ) + ", "
+
+                        + "pressure: " + String(pressure) + ", "
+                        + "altitude: " + String(altitude) + ", "
+
+                        + "w: " + String(w) + ", "
+                        + "i: " + String(i) + ", "
+                        + "j: " + String(j) + ", "
+                        + "k: " + String(k) + ", "
+                        + "posX: " + String(posX) + ", "
+                        + "posY: " + String(posY) + ", "
+                        + "posZ: " + String(posZ) + ", "
+                        + "velX: " + String(velX) + ", "
+                        + "velY: " + String(velY) + ", "
+                        + "velZ: " + String(velZ) + ", "
+
+                        + "gpsLat: " + String(gpsLat) + ", "
+                        + "gpsLong: " + String(gpsLong) + ", "
+                        + "gpsAltAGL: " + String(gpsAltAGL) + ", "
+                        + "gpsAltMSL: " + String(gpsAltMSL) + ", "
+                        + "epochTime: " + String(epochTime) + ", "
+                        + "satellites: " + String(satellites) + ", "
+                        + "gpsLock: " + String(gpsLock) + ", "
+
+                        + "loopCount: " + String(loopCount) + ", "
+                        + "timestamp: " + String(timestamp));
+        }
+#endif
     };
     #pragma pack(pop)
 

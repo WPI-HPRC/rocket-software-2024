@@ -1,6 +1,6 @@
 /* Rayhan Semy and Amber Cronin
 10/7/2023*/
-#include <Barometer.h>
+#include "Barometer.h"
 #include <Wire.h>
 
 Barometer::Barometer() {}

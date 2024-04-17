@@ -9,6 +9,17 @@ constexpr static float rocketMass = 22.745; // [kg] Rocket mass from ORK
 constexpr static float C_d = 0.5; // Eyeball averaged from ORK
 constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2] Cross Sectional Area -- Body Tube + 4 Fins
 
+// Debug things
+// #define DEBUG_MODE
+#ifdef DEBUG_MODE
+#define NO_TRANSITION
+#define NO_FLASH
+#define NO_XBEE
+#define SERIAL_TELEMETRY
+#define WAIT_FOR_SERIAL
+#endif
+
+
 // These constants define transitions between states and the conditions for those transitions
 
 // PreLaunch -------------------------
@@ -29,7 +40,7 @@ constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2]
     // time in Launch > 2 * MOTOR_BURN_TIME
 
 // 3.1 second timeout, as defined in OpenRocket for Test Launch 2/17
-#define MOTOR_BURN_TIME 3.1 * 1000.0
+constexpr float MOTOR_BURN_TIME = 3.1 * 1000.0;
 
 // Acceleration threshold for burnout detection, in G's
 // checking if average Z acceleration is less than 0.3 G's
@@ -42,7 +53,7 @@ constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2]
     // time in Coast > 1.5 * TIME_IN_COAST
 
 // seconds, OpenRocket for Test Launch 2/17
-#define TIME_IN_COAST 18.4 * 1000.0
+constexpr float TIME_IN_COAST = 18.4 * 1000.0;
 
 // DrogueDescent -------------------------
 // DrogueDescent to MainDescent Conditions
@@ -55,10 +66,10 @@ constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2]
 
 // Given in FPS from OpenRocket, convert to m/s
 // checking if average vertical velocity is less than or equal to 82.6 ft/s
-#define MAIN_DEPLOY_VELOCITY 82.6 / FPS_TO_MPS
+constexpr float MAIN_DEPLOY_VELOCITY = 82.6 / FPS_TO_MPS;
 
 // seconds, OpenRocket for Test Launch 2/17
-#define TIME_IN_DROGUE_DESCENT 67.6 * 1000.0
+constexpr float TIME_IN_DROGUE_DESCENT = 67.6 * 1000.0;
 
 // MainDescent -------------------------
 // MainDescent to Recovery Conditions
@@ -67,7 +78,7 @@ constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2]
     // time in MainDescent > 1.1 * TIME_IN_MAIN_DESCENT
 
 // 88 seconds, OpenRocket for Test Launch 2/17
-#define TIME_IN_MAIN_DESCENT 90.0 * 1000.0
+constexpr float TIME_IN_MAIN_DESCENT = 90.0 * 1000.0;
 
 // Upper bound for landing velocity
 // checking if average vertical velocity is less than 5 m/s

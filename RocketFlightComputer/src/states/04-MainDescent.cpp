@@ -2,7 +2,6 @@
 #include "06-Abort.h"
 #include "05-Recovery.h"
 #include "State.h"
-// #include "Sensors.h"
 
 MainDescent::MainDescent(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
@@ -11,8 +10,8 @@ void MainDescent::initialize_impl() {}
 void MainDescent::loop_impl()
 {
     // calculate vertical velocity
-    float verticalVelocity = (sensorPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
-    lastAltitude = sensorPacket.altitude;
+    float verticalVelocity = (telemPacket.altitude - lastAltitude) / (deltaTime / 1000.0);
+    lastAltitude = telemPacket.altitude;
 
     // add vertical velocity to cyclic buffer
     verticalVelocityBuffer[bufferIndex] = verticalVelocity;
@@ -29,7 +28,7 @@ void MainDescent::loop_impl()
     bufferIndex = (bufferIndex + 1) % 10;
 
     // if the average vertical velocity is less than the expected landing velocity for 30 cycles, the rocket has landed
-    landed = landedDebouncer.checkOut(averageVerticalVelocity < LANDING_VELOCITY);
+    landed = landedDebouncer.checkOut(abs(averageVerticalVelocity) < LANDING_VELOCITY);
 }
 
 State *MainDescent::nextState_impl()

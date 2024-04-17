@@ -21,7 +21,7 @@ StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt)
  * @param sensorPacket Sensor Frame
  * @return BLA::Matrix<4> State Vector
  */
-BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
+void StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
 {
     /* Read Data from Sensors and Convert to SI Units */
 
@@ -57,13 +57,18 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
     P_min = A * P * BLA::MatrixTranspose<BLA::Matrix<10, 10>>(A) + Q;
 
     BLA::Matrix<3> magVector = {magX, magY, magZ};
+    float magVectorLen = BLA::Norm(magVector);
 
     BLA::Matrix<3> accelVector = {accX, accY, accZ};
+    float accelVectorLen = BLA::Norm(accelVector);
 
     // Normalize Accel and Mag for use in correction step
-    magVector = magVector / BLA::Norm(magVector);
-
-    accelVector = accelVector / BLA::Norm(accelVector);
+    if (magVectorLen != 0) {
+        magVector /= magVectorLen;
+    }
+    if (accelVectorLen != 0) {
+        accelVector /= accelVectorLen;
+    }
 
     // Calculate update function with magnetometer readings to correct orientation
     BLA::Matrix<6> z = {
@@ -94,13 +99,29 @@ BLA::Matrix<10> StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
     // }
 
     float quatNorm = sqrt(x(0) * x(0) + x(1) * x(1) + x(2) * x(2) + x(3) * x(3));
-    x(0) = x(0) / quatNorm;
-    x(1) = x(1) / quatNorm;
-    x(2) = x(2) / quatNorm;
-    x(3) = x(3) / quatNorm;
+    if (quatNorm != 0) {
+        x(0) = x(0) / quatNorm;
+        x(1) = x(1) / quatNorm;
+        x(2) = x(2) / quatNorm;
+        x(3) = x(3) / quatNorm;
+    }
 
+    // Serial.print("VEL|");
+    // Serial.print(x(7)); Serial.print(",");
+    // Serial.print(x(8)); Serial.print(",");
+    // Serial.println(x(9));
 
-    return this->x;
+    // float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
+    // float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth,2) * pow(sin(sensorPacket.gpsLat), 2));
+
+    // float X_NEW = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * cos(sensorPacket.gpsLong * DEG_TO_RAD);
+    // float Y_NEW = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * sin(sensorPacket.gpsLong * DEG_TO_RAD);
+    // // float Z_0 = (((Utility::b_earth*Utility::b_earth)/(Utility::a_earth*Utility::a_earth))*N_earth + sensorPacket.gpsAltAGL) * sin(sensorPacket.gpsLat * DEG_TO_RAD);
+    // float Z_NEW = (N_earth*(1-pow(Utility::e_earth,2))+sensorPacket.gpsAltAGL)*sin(sensorPacket.gpsLat);
+
+    // x(4) = X_NEW;
+    // x(5) = Y_NEW;
+    // x(6) = Z_NEW;
 }
 
 BLA::Matrix<10> StateEstimator::measurementFunction(BLA::Matrix<6> u)
@@ -121,6 +142,7 @@ BLA::Matrix<10> StateEstimator::measurementFunction(BLA::Matrix<6> u)
         qy + (dt/2.0f)*p*qz + (dt/2.0f)*q*qw - (dt/2.0f)*r*qx,
         qz - (dt/2.0f)*p*qy + (dt/2.0f)*q*qx - (dt/2.0f)*r*qw
     };
+    float f_qLen = BLA::Norm(f_q);
 
     // Calculate linear accelerations in the NED Frame
     // BLA::Matrix<4> quat = {x(0), x(1), x(2), x(3)};
@@ -138,8 +160,18 @@ BLA::Matrix<10> StateEstimator::measurementFunction(BLA::Matrix<6> u)
 
     // BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * accelB;
 
+    // Serial.println("<----- Linear Accel ----->");
+    // for (int i = 0; i < accelT.Rows; i++) {
+    //     for (int j = 0; j < accelT.Cols; j++) {
+    //         Serial.print(String(accelT(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // }
+
     // Normalize Quaternion Derivative Function
-    // f_q = f_q / BLA::Norm(f_q);
+    // if (f_qLen != 0) {
+    //     f_q /= f_qLen;
+    // }
 
     // BLA::Matrix<3> f_p = {
     //     x(4) + (x(7)*dt + 0.5*accelT(0)*(dt*dt)),
@@ -198,9 +230,12 @@ BLA::Matrix<6> StateEstimator::updateFunction()
     BLA::Matrix<3> r = {
         cos(magneticDip), 0, sin(magneticDip)
     };
+    float rLen = BLA::Norm(r);
 
     // Must normalize vector for corrections step
-    r = r / BLA::Norm(r);
+    if (rLen != 0) {
+        r /= rLen;
+    }
 
     BLA::Matrix<3> G = {0, 0, -g}; // NED Gravity Vector
 
@@ -209,7 +244,10 @@ BLA::Matrix<6> StateEstimator::updateFunction()
 
     // Normalize quaternion prior to calculation
     BLA::Matrix<4> q = {x_min(0), x_min(1), x_min(2), x_min(3)};
-    q = q / BLA::Norm(q);
+    float qLen = BLA::Norm(q);
+    if (qLen != 0) {
+        q /= qLen;
+    }
 
     BLA::Matrix<3, 3> quatRotm = quat2rotm(q);
 
@@ -234,9 +272,12 @@ BLA::Matrix<6, 10> StateEstimator::updateJacobian()
     BLA::Matrix<3> r = {
         cos(magneticDip), 0, sin(magneticDip)
         }; // NED Mag vector
+    float rLen = BLA::Norm(r);
 
     // Must normalize vector for corrections step
-    r = r / BLA::Norm(r);
+    if (rLen != 0) {
+        r /= rLen;
+    }
 
     BLA::Matrix<3> G = {0, 0, -g}; // NED Gravity Vector
 
@@ -245,7 +286,10 @@ BLA::Matrix<6, 10> StateEstimator::updateJacobian()
 
     // Normalize quaternion prior to calculation
     BLA::Matrix<4> q = {x_min(0), x_min(1), x_min(2), x_min(3)};
-    q = q / BLA::Norm(q);
+    float qLen = BLA::Norm(q);
+    if (qLen != 0) {
+        q /= qLen;
+    }
 
     float rx = r(0);
     float ry = r(1);

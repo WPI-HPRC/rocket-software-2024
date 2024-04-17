@@ -12,13 +12,7 @@
 #include <states/State.h>
 #include <states/00-PreLaunch.h>
 
-#include <Barometer.h>
-#include <BNO055.h>
-#include <GNSS.h>
-#include <Accelerometer.h>
-#include <Magnetometer.h>
-
-#include <TelemetryBoard/XBeeProSX.h>
+#include <Sensors.h>
 
 Metro timer = Metro(1000 / LOOP_RATE);
 
@@ -34,7 +28,9 @@ State *state = new PreLaunch(&sensors, stateEstimator);
 void setup()
 {
     Serial.begin(115200);
-    while (!Serial);
+#ifdef WAIT_FOR_SERIAL
+    while (!Serial) {}
+#endif
     Serial.println("Beginning Flight Computer");
 
     Wire.begin();
@@ -102,20 +98,12 @@ void setup()
     timer.reset();
 }
 
-uint32_t previousTime = 0;
-
 void loop()
 {
     if (timer.check() == 1)
     {
-        // Serial.print("dt: "); Serial.println(millis() - previousTime);
-
-        previousTime = millis();
-        
         // Reads sensors, logs to flash chip, loops the state
         state->loop();
-
-        // Utility::debugPrint();
 
         State *nextState = state->nextState();
         if (nextState != nullptr)
@@ -125,4 +113,4 @@ void loop()
             state->initialize();
         }
     }
-};
+}

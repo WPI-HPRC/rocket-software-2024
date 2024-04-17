@@ -1,7 +1,4 @@
 #include "Sensors.h"
-#include "Accelerometer.h"
-#include "Barometer.h"
-#include "Magnetometer.h"
 #include "utility.hpp"
 #include <Arduino.h>
 
@@ -13,7 +10,6 @@ Utility::SensorPacket Sensors::readSensors() {
   LPS25_data barometerData = this->barometer->read();
 
   sensorPacket.pressure = barometerData.pressure; // [hPa/mBar]
-  sensorPacket.altitude = Utility::pressureToAltitude(barometerData.pressure); // m
 
   ICM_data accelerometerData = this->acc->read();
 

@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2023
  */
 #include <Arduino.h>
-#include <GNSS.h>
+#include "GNSS.h"
 
 GNSS::GNSS() {}
 

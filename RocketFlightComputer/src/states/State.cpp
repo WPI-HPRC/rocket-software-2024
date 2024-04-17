@@ -80,6 +80,9 @@ void State::loop() {
 
   if (sdCardInitialized) {
     dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
+    if (this->loopCount % 20 == 0) {
+      dataFile.flush();
+    }
   }
 
 #ifdef SERIAL_TELEMETRY

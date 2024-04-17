@@ -33,6 +33,7 @@ void PreLaunch::loop_impl()
     }
 
     if (!sdCardInitialized) {
+        Serial.println("SD NOT INITIALIZED");
         if (SD.begin(9)) {
             sdCardInitialized = true;
             dataFile = SD.open("flightData.bin", FILE_WRITE);

@@ -1,4 +1,5 @@
 #include "XBeeProSX.h"
+#include <cstdarg>
 
 XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin), XBeeDevice()
 {

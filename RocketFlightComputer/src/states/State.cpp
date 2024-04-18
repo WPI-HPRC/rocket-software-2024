@@ -40,9 +40,8 @@ void State::loop() {
   this->telemPacket.altitude = Utility::pressureToAltitude(this->sensorPacket.pressure);
 	if (this->stateEstimatorInitialized) {
         this->stateEstimator->onLoop(this->sensorPacket);
-        // this->quat = this->madgwick->onLoop(this->sensorPacket);
 
-        BLA::Matrix<10> testState = {this->stateEstimator->x(0), this->stateEstimator->x(1), this->stateEstimator->x(2), this->stateEstimator->x(3), 0, 0, -305, 0, 0, 0};
+        // BLA::Matrix<10> testState = {this->stateEstimator->x(0), this->stateEstimator->x(1), this->stateEstimator->x(2), this->stateEstimator->x(3), 0, 0, -305, 0, 0, 0};
 
         // float apogee = apogeeEstimator->estimate(testState, sensorPacket);
 
@@ -126,7 +125,7 @@ angle = (angle +360) % 360*/
 
     /** Loop Radio and Send Data */
 
-    Serial.printf("Loop count: %llu\n", this->loopCount);
+    // Serial.printf("Loop count: %llu\n", this->loopCount);
 
 #ifndef NO_XBEE
 

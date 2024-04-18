@@ -68,16 +68,22 @@ public:
 
     #pragma pack(push,1)
     struct TelemPacket {
-        uint8_t packetType = 0x01;
-        // State Integer
+
+        uint8_t packetType = 0x02;
+
+	    // State Integer
         // 0 - PreLaunch
-        // 1 - Launch
-        // 2 - Coast
-        // 3 - DrogueDescent
-        // 4 - MainDescent
-        // 5 - Recovery
-        // 6 - Abort
-        uint8_t state = 0;
+        // 1 - Stowed
+        // 2 - Freefall
+        // 3 - WindLeft
+        // 4 - HoldLeft
+        // 5 - WindRight
+	    // 6 - HoldRight
+	    // 7 - LandPrep
+	    // 8 - Recovery 
+        // 9 - Abort
+        uint8_t state;
+
         // Raw Sensor Readings
         float accelX = 0.0f;
         float accelY = 0.0f;
@@ -89,8 +95,6 @@ public:
         float magY = 0.0f;
         float magZ = 0.0f;
         float pressure = 0.0f;
-
-        uint32_t servoPosition = 0;
 
         // Calculated Values
         float altitude = 0.0f;
@@ -116,49 +120,63 @@ public:
         uint8_t satellites = 0;
         bool gpsLock = false;
 
-        uint32_t loopCount = 0;
         uint32_t timestamp = 0;
 
-#ifdef SERIAL_TELEMETRY
-        void debugPrint() {
-            Serial.println("state: " + String(state) + ", "
+        //Payload Specific 
 
-                        + "accelX: " + String(accelX) + ", "
-                        + "accelY: " + String(accelY) + ", "
-                        + "accelZ: " + String(accelZ) + ", "
-                        + "gyroX: " + String(gyroX) + ", "
-                        + "gyroY: " + String(gyroY) + ", "
-                        + "gyroZ: " + String(gyroZ) + ", "
-                        + "magX: " + String(magX) + ", "
-                        + "magY: " + String(magY) + ", "
-                        + "magZ: " + String(magZ) + ", "
+        //CV 
+        uint32_t cx = 0; //Camera Centroids 
+        uint32_t cy = 0;
 
-                        + "pressure: " + String(pressure) + ", "
-                        + "altitude: " + String(altitude) + ", "
+        float targetGpsLat = 0.0f; //Target Point GPS Estimations
+        float targetGpsLong = 0.0f;
 
-                        + "w: " + String(w) + ", "
-                        + "i: " + String(i) + ", "
-                        + "j: " + String(j) + ", "
-                        + "k: " + String(k) + ", "
-                        + "posX: " + String(posX) + ", "
-                        + "posY: " + String(posY) + ", "
-                        + "posZ: " + String(posZ) + ", "
-                        + "velX: " + String(velX) + ", "
-                        + "velY: " + String(velY) + ", "
-                        + "velZ: " + String(velZ) + ", "
+        //Controls 
+        uint32_t desiredServoPos1 = 0; //Servo Controls Values 
+        uint32_t actualServoPos1 = 0;
+        uint32_t desiredServoPos2 = 0; 
+        uint32_t actualServoPos2 = 0;
+        uint32_t desiredServoPos3 = 0; 
+        uint32_t actualServoPos3 = 0;
+        uint32_t desiredServoPos4 = 0; 
+        uint32_t actualServoPos4 = 0;
 
-                        + "gpsLat: " + String(gpsLat) + ", "
-                        + "gpsLong: " + String(gpsLong) + ", "
-                        + "gpsAltAGL: " + String(gpsAltAGL) + ", "
-                        + "gpsAltMSL: " + String(gpsAltMSL) + ", "
-                        + "epochTime: " + String(epochTime) + ", "
-                        + "satellites: " + String(satellites) + ", "
-                        + "gpsLock: " + String(gpsLock) + ", "
+        float trajA = 0.0f; //Calculated Trajectory Constants 
+        float trajB = 0.0f;
+        float trajC = 0.0f;
+        float trajD = 0.0f; 
 
-                        + "loopCount: " + String(loopCount) + ", "
-                        + "timestamp: " + String(timestamp));
-        }
-#endif
+        uint32_t loopCount = 0;
+    }; 
+    #pragma pack(pop)
+
+    struct SensorPacket
+    {
+        // Raw Sensor Readings
+        float accelX = 0.0;
+        float accelY = 0.0;
+        float accelZ = 0.0;
+        float gyroX = 0.0;
+        float gyroY = 0.0;
+        float gyroZ = 0.0;
+        float magX = 0.0;
+        float magY = 0.0;
+        float magZ = 0.0;
+        float pressure = 0.0;
+
+        // Calculated Values
+        float altitude = 0.0;
+
+        // GPS Inputs
+        float gpsLat;
+        float gpsLong;
+        float gpsAltMSL;
+        float gpsAltAGL;
+        uint32_t epochTime;
+        uint8_t satellites;
+        bool gpsLock = false;
+
+        uint32_t timestamp = 0;
     };
     #pragma pack(pop)
 

@@ -39,7 +39,7 @@ void State::loop() {
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
   this->telemPacket.altitude = Utility::pressureToAltitude(this->sensorPacket.pressure);
-  this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
+  // this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
 	if (this->stateEstimator->initialized) {
 		this->stateEstimator->onLoop(this->sensorPacket);
 

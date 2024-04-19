@@ -65,17 +65,17 @@ void State::loop() {
   this->telemPacket.timestamp = now;
   /* Apply Accelerometer Biases */
   //TODO: Make these matrices constants, I tried and it was mad :(
-  BLA::Matrix<3,3> accelScaleFactor = {
-    1.515094, -0.057311, -0.115285,
-    -0.057311, 1.081834, 0.021162,
-    -0.115285, 0.021162, 1.002006
-  };
+  // BLA::Matrix<3,3> accelScaleFactor = {
+  //   1.515094, -0.057311, -0.115285,
+  //   -0.057311, 1.081834, 0.021162,
+  //   -0.115285, 0.021162, 1.002006
+  // };
 
-  BLA::Matrix<3> accelBias = {-0.043848, 0.071495, 0.018711};
+  // BLA::Matrix<3> accelBias = {-0.043848, 0.071495, 0.018711};
 
-  BLA::Matrix<3> accelVector = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
+  // BLA::Matrix<3> accelVector = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
 
-  BLA::Matrix<3> accelCal = accelScaleFactor * (accelVector - accelBias);
+  // BLA::Matrix<3> accelCal = accelScaleFactor * (accelVector - accelBias);
 
   /* Apply Magnetometer Calibration */
 
@@ -96,9 +96,9 @@ void State::loop() {
   this->telemPacket.magZ = magCal(2);
 
   // Update sensor packet with the calibrated values
-  this->telemPacket.accelX = accelCal(0);
-  this->telemPacket.accelY = accelCal(1);
-  this->telemPacket.accelZ = accelCal(2);
+  // this->telemPacket.accelX = accelCal(0);
+  // this->telemPacket.accelY = accelCal(1);
+  // this->telemPacket.accelZ = accelCal(2);
 
   // BLA::Matrix<10> testState = {this->stateEstimator->x(0), this->stateEstimator->x(1), this->stateEstimator->x(2), this->stateEstimator->x(3), 0, 0, -305, 0, 0, 0};
 

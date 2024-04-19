@@ -1,6 +1,7 @@
 #include "00-PreLaunch.h"
 #include "State.h"
 #include "01-Launch.h"
+#include "utility.hpp"
 
 PreLaunch::PreLaunch(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
@@ -31,7 +32,22 @@ void PreLaunch::loop_impl()
         // return;
     }
 
-    if (this->stateEstimatorInitialized)
+    if (!sdCardInitialized) {
+        if (SD.begin(9)) {
+            int fileIdx = 0;
+            while (1) {
+                char filename[100];
+                sprintf(filename, "flightData%d.bin", fileIdx++);
+                if (!SD.exists(filename)) {
+                    dataFile = SD.open(filename, FILE_WRITE);
+                    break;
+                }
+            }
+            sdCardInitialized = true;
+        }
+    }
+
+    if (this->stateEstimator->initialized)
     {
         this->accelReadingBuffer[this->buffIdx++] = this->sensorPacket.accelZ;
         this->buffIdx %= sizeof(this->accelReadingBuffer) / sizeof(float);
@@ -61,16 +77,22 @@ void PreLaunch::loop_impl()
     // Serial.println(">");
 
     // Intialize EKF
-    if (!this->stateEstimatorInitialized)
+    if (!this->stateEstimator->initialized)
     {
         // Calculate Initial Quaternion using Accel and Mag
         // Normalize Acceleration Vector
         BLA::Matrix<3> a = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
-        a /= BLA::Norm(a);
+        float aLen = BLA::Norm(a);
+        if (aLen != 0) {
+            a /= aLen;
+        }
 
         // Normalize Magnetometer Vector
         BLA::Matrix<3> m = {sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
-        m /= BLA::Norm(m);
+        float mLen = BLA::Norm(m);
+        if (mLen != 0) {
+            m /= mLen;
+        }
 
         // Observation Matrix
 
@@ -93,10 +115,9 @@ void PreLaunch::loop_impl()
         };
 
         BLA::Matrix<10> x_0 = {q_0(0), q_0(1), q_0(2), q_0(3), 0, 0, 0, 0, 0, 0};
-        this->stateEstimator = new StateEstimator(x_0, 0.025);
+        this->stateEstimator->init(x_0, 0.025);
         
         Serial.println("[Prelaunch] Initialized EKF");
-        this->stateEstimatorInitialized = true;
     }
 }
 

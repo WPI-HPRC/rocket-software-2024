@@ -1,3 +1,6 @@
+#include "EKF/EKF.h"
+#include "FlightParams.hpp"
+#include "utility.hpp"
 #include <Arduino.h>
 #include <Metro.h>
 #include <Wire.h>
@@ -14,10 +17,14 @@
 
 #include <Sensors.h>
 
+bool sdCardInitialized = false;
+fs::File dataFile;
+Servo airbrakesServo = Servo();
+
 Metro timer = Metro(1000 / LOOP_RATE);
 
 struct Sensors sensors;
-StateEstimator *stateEstimator = nullptr;
+StateEstimator *stateEstimator = new StateEstimator();
 // Start in pre-launch
 State *state = new PreLaunch(&sensors, stateEstimator);
 
@@ -36,6 +43,9 @@ void setup()
     Wire.begin();
     Wire.setClock(400000);
 
+    SPI.setSCK(18);
+    SPI.setTX(19);
+    SPI.setRX(16);
     SPI.begin();
     SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE0));
 
@@ -47,6 +57,9 @@ void setup()
         .mag = new Magnetometer(),
         .acc = new Accelerometer(0x68),
     };
+    pinMode(SERVO_FEEDBACK_GPIO, INPUT);
+    Serial.println(airbrakesServo.attach(SERVO_PWM_GPIO));
+    airbrakesServo.write(AIRBRAKE_RETRACTED);
 
     if(!sensors.bno055->init()) {
         Serial.println("[Sensorboard] No BNO055 Detected");

@@ -5,15 +5,19 @@
 /**
  * @brief Construct a new Quat State Estimator:: Quat State Estimator object
  *
+ */
+StateEstimator::StateEstimator() {}
+
+/**
  * @param initialOrientation
  * @param dt
  */
-StateEstimator::StateEstimator(BLA::Matrix<10> initialOrientation, float dt)
-{
+void StateEstimator::init(BLA::Matrix<10> initialOrientation, float dt) {
     this->x = initialOrientation;
     this->x_min = initialOrientation;
     this->dt = dt;
-};
+    this->initialized = true;
+}
 
 /**
  * @brief Run every loop of the state machine to perform the predict and update step of the EKF

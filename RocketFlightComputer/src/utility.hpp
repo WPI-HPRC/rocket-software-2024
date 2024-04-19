@@ -1,6 +1,8 @@
 #pragma once
 
 #include <BasicLinearAlgebra.h>
+#include "FS.h"
+#include "Servo.h"
 #include <Arduino.h>
 #include <cstdint>
 #include <cmath>
@@ -9,6 +11,14 @@
 #define LOOP_RATE 40
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
+#define SERVO_FEEDBACK_GPIO 27
+#define SERVO_PWM_GPIO 20
+
+// FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
+extern bool sdCardInitialized;
+extern fs::File dataFile;
+extern Servo airbrakesServo;
 
 class Utility
 {
@@ -108,13 +118,18 @@ public:
         float gyroX = 0.0f;
         float gyroY = 0.0f;
         float gyroZ = 0.0f;
-        float magX = 0.0f;
-        float magY = 0.0f;
-        float magZ = 0.0f;
+        float rawMagX = 0.0f;
+        float rawMagY = 0.0f;
+        float rawMagZ = 0.0f;
         float pressure = 0.0f;
+
+        uint32_t servoPosition = 0;
 
         // Calculated Values
         float altitude = 0.0f;
+        float magX = 0.0f;
+        float magY = 0.0f;
+        float magZ = 0.0f;
 
         // EKF Results
         float w = 0.0f; // Quaternion State
@@ -150,12 +165,18 @@ public:
                         + "gyroX: " + String(gyroX) + ", "
                         + "gyroY: " + String(gyroY) + ", "
                         + "gyroZ: " + String(gyroZ) + ", "
+                        + "rawMagX: " + String(rawMagX) + ", "
+                        + "rawMagY: " + String(rawMagY) + ", "
+                        + "rawMagZ: " + String(rawMagZ) + ", "
+
+                        + "pressure: " + String(pressure) + ", "
+
+                        + "servoPosition: " + String(servoPosition) + ", "
+
+                        + "altitude: " + String(altitude) + ", "
                         + "magX: " + String(magX) + ", "
                         + "magY: " + String(magY) + ", "
                         + "magZ: " + String(magZ) + ", "
-
-                        + "pressure: " + String(pressure) + ", "
-                        + "altitude: " + String(altitude) + ", "
 
                         + "w: " + String(w) + ", "
                         + "i: " + String(i) + ", "

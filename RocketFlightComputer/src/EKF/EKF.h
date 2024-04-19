@@ -12,13 +12,17 @@
 class StateEstimator {
     public:
 
-    StateEstimator(BLA::Matrix<10> initialOrientation, float dt);
+    StateEstimator();
+
+    void init(BLA::Matrix<10> initialOrientation, float dt);
 
     void onLoop(Utility::SensorPacket sensorPacket);
 
     BLA::Matrix<3,3> quat2rotm(BLA::Matrix<4> q);
 
     BLA::Matrix<10> x;
+
+    bool initialized = false;
     
     private:
     constexpr static int initialLoopIters = 1000;

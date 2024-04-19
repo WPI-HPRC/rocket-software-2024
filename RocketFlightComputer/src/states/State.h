@@ -70,8 +70,6 @@ protected:
     StateEstimator *stateEstimator;
     ApogeeEstimation *apogeeEstimator;
 
-    XbeeProSX *xbee = new XbeeProSX(17); // CS GPIO17
-
 private:
     //! @brief number of milliseconds from boot to the initialize call
     long long startTime = 0;

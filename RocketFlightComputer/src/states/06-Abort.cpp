@@ -11,10 +11,7 @@ void Abort::initialize_impl() {}
 
 void Abort::loop_impl()
 {
-    // shut down all systems, log slowly
-
-    // busy wait
-    delay(500);
+    // Just continue logging
 }
 
 State *Abort::nextState_impl()

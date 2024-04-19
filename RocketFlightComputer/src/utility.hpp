@@ -3,6 +3,7 @@
 #include <BasicLinearAlgebra.h>
 #include "FS.h"
 #include "Servo.h"
+#include "TelemetryBoard/XBeeProSX.h"
 #include <Arduino.h>
 #include <cstdint>
 #include <cmath>
@@ -19,6 +20,7 @@
 extern bool sdCardInitialized;
 extern fs::File dataFile;
 extern Servo airbrakesServo;
+extern XbeeProSX xbee;
 
 class Utility
 {

@@ -20,6 +20,7 @@
 bool sdCardInitialized = false;
 fs::File dataFile;
 Servo airbrakesServo = Servo();
+XbeeProSX xbee = XbeeProSX(17); // CS GPIO17
 
 Metro timer = Metro(1000 / LOOP_RATE);
 
@@ -60,6 +61,8 @@ void setup()
     pinMode(SERVO_FEEDBACK_GPIO, INPUT);
     Serial.println(airbrakesServo.attach(SERVO_PWM_GPIO));
     airbrakesServo.write(AIRBRAKE_RETRACTED);
+
+    xbee.start();
 
     if(!sensors.bno055->init()) {
         Serial.println("[Sensorboard] No BNO055 Detected");

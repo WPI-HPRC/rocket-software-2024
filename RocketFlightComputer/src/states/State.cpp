@@ -95,7 +95,7 @@ void State::loop() {
 
 #ifndef NO_XBEE
 
-    xbee->sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket));
+    // xbee->sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket));
 
     // Serial.print("Packet Success: ");
     // Serial.println(now);

@@ -150,36 +150,6 @@ public:
     }; 
     #pragma pack(pop)
 
-    struct SensorPacket
-    {
-        // Raw Sensor Readings
-        float accelX = 0.0;
-        float accelY = 0.0;
-        float accelZ = 0.0;
-        float gyroX = 0.0;
-        float gyroY = 0.0;
-        float gyroZ = 0.0;
-        float magX = 0.0;
-        float magY = 0.0;
-        float magZ = 0.0;
-        float pressure = 0.0;
-
-        // Calculated Values
-        float altitude = 0.0;
-
-        // GPS Inputs
-        float gpsLat;
-        float gpsLong;
-        float gpsAltMSL;
-        float gpsAltAGL;
-        uint32_t epochTime;
-        uint8_t satellites;
-        bool gpsLock = false;
-
-        uint32_t timestamp = 0;
-    };
-    #pragma pack(pop)
-
 #if 0 // NOTE: REMOVES FLASH CODE
     static void logData(FlashChip *flash, SensorPacket sensorPacket)
     {

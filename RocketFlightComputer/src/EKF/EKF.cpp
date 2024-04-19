@@ -22,26 +22,26 @@ void StateEstimator::init(BLA::Matrix<10> initialOrientation, float dt) {
 /**
  * @brief Run every loop of the state machine to perform the predict and update step of the EKF
  *
- * @param sensorPacket Sensor Frame
+ * @param telemPacket Sensor Frame
  * @return BLA::Matrix<4> State Vector
  */
-void StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
+void StateEstimator::onLoop(Utility::TelemPacket telemPacket)
 {
     /* Read Data from Sensors and Convert to SI Units */
 
     // Convert Accel values to m/s/s
-    float accX = sensorPacket.accelX * g;
-    float accY = sensorPacket.accelY * g;
-    float accZ = sensorPacket.accelZ * g;
+    float accX = telemPacket.accelX * g;
+    float accY = telemPacket.accelY * g;
+    float accZ = telemPacket.accelZ * g;
 
     // Convert gyro values from deg/s to rad/s
-    float gyrX = sensorPacket.gyroX * (PI / 180);
-    float gyrY = sensorPacket.gyroY * (PI / 180);
-    float gyrZ = sensorPacket.gyroZ * (PI / 180);
+    float gyrX = telemPacket.gyroX * (PI / 180);
+    float gyrY = telemPacket.gyroY * (PI / 180);
+    float gyrZ = telemPacket.gyroZ * (PI / 180);
 
-    float magX = sensorPacket.magX;
-    float magY = sensorPacket.magY;
-    float magZ = sensorPacket.magZ;
+    float magX = telemPacket.magX;
+    float magY = telemPacket.magY;
+    float magZ = telemPacket.magZ;
 
     BLA::Matrix<6> u = {accX, accY, accZ, gyrX, gyrY, gyrZ};
 
@@ -52,7 +52,7 @@ void StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
     BLA::Matrix<10, 10> A = measurementJacobian(u);
 
     // Update model covariance from previous state
-    BLA::Matrix<10, 6> W = updateModelCovariance(sensorPacket);
+    BLA::Matrix<10, 6> W = updateModelCovariance(telemPacket);
 
     // Apply updated model covariance to process noise covariance matrix
     BLA::Matrix<10, 10> Q = W * gyroAccelVar * BLA::MatrixTranspose<BLA::Matrix<10, 6>>(W);
@@ -115,13 +115,13 @@ void StateEstimator::onLoop(Utility::SensorPacket sensorPacket)
     // Serial.print(x(8)); Serial.print(",");
     // Serial.println(x(9));
 
-    // float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
-    // float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth,2) * pow(sin(sensorPacket.gpsLat), 2));
+    // float r_adj = Utility::r_earth + telemPacket.gpsAltMSL; // [m]
+    // float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth,2) * pow(sin(telemPacket.gpsLat), 2));
 
-    // float X_NEW = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * cos(sensorPacket.gpsLong * DEG_TO_RAD);
-    // float Y_NEW = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * sin(sensorPacket.gpsLong * DEG_TO_RAD);
-    // // float Z_0 = (((Utility::b_earth*Utility::b_earth)/(Utility::a_earth*Utility::a_earth))*N_earth + sensorPacket.gpsAltAGL) * sin(sensorPacket.gpsLat * DEG_TO_RAD);
-    // float Z_NEW = (N_earth*(1-pow(Utility::e_earth,2))+sensorPacket.gpsAltAGL)*sin(sensorPacket.gpsLat);
+    // float X_NEW = (N_earth + telemPacket.gpsAltAGL) * cos(telemPacket.gpsLat * DEG_TO_RAD) * cos(telemPacket.gpsLong * DEG_TO_RAD);
+    // float Y_NEW = (N_earth + telemPacket.gpsAltAGL) * cos(telemPacket.gpsLat * DEG_TO_RAD) * sin(telemPacket.gpsLong * DEG_TO_RAD);
+    // // float Z_0 = (((Utility::b_earth*Utility::b_earth)/(Utility::a_earth*Utility::a_earth))*N_earth + telemPacket.gpsAltAGL) * sin(telemPacket.gpsLat * DEG_TO_RAD);
+    // float Z_NEW = (N_earth*(1-pow(Utility::e_earth,2))+telemPacket.gpsAltAGL)*sin(telemPacket.gpsLat);
 
     // x(4) = X_NEW;
     // x(5) = Y_NEW;
@@ -319,7 +319,7 @@ BLA::Matrix<6, 10> StateEstimator::updateJacobian()
     return H;
 };
 
-BLA::Matrix<10, 6> StateEstimator::updateModelCovariance(Utility::SensorPacket sensorPacket)
+BLA::Matrix<10, 6> StateEstimator::updateModelCovariance(Utility::TelemPacket    telemPacket)
 {
 
     BLA::Matrix<10, 6> W = {

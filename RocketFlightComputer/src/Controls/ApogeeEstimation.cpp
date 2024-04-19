@@ -4,7 +4,7 @@ ApogeeEstimation::ApogeeEstimation() {
     Serial.println("[Apogee Estimator] Initialized!");
 };
 
-float ApogeeEstimation::estimate(BLA::Matrix<10> currentState, Utility::SensorPacket sensorPacket) {
+float ApogeeEstimation::estimate(BLA::Matrix<10> currentState, Utility::TelemPacket telemPacket) {
 
     BLA::Matrix<13> x_t = {
         currentState(0), // qw
@@ -49,7 +49,12 @@ BLA::Matrix<13> ApogeeEstimation::systemDynamics(BLA::Matrix<13> x) {
     BLA::Matrix<3,3> R_TB = Utility::quat2rotm(quat);
 
     BLA::Matrix<3> v_N = {x(10), x(11), x(12)};
-    BLA::Matrix<3> v_hat = v_N / BLA::Norm(v_N);
+    BLA::Matrix<3> v_hat = v_N;
+    float v_NLen = BLA::Norm(v_N);
+    if (v_NLen != 0) {
+        v_hat /= v_NLen;
+    }
+
     BLA::Matrix<3> v_B = R_TB*v_N;
     float dragForce = Utility::rho_sl*C_d*S_r* pow(BLA::Norm(v_B),2);
 

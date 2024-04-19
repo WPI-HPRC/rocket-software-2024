@@ -16,7 +16,7 @@ class StateEstimator {
 
     void init(BLA::Matrix<10> initialOrientation, float dt);
 
-    void onLoop(Utility::SensorPacket sensorPacket);
+    void onLoop(Utility::TelemPacket sensorPacket);
 
     BLA::Matrix<3,3> quat2rotm(BLA::Matrix<4> q);
 
@@ -98,7 +98,7 @@ class StateEstimator {
     BLA::Matrix<6> updateFunction();
     BLA::Matrix<6,10> updateJacobian();
 
-    BLA::Matrix<10,6> updateModelCovariance(Utility::SensorPacket sensorPacket);
+    BLA::Matrix<10,6> updateModelCovariance(Utility::TelemPacket sensorPacket);
 
     BLA::Matrix<10> x_min;
 

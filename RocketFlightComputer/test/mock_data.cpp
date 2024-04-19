@@ -27,17 +27,41 @@ int parseLine(FILE *dataFile, Utility::SensorPacket *packet) {
 }
 
 void writeLine(FILE *outFile, Utility::TelemPacket packet) {
-  fprintf(outFile, "%hhd,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%d,%hhd,%hhd,%d,%d\n",
-          packet.state, packet.accelX, packet.accelY, packet.accelZ,
-          packet.gyroX, packet.gyroY, packet.gyroZ,
-          packet.magX, packet.magY, packet.magZ,
-          packet.pressure, packet.altitude,
-          packet.w, packet.i, packet.j, packet.k,
-          packet.posX, packet.posY, packet.posZ,
-          packet.velX, packet.velY, packet.velZ,
-          packet.gpsLat, packet.gpsLong, packet.gpsAltMSL, packet.gpsAltAGL,
-          packet.epochTime, packet.satellites, packet.gpsLock,
-          packet.loopCount, packet.timestamp);
+    fprintf(outFile, "%hhd,", packet.state);
+    fprintf(outFile, "%f,", packet.accelX);
+    fprintf(outFile, "%f,", packet.accelY);
+    fprintf(outFile, "%f,", packet.accelZ);
+    fprintf(outFile, "%f,", packet.gyroX);
+    fprintf(outFile, "%f,", packet.gyroY);
+    fprintf(outFile, "%f,", packet.gyroZ);
+    fprintf(outFile, "%f,", packet.rawMagX);
+    fprintf(outFile, "%f,", packet.rawMagY);
+    fprintf(outFile, "%f,", packet.rawMagZ);
+    fprintf(outFile, "%f,", packet.pressure);
+    fprintf(outFile, "%d,", packet.servoPosition);
+    fprintf(outFile, "%f,", packet.altitude);
+    fprintf(outFile, "%f,", packet.magX);
+    fprintf(outFile, "%f,", packet.magY);
+    fprintf(outFile, "%f,", packet.magZ);
+    fprintf(outFile, "%f,", packet.w);
+    fprintf(outFile, "%f,", packet.i);
+    fprintf(outFile, "%f,", packet.j);
+    fprintf(outFile, "%f,", packet.k);
+    fprintf(outFile, "%f,", packet.posX);
+    fprintf(outFile, "%f,", packet.posY);
+    fprintf(outFile, "%f,", packet.posZ);
+    fprintf(outFile, "%f,", packet.velX);
+    fprintf(outFile, "%f,", packet.velY);
+    fprintf(outFile, "%f,", packet.velZ);
+    fprintf(outFile, "%f,", packet.gpsLat);
+    fprintf(outFile, "%f,", packet.gpsLong);
+    fprintf(outFile, "%f,", packet.gpsAltMSL);
+    fprintf(outFile, "%f,", packet.gpsAltAGL);
+    fprintf(outFile, "%d,", packet.epochTime);
+    fprintf(outFile, "%hhd,", packet.satellites);
+    fprintf(outFile, "%hhd,", packet.gpsLock);
+    fprintf(outFile, "%d,", packet.loopCount);
+    fprintf(outFile, "%d\n", packet.timestamp);
 }
 
 void test_basic() {

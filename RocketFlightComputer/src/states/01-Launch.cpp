@@ -11,7 +11,7 @@ void Launch::loop_impl()
 {
     // detect motor burnout via acceleration
     // add current Z acceleration to cyclic buffer
-    accelerationBuffer[bufferIndex] = sensorPacket.accelZ;
+    accelerationBuffer[bufferIndex] = telemPacket.accelZ;
 
     // take the average of the buffer
     float sum = 0.0;

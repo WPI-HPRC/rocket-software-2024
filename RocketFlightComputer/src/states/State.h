@@ -4,8 +4,8 @@
 #include "Sensors.h"
 #include "Arduino.h"
 #include <TelemetryBoard/XBeeProSX.h>
-#include <EKF/EKF.h>
 #include <Controls/ApogeeEstimation.h>
+#include <EKF/EKF.h>
 #include "SD.h"
 
 //! @brief Enum representing the id of the state, to be used in logging and communication with ground station
@@ -68,7 +68,7 @@ protected:
     //! @brief "global" sensors object
     struct Sensors *sensors;
     StateEstimator *stateEstimator;
-    ApogeeEstimation *apogeeEstimator;
+    // ApogeeEstimation *apogeeEstimator; //TODO - Implement
 
 private:
     //! @brief number of milliseconds from boot to the initialize call

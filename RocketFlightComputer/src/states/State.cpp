@@ -13,9 +13,6 @@ void State::initialize()
 {
     this->startTime = millis();
     initialize_impl();
-
-    apogeeEstimator = new ApogeeEstimation();
-
 /*
 
     const uint16_t networkID = 0x4843;
@@ -38,20 +35,47 @@ void State::loop() {
 	this->deltaTime = now - this->lastLoopTime;
 	this->loopCount++;
 	this->sensorPacket = this->sensors->readSensors();
+  /**
+   * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
+   */
   this->telemPacket.altitude = Utility::pressureToAltitude(this->sensorPacket.pressure);
+  this->telemPacket.state = this->getId();
+  this->telemPacket.accelX = this->sensorPacket.accelX;
+  this->telemPacket.accelY = this->sensorPacket.accelY;
+  this->telemPacket.accelZ = this->sensorPacket.accelZ;
+
+  this->telemPacket.gyroX = this->sensorPacket.gyroX;
+  this->telemPacket.gyroY = this->sensorPacket.gyroY;
+  this->telemPacket.gyroZ = this->sensorPacket.gyroZ;
+
+  this->telemPacket.rawMagX = this->sensorPacket.magX;
+  this->telemPacket.rawMagY = this->sensorPacket.magY;
+  this->telemPacket.rawMagZ = this->sensorPacket.magZ;
+
+  this->telemPacket.pressure = this->sensorPacket.pressure;
+
+  this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
+
+  this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
+  this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
+  this->telemPacket.epochTime = this->sensorPacket.epochTime;
+  this->telemPacket.satellites = this->sensorPacket.satellites;
+  this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
+  this->telemPacket.loopCount = this->loopCount;
+  this->telemPacket.timestamp = now;
   /* Apply Accelerometer Biases */
   //TODO: Make these matrices constants, I tried and it was mad :(
-  // BLA::Matrix<3,3> accelScaleFactor = {
-  //   1.515094, -0.057311, -0.115285,
-  //   -0.057311, 1.081834, 0.021162,
-  //   -0.115285, 0.021162, 1.002006
-  // };
+  BLA::Matrix<3,3> accelScaleFactor = {
+    1.515094, -0.057311, -0.115285,
+    -0.057311, 1.081834, 0.021162,
+    -0.115285, 0.021162, 1.002006
+  };
 
-  // BLA::Matrix<3> accelBias = {-0.043848, 0.071495, 0.018711};
+  BLA::Matrix<3> accelBias = {-0.043848, 0.071495, 0.018711};
 
-  // BLA::Matrix<3> accelVector = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
+  BLA::Matrix<3> accelVector = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
 
-  // BLA::Matrix<3> accelCal = accelScaleFactor * (accelVector - accelBias);
+  BLA::Matrix<3> accelCal = accelScaleFactor * (accelVector - accelBias);
 
   /* Apply Magnetometer Calibration */
 
@@ -72,9 +96,9 @@ void State::loop() {
   this->telemPacket.magZ = magCal(2);
 
   // Update sensor packet with the calibrated values
-  // sensorPacket.accelX = accelCal(0);
-  // sensorPacket.accelY = accelCal(1);
-  // sensorPacket.accelZ = accelCal(2);
+  this->telemPacket.accelX = accelCal(0);
+  this->telemPacket.accelY = accelCal(1);
+  this->telemPacket.accelZ = accelCal(2);
 
   // BLA::Matrix<10> testState = {this->stateEstimator->x(0), this->stateEstimator->x(1), this->stateEstimator->x(2), this->stateEstimator->x(3), 0, 0, -305, 0, 0, 0};
 
@@ -102,21 +126,8 @@ void State::loop() {
   // Serial.print("Heading: "); Serial.println(heading);
   // Serial.println(sensorPacket.timestamp);  
 
-  // Serial.print("QUAT|"); Serial.print(this->stateEstimator->x(0)); Serial.print(",");
-  // Serial.print(this->stateEstimator->x(1)); Serial.print(",");
-  // Serial.print(this->stateEstimator->x(2)); Serial.print(",");
-  // Serial.println(this->stateEstimator->x(3));
-
-  // float hdg = atan2(sensorPafcket.magY, sensorPacket.magX) * (180/PI);
-  /*
-  let angle = Math.atan2(y, x);
-  angle = angle * (180 / Math.PI)
-  angle = angle + 90
-  angle = (angle +360) % 360*/
-
-  this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
 	if (this->stateEstimator->initialized) {
-		this->stateEstimator->onLoop(this->sensorPacket);
+		this->stateEstimator->onLoop(this->telemPacket);
 
 		this->telemPacket.w = this->stateEstimator->x(0);
 		this->telemPacket.i = this->stateEstimator->x(1);
@@ -127,32 +138,6 @@ void State::loop() {
 	loop_impl();
 	this->lastLoopTime = now;
 
-  // These values are for logging, and should not be used in the state code without moving the corresponding line above loop_impl()
-  /**
-   * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
-   */
-  this->telemPacket.state = this->getId();
-  this->telemPacket.accelX = this->sensorPacket.accelX;
-  this->telemPacket.accelY = this->sensorPacket.accelY;
-  this->telemPacket.accelZ = this->sensorPacket.accelZ;
-
-  this->telemPacket.gyroX = this->sensorPacket.gyroX;
-  this->telemPacket.gyroY = this->sensorPacket.gyroY;
-  this->telemPacket.gyroZ = this->sensorPacket.gyroZ;
-
-  this->telemPacket.rawMagX = this->sensorPacket.magX;
-  this->telemPacket.rawMagY = this->sensorPacket.magY;
-  this->telemPacket.rawMagZ = this->sensorPacket.magZ;
-
-  this->telemPacket.pressure = this->sensorPacket.pressure;
-
-  this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
-  this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
-  this->telemPacket.epochTime = this->sensorPacket.epochTime;
-  this->telemPacket.satellites = this->sensorPacket.satellites;
-  this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
-  this->telemPacket.loopCount = this->loopCount;
-  this->telemPacket.timestamp = now;
 
   if (sdCardInitialized) {
     dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
@@ -165,7 +150,10 @@ void State::loop() {
     this->telemPacket.debugPrint();
 #endif
 
-
+  // Serial.print("QUAT|"); Serial.print(this->stateEstimator->x(0)); Serial.print(",");
+  // Serial.print(this->stateEstimator->x(1)); Serial.print(",");
+  // Serial.print(this->stateEstimator->x(2)); Serial.print(",");
+  // Serial.println(this->stateEstimator->x(3));
 
     /** Loop Radio and Send Data */
 

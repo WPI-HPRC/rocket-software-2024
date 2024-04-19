@@ -10,7 +10,7 @@ public:
 
     ApogeeEstimation();
     
-    float estimate(BLA::Matrix<10> currentState, Utility::SensorPacket sensorPacket);
+    float estimate(BLA::Matrix<10> currentState, Utility::TelemPacket telemPacket);
 
 private:
 

@@ -24,14 +24,14 @@ void PreLaunch::initialize_impl()
 
 void PreLaunch::loop_impl()
 {
-    if (!sensorPacket.gpsLock)
+    if (!telemPacket.gpsLock)
     {
         // Serial.println("[PreLaunch] Gps Lock Failed...");
 
         // delay(100);
         // return;
     }
-
+#ifndef NO_SDCARD
     if (!sdCardInitialized) {
         if (SD.begin(9)) {
             int fileIdx = 0;
@@ -46,10 +46,10 @@ void PreLaunch::loop_impl()
             sdCardInitialized = true;
         }
     }
-
+#endif
     if (this->stateEstimator->initialized)
     {
-        this->accelReadingBuffer[this->buffIdx++] = this->sensorPacket.accelZ;
+        this->accelReadingBuffer[this->buffIdx++] = this->telemPacket.accelZ;
         this->buffIdx %= sizeof(this->accelReadingBuffer) / sizeof(float);
         launched = launchDebouncer.checkOut(this->avgAccelZ() > LAUNCH_ACCEL_THRESHOLD);
         return;
@@ -81,14 +81,14 @@ void PreLaunch::loop_impl()
     {
         // Calculate Initial Quaternion using Accel and Mag
         // Normalize Acceleration Vector
-        BLA::Matrix<3> a = {sensorPacket.accelX, sensorPacket.accelY, sensorPacket.accelZ};
+        BLA::Matrix<3> a = {telemPacket.accelX, telemPacket.accelY, telemPacket.accelZ};
         float aLen = BLA::Norm(a);
         if (aLen != 0) {
             a /= aLen;
         }
 
         // Normalize Magnetometer Vector
-        BLA::Matrix<3> m = {sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
+        BLA::Matrix<3> m = {telemPacket.magX, telemPacket.magY, telemPacket.magZ};
         float mLen = BLA::Norm(m);
         if (mLen != 0) {
             m /= mLen;

@@ -18,11 +18,11 @@ private:
     Debouncer apogeeDebouncer = Debouncer(30);
 
     enum AirbrakeServoState {
-        WAIT,
-        FULL,
-        THREE_QUARTERS,
-        HALF,
-        ONE_QUARTER,
-        RETRACTED,
-    } servoState;
+        WAIT = 0,
+        FULL = 1,
+        THREE_QUARTERS = 2,
+        HALF = 3,
+        ONE_QUARTER = 4,
+        RETRACTED = 5,
+    } servoState = WAIT;
 };

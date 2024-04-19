@@ -50,25 +50,25 @@ void Coast::loop_impl()
         break;
     case FULL:
         airbrakesServo.write(AIRBRAKE_FULL_EXTENSION);
-        if (this->currentTime >= 2000) {
+        if (this->currentTime >= 3000) {
             this->servoState = THREE_QUARTERS;
         }
         break;
     case THREE_QUARTERS:
         airbrakesServo.write(AIRBRAKE_75_EXTENSION);
-        if (this->currentTime >= 3000) {
+        if (this->currentTime >= 5000) {
             this->servoState = HALF;
         }
         break;
     case HALF:
         airbrakesServo.write(AIRBRAKE_HALF_EXTENSION);
-        if (this->currentTime >= 4000) {
+        if (this->currentTime >= 7000) {
             this->servoState = ONE_QUARTER;
         }
         break;
     case ONE_QUARTER:
         airbrakesServo.write(AIRBRAKE_25_EXTENSION);
-        if (this->currentTime >= 5000) {
+        if (this->currentTime >= 9000) {
             this->servoState = RETRACTED;
         }
         break;

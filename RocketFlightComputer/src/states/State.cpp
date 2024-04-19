@@ -91,7 +91,8 @@ void State::loop() {
 
     /** Loop Radio and Send Data */
 
-    Serial.printf("Loop count: %llu\n", this->loopCount);
+    // Serial.printf("Loop count: %llu\n", this->loopCount);
+  Serial.printf("SERVO: %d\n", this->telemPacket.servoPosition);
 
 #ifndef NO_XBEE
 

@@ -26,17 +26,25 @@ void PreLaunch::loop_impl()
 {
     if (!sensorPacket.gpsLock)
     {
-        Serial.println("[PreLaunch] Gps Lock Failed...");
+        // Serial.println("[PreLaunch] Gps Lock Failed...");
 
         // delay(100);
         // return;
     }
 
     if (!sdCardInitialized) {
-        Serial.println("SD NOT INITIALIZED");
         if (SD.begin(9)) {
+            int fileIdx = 0;
+            while (1) {
+                char filename[100];
+                sprintf(filename, "flightData%d.bin", fileIdx++);
+                Serial.printf("Testing file name `%s`\n", filename);
+                if (!SD.exists(filename)) {
+                    dataFile = SD.open(filename, FILE_WRITE);
+                    break;
+                }
+            }
             sdCardInitialized = true;
-            dataFile = SD.open("flightData.bin", FILE_WRITE);
         }
     }
 

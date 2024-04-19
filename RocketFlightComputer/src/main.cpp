@@ -54,7 +54,7 @@ void setup()
         .acc = new Accelerometer(0x68),
     };
     pinMode(SERVO_FEEDBACK_GPIO, INPUT);
-    airbrakesServo.attach(SERVO_PWM_GPIO);
+    Serial.println(airbrakesServo.attach(SERVO_PWM_GPIO));
     airbrakesServo.write(AIRBRAKE_RETRACTED);
 
     if(!sensors.bno055->init()) {

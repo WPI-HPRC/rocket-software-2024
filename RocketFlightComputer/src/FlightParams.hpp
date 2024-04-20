@@ -11,6 +11,7 @@ constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2]
 
 // Debug things
 // #define DEBUG_MODE
+#define NO_XBEE
 #ifdef DEBUG_MODE
 
 #define NO_TRANSITION

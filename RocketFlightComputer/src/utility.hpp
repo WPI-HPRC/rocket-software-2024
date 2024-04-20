@@ -1,12 +1,11 @@
 #pragma once
 
 #include <BasicLinearAlgebra.h>
-#include "FS.h"
-#include "Servo.h"
 #include "TelemetryBoard/XBeeProSX.h"
 #include <Arduino.h>
 #include <cstdint>
 #include <cmath>
+#include <SD.h>
 
 // #define DEBUG_MODE 
 #define LOOP_RATE 40
@@ -18,8 +17,8 @@
 
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
 extern bool sdCardInitialized;
-extern fs::File dataFile;
-extern Servo airbrakesServo;
+extern File dataFile;
+// extern Servo airbrakesServo;
 extern XbeeProSX xbee;
 
 class Utility

@@ -4,6 +4,9 @@
 #include <Arduino.h>
 #include <Metro.h>
 #include <Wire.h>
+#define PIN_SPI_MISO 16
+#define PIN_SPI_MOSI 19
+#define PIN_SPI_SCK 18
 #include <SPI.h>
 
 #include <Adafruit_Sensor.h>
@@ -18,8 +21,8 @@
 #include <Sensors.h>
 
 bool sdCardInitialized = false;
-fs::File dataFile;
-Servo airbrakesServo = Servo();
+File dataFile;
+// Servo airbrakesServo = Servo();
 XbeeProSX xbee = XbeeProSX(17); // CS GPIO17
 
 Metro timer = Metro(1000 / LOOP_RATE);
@@ -44,9 +47,9 @@ void setup()
     Wire.begin();
     Wire.setClock(400000);
 
-    SPI.setSCK(18);
-    SPI.setTX(19);
-    SPI.setRX(16);
+    // SPI.setSCK(18);
+    // SPI.setTX(19);
+    // SPI.setRX(16);
     SPI.begin();
     SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE0));
 
@@ -59,8 +62,8 @@ void setup()
         .acc = new Accelerometer(0x68),
     };
     pinMode(SERVO_FEEDBACK_GPIO, INPUT);
-    Serial.println(airbrakesServo.attach(SERVO_PWM_GPIO));
-    airbrakesServo.write(AIRBRAKE_RETRACTED);
+    // airbrakesServo.attach(SERVO_PWM_GPIO);
+    // airbrakesServo.write(AIRBRAKE_RETRACTED);
 
     xbee.start();
 

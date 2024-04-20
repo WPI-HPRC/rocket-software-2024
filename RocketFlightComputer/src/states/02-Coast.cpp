@@ -11,7 +11,7 @@
 Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
 
 Coast::~Coast() {
-    airbrakesServo.write(AIRBRAKE_RETRACTED);
+    // airbrakesServo.write(AIRBRAKE_RETRACTED);
 }
 
 void Coast::initialize_impl() {}
@@ -41,6 +41,7 @@ void Coast::loop_impl()
 
     // Handle airbrake control
     // TODO: I don't really know which values correspond to which positions yet, so these values are subject to change
+    /*
     switch (this->servoState) {
     case WAIT:
         airbrakesServo.write(AIRBRAKE_RETRACTED);
@@ -76,6 +77,7 @@ void Coast::loop_impl()
         airbrakesServo.write(AIRBRAKE_RETRACTED);
         break;
     }
+*/
 }
 
 //! @details max 8 seconds until deploy

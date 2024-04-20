@@ -140,8 +140,12 @@ void State::loop() {
 
 
   if (sdCardInitialized) {
-    dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
+    Serial.print("Writing file: ");
+    Serial.print(dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket)));
+    Serial.print(" ");
+    Serial.println(dataFile.available());
     if (this->loopCount % 20 == 0) {
+      Serial.println("Flushing file");
       dataFile.flush();
     }
   }

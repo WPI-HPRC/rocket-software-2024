@@ -1,13 +1,9 @@
-#include <pico/multicore.h>
 #include "EKF/EKF.h"
 #include "FlightParams.hpp"
 #include "utility.hpp"
 #include <Arduino.h>
 #include <Metro.h>
 #include <Wire.h>
-#define PIN_SPI_MISO 16
-#define PIN_SPI_MOSI 19
-#define PIN_SPI_SCK 18
 #include <SPI.h>
 
 #include <Adafruit_Sensor.h>
@@ -20,6 +16,10 @@
 #include <states/00-PreLaunch.h>
 
 #include <Sensors.h>
+
+#define PIN_SPI_MISO 16
+#define PIN_SPI_MOSI 19
+#define PIN_SPI_SCK 18
 
 bool sdCardInitialized = false;
 File dataFile;
@@ -64,7 +64,6 @@ void setup()
     };
     pinMode(SERVO_FEEDBACK_GPIO, INPUT);
     pinMode(SERVO_PWM_GPIO, OUTPUT);
-    multicore_fifo_push_blocking(AIRBRAKE_RETRACTED);
     // airbrakesServo.attach(SERVO_PWM_GPIO);
     // airbrakesServo.write(AIRBRAKE_RETRACTED);
 
@@ -114,12 +113,18 @@ void setup()
 
     delay(150);
 
-    multicore_launch_core1(handleServoPwm);
+    // Serial.println("[Init] Try launch core 1");
+    // multicore_launch_core1(handleServoPwm);
+    // Serial.println("[Init] Launched core 1");
     
     // Initialize starting state
+    // Serial.println("[Init] Initialize first state");
     state->initialize();
+    // Serial.println("[Init] Success");
 
+    // Serial.println("[Init] Reset timer");
     timer.reset();
+    // Serial.println("[Init] Success");
 }
 
 void loop()
@@ -127,7 +132,9 @@ void loop()
     if (timer.check() == 1)
     {
         // Reads sensors, logs to flash chip, loops the state
+        // Serial.println("Start loop");
         state->loop();
+        // Serial.println("Loop finished");
 
         State *nextState = state->nextState();
         if (nextState != nullptr)
@@ -139,22 +146,26 @@ void loop()
     }
 }
 
-void handleServoPwm() {
-    constexpr uint64_t microseconds = 1000000 / 50;
-    uint64_t lastTime = micros();
-    int on = false;
-    uint64_t time = 0;
-    while (true) {
-        if (multicore_fifo_rvalid()) {
-            time = multicore_fifo_pop_blocking();
-        }
-        uint64_t now = micros();
-        if (on && now - lastTime >= time) {
-            on = false;
-        } else if (!on && now - lastTime >= microseconds - time) {
-            on = true;
-        }
-        lastTime = now;
-        digitalWrite(SERVO_PWM_GPIO, on);
-    }
-}
+// void handleServoPwm() {
+//     constexpr uint64_t microseconds = 1000000 / 50;
+//     uint64_t lastTime = micros();
+//     int on = false;
+//     uint64_t time = 0;
+//     while (true) {
+//         Serial.println("[Core1] Loop start");
+//         if (multicore_fifo_rvalid()) {
+//             Serial.println("[Core1] Read from fifo");
+//             time = multicore_fifo_pop_blocking();
+//             Serial.println("[Core1] Success");
+//         }
+//         uint64_t now = micros();
+//         if (on && now - lastTime >= time) {
+//             on = false;
+//         } else if (!on && now - lastTime >= microseconds - time) {
+//             on = true;
+//         }
+//         lastTime = now;
+//         digitalWrite(SERVO_PWM_GPIO, on);
+//         delayMicroseconds(50);
+//     }
+// }

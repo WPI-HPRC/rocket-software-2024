@@ -35,7 +35,7 @@ void PreLaunch::loop_impl()
     if (!sdCardInitialized) {
         if (sd.begin(9)) {
             int fileIdx = 0;
-            while (1) {
+            for (int i = 0; i < 50; i++) {
                 char filename[100];
                 sprintf(filename, "flightData%d.bin", fileIdx++);
                 Serial.print("Trying file: ");

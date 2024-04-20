@@ -1,12 +1,14 @@
 #pragma once
 
+#define SD_FAT_TYPE 0
+
 #include <BasicLinearAlgebra.h>
 #include "TelemetryBoard/XBeeProSX.h"
 #include <Arduino.h>
 #include <cstdint>
 #include <cmath>
 // #include <RP2040_SD.h>
-#include <SD.h>
+#include <SdFat.h>
 
 // #define DEBUG_MODE 
 #define LOOP_RATE 40
@@ -19,6 +21,7 @@
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
 extern bool sdCardInitialized;
 extern File dataFile;
+extern SdFat sd;
 // extern Servo airbrakesServo;
 extern XbeeProSX xbee;
 

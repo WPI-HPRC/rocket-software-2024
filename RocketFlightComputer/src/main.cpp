@@ -23,6 +23,7 @@
 
 bool sdCardInitialized = false;
 File dataFile;
+SdFat sd;
 // Servo airbrakesServo = Servo();
 XbeeProSX xbee = XbeeProSX(17); // CS GPIO17
 

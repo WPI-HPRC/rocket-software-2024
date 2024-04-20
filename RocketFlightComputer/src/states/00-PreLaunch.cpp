@@ -33,22 +33,20 @@ void PreLaunch::loop_impl()
     }
 #ifndef NO_SDCARD
     if (!sdCardInitialized) {
-        int x;
-        if ((x = SD.begin(9))) {
+        if (sd.begin(9)) {
             int fileIdx = 0;
             while (1) {
                 char filename[100];
                 sprintf(filename, "flightData%d.bin", fileIdx++);
                 Serial.print("Trying file: ");
                 Serial.println(filename);
-                if (!SD.exists(filename)) {
-                    dataFile = SD.open(filename, FILE_WRITE);
+                if (!sd.exists(filename)) {
+                    dataFile = sd.open(filename, FILE_WRITE);
                     break;
                 }
             }
             sdCardInitialized = true;
         }
-        Serial.println(x);
     }
 #endif
     Serial.print("ACCEL: ");

@@ -1,3 +1,4 @@
+#include <pico/multicore.h>
 #include "EKF/EKF.h"
 #include "FlightParams.hpp"
 #include "utility.hpp"
@@ -62,6 +63,8 @@ void setup()
         .acc = new Accelerometer(0x68),
     };
     pinMode(SERVO_FEEDBACK_GPIO, INPUT);
+    pinMode(SERVO_PWM_GPIO, OUTPUT);
+    multicore_fifo_push_blocking(AIRBRAKE_RETRACTED);
     // airbrakesServo.attach(SERVO_PWM_GPIO);
     // airbrakesServo.write(AIRBRAKE_RETRACTED);
 
@@ -110,6 +113,8 @@ void setup()
     // attachInterrupt(digitalPinToInterrupt(magInterruptPin), handleMagInterrupt, RISING);
 
     delay(150);
+
+    multicore_launch_core1(handleServoPwm);
     
     // Initialize starting state
     state->initialize();
@@ -131,5 +136,25 @@ void loop()
             state = nextState;
             state->initialize();
         }
+    }
+}
+
+void handleServoPwm() {
+    constexpr uint64_t microseconds = 1000000 / 50;
+    uint64_t lastTime = micros();
+    int on = false;
+    uint64_t time = 0;
+    while (true) {
+        if (multicore_fifo_rvalid()) {
+            time = multicore_fifo_pop_blocking();
+        }
+        uint64_t now = micros();
+        if (on && now - lastTime >= time) {
+            on = false;
+        } else if (!on && now - lastTime >= microseconds - time) {
+            on = true;
+        }
+        lastTime = now;
+        digitalWrite(SERVO_PWM_GPIO, on);
     }
 }

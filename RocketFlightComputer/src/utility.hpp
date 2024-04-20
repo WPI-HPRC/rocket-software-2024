@@ -1,5 +1,6 @@
 #pragma once
 
+#include <pico/multicore.h>
 #include <BasicLinearAlgebra.h>
 #include "TelemetryBoard/XBeeProSX.h"
 #include <Arduino.h>
@@ -20,6 +21,8 @@ extern bool sdCardInitialized;
 extern File dataFile;
 // extern Servo airbrakesServo;
 extern XbeeProSX xbee;
+
+void handleServoPwm();
 
 class Utility
 {

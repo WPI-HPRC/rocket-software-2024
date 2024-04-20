@@ -11,5 +11,5 @@ class PreLaunch : public State {
 		uint8_t buffIdx = 0;
 		float avgAccelZ();
     bool launched = false;
-    Debouncer launchDebouncer = Debouncer(30);
+    Debouncer launchDebouncer = Debouncer(4);
 };

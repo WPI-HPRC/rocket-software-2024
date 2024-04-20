@@ -13,5 +13,5 @@ private:
     float verticalVelocityBuffer[10] = {0};
     int bufferIndex = 0;
     float lastAltitude = 0;
-    Debouncer drogueDescentDebouncer = Debouncer(30);
+    Debouncer drogueDescentDebouncer = Debouncer(10);
 };

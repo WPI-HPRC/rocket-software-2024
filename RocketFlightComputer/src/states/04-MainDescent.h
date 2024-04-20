@@ -13,5 +13,5 @@ private:
     int bufferIndex = 0;
     float lastAltitude = 0;
     bool landed = false;
-    Debouncer landedDebouncer = Debouncer(30);
+    Debouncer landedDebouncer = Debouncer(10);
 };

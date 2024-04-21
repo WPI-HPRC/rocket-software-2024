@@ -4,7 +4,7 @@
 
 // IREC 2024 Rocket Global Definitions (4/16/2024)
 
-constexpr static float magneticDip = -11.9 * (180/PI); // [rad] Magnetic Inclination of launch site
+constexpr static float magneticDip = -13.85 * (180/PI); // [rad] Magnetic Inclination of launch site
 constexpr static float rocketMass = 22.745; // [kg] Rocket mass from ORK
 constexpr static float C_d = 0.5; // Eyeball averaged from ORK
 constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2] Cross Sectional Area -- Body Tube + 4 Fins

@@ -31,24 +31,7 @@ void PreLaunch::loop_impl()
         // delay(100);
         // return;
     }
-#ifndef NO_SDCARD
-    if (!sdCardInitialized) {
-        if (sd.begin(9)) {
-            int fileIdx = 0;
-            for (int i = 0; i < 50; i++) {
-                char filename[100];
-                sprintf(filename, "flightData%d.bin", fileIdx++);
-                Serial.print("Trying file: ");
-                Serial.println(filename);
-                if (!sd.exists(filename)) {
-                    dataFile = sd.open(filename, FILE_WRITE);
-                    break;
-                }
-            }
-            sdCardInitialized = true;
-        }
-    }
-#endif
+
     Serial.print("ACCEL: ");
     Serial.print(telemPacket.accelX);
     Serial.print(", ");

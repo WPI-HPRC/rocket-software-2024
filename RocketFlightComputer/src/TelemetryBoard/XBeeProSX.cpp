@@ -19,6 +19,11 @@ void XbeeProSX::readBytes(uint8_t *buffer, size_t length_bytes)
 
 void XbeeProSX::writeBytes(const char *data, size_t length_bytes)
 {
+    SPI.end();
+    SPI.endTransaction();
+    SPI.begin();
+    SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE0));
+
     digitalWrite(_cs_pin, LOW);
     for (size_t i = 0; i < length_bytes; i++)
     {

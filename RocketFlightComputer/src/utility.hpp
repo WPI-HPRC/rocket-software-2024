@@ -90,12 +90,12 @@ public:
         float pressure = 0.0;
 
         // GPS Inputs
-        float gpsLat;
-        float gpsLong;
-        float gpsAltMSL;
-        float gpsAltAGL;
-        uint32_t epochTime;
-        uint8_t satellites;
+        float gpsLat = 0.0;
+        float gpsLong = 0.0;
+        float gpsAltMSL = 0.0;
+        float gpsAltAGL = 0.0;
+        uint32_t epochTime = 0;
+        uint8_t satellites = 0;
         bool gpsLock = false;
 
         uint32_t timestamp = 0;

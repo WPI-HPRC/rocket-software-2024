@@ -13,28 +13,34 @@ void State::initialize()
 {
     this->startTime = millis();
     initialize_impl();
-/*
 
-    const uint16_t networkID = 0x4843;
 
-    uint8_t byte_array[2];
+    // const uint16_t networkID = 0x4843;
+
+    // uint8_t byte_array[2];
     
-    break_uint16(networkID, byte_array);
+    // break_uint16(networkID, byte_array);
 
-    xbee->setParameter(XBee::AtCommand::ApiOptions, 0x90);
-    xbee->setParameter(AsciiToUint16('I', 'D'), byte_array, 2);
-*/
+    // xbee.setParameter(XBee::AtCommand::ApiOptions, 0x90);
+    // xbee.setParameter(AsciiToUint16('I', 'D'), byte_array, 2);
+
 
     // exit(0);
 }
 
 void State::loop() {
-	long now = millis();
+	uint64_t now = millis();
   // These values may be used in the state code
 	this->currentTime = now - this->startTime;
 	this->deltaTime = now - this->lastLoopTime;
 	this->loopCount++;
+  #ifdef PRINT_TIMINGS
+  uint64_t start = millis();
+  #endif
 	this->sensorPacket = this->sensors->readSensors();
+  #ifdef PRINT_TIMINGS
+  Serial.printf("\tREAD SENSORS TIME: %llu\n", millis() - start);
+  #endif
   /**
    * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
    */
@@ -127,7 +133,13 @@ void State::loop() {
   // Serial.println(sensorPacket.timestamp);  
 
 	if (this->stateEstimator->initialized) {
+    #ifdef PRINT_TIMINGS
+    start = millis();
+    #endif
 		this->stateEstimator->onLoop(this->telemPacket);
+    #ifdef PRINT_TIMINGS
+    Serial.printf("\tEKF STEP TIME: %llu\n", millis() - start);
+    #endif
 
 		this->telemPacket.w = this->stateEstimator->x(0);
 		this->telemPacket.i = this->stateEstimator->x(1);
@@ -135,15 +147,27 @@ void State::loop() {
 		this->telemPacket.k = this->stateEstimator->x(3);
 	}
 	
+  #ifdef PRINT_TIMINGS
+  start = millis();
+  #endif
 	loop_impl();
+  #ifdef PRINT_TIMINGS
+  Serial.printf("\tLOOP IMPL TIME: %llu\n", millis() - start);
+  #endif
 	this->lastLoopTime = now;
 
 
   if (sdCardInitialized) {
+    #ifdef PRINT_TIMINGS
+    start = millis();
+    #endif
     dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
     if (this->loopCount % 20 == 0) {
       dataFile.flush();
     }
+    #ifdef PRINT_TIMINGS
+    Serial.printf("\tSD WRITE TIME: %llu\n", millis() - start);
+    #endif
   }
 
 #ifdef SERIAL_TELEMETRY
@@ -161,7 +185,13 @@ void State::loop() {
 
 #ifndef NO_XBEE
 
+    #ifdef PRINT_TIMINGS
+    start = millis();
+    #endif
     xbee.sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket));
+    #ifdef PRINT_TIMINGS
+    Serial.printf("\tXBEE SEND TIME: %llu\n", millis() - start);
+    #endif
 
     // Serial.print("Packet Success: ");
     // Serial.println(now);

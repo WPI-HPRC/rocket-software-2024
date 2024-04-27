@@ -5,7 +5,7 @@ Accelerometer::Accelerometer(int addr) : icm42688(Wire, addr) {}
 
 bool Accelerometer::init() {
 
-  if(!this->icm42688.begin()) {
+  if(this->icm42688.begin() != 1) {
     return false;
   }
 

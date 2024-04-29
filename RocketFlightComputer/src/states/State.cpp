@@ -1,4 +1,5 @@
 #include "State.h"
+#include "hardware/dma.h"
 #include "utility.hpp"
 #include <Arduino.h>
 
@@ -156,7 +157,30 @@ void State::loop() {
   #endif
 	this->lastLoopTime = now;
 
+#ifndef NO_SD
+  // if (dma_channel_is_busy(sd_spi_dma_chan)) {
+  //   Serial.printf("[ERROR] DMA channel still busy, waiting for finish!");
+  //   dma_channel_wait_for_finish_blocking(sd_spi_dma_chan);
+  // }
+#endif
 
+#ifndef NO_XBEE
+
+    #ifdef PRINT_TIMINGS
+    start = millis();
+    #endif
+    SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE0));
+    xbee.sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket));
+    SPI.endTransaction();
+    #ifdef PRINT_TIMINGS
+    Serial.printf("\tXBEE SEND TIME: %llu\n", millis() - start);
+    #endif
+
+    // Serial.print("Packet Success: ");
+    // Serial.println(now);
+#endif
+
+#ifndef NO_SD
   if (sdCardInitialized) {
     #ifdef PRINT_TIMINGS
     start = millis();
@@ -169,6 +193,7 @@ void State::loop() {
     Serial.printf("\tSD WRITE TIME: %llu\n", millis() - start);
     #endif
   }
+#endif
 
 #ifdef SERIAL_TELEMETRY
     this->telemPacket.debugPrint();
@@ -182,20 +207,6 @@ void State::loop() {
     /** Loop Radio and Send Data */
 
     // Serial.printf("Loop count: %llu\n", this->loopCount);
-
-#ifndef NO_XBEE
-
-    #ifdef PRINT_TIMINGS
-    start = millis();
-    #endif
-    xbee.sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket));
-    #ifdef PRINT_TIMINGS
-    Serial.printf("\tXBEE SEND TIME: %llu\n", millis() - start);
-    #endif
-
-    // Serial.print("Packet Success: ");
-    // Serial.println(now);
-#endif
 }
 
 State *State::nextState()

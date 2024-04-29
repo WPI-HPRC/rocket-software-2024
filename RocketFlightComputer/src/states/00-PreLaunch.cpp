@@ -1,5 +1,4 @@
 #include "00-PreLaunch.h"
-#include "SpiDriver/SdSpiDriver.h"
 #include "State.h"
 #include "01-Launch.h"
 #include "utility.hpp"
@@ -32,23 +31,6 @@ void PreLaunch::loop_impl()
         // delay(100);
         // return;
     }
-#ifndef NO_SDCARD
-    if (!sdCardInitialized) {
-        if (SD.begin(9, SPI_FULL_SPEED, SPI)) {
-            int fileIdx = 0;
-            while (1) {
-                char filename[100];
-                sprintf(filename, "flightData%d.bin", fileIdx++);
-                Serial.printf("Trying file `%s`\n", filename);
-                if (!SD.exists(filename)) {
-                    dataFile = SD.open(filename, FILE_WRITE);
-                    break;
-                }
-            }
-            sdCardInitialized = true;
-        }
-    }
-#endif
     if (this->stateEstimator->initialized)
     {
         this->accelReadingBuffer[this->buffIdx++] = this->telemPacket.accelZ;

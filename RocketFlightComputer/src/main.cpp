@@ -5,6 +5,7 @@
 #include <Metro.h>
 #include <Wire.h>
 #include <SPI.h>
+#include <SdFat.h>
 
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -16,9 +17,14 @@
 #include <states/00-PreLaunch.h>
 
 #include <Sensors.h>
+#include <CustomSPI.h>
 
 bool sdCardInitialized = false;
-fs::File dataFile;
+#ifndef NO_SD
+File32 dataFile;
+SdFat sd;
+uint sd_spi_dma_chan = -1;
+#endif
 Servo airbrakesServo = Servo();
 #ifndef NO_XBEE
 XbeeProSX xbee = XbeeProSX(17); // CS GPIO17
@@ -55,7 +61,24 @@ void setup()
     SPI.setTX(19);
     SPI.setRX(16);
     SPI.begin();
-    SPI.beginTransaction(SPISettings(6000000, MSBFIRST, SPI_MODE0));
+
+#ifndef NO_SDCARD
+    if (!sdCardInitialized) {
+        if (sd.begin(SdSpiConfig(9, SHARED_SPI, SD_SCK_MHZ(50), &customSpi))) {
+            int fileIdx = 0;
+            while (1) {
+                char filename[100];
+                sprintf(filename, "flightData%d.bin", fileIdx++);
+                Serial.printf("Trying file `%s`\n", filename);
+                if (!sd.exists(filename)) {
+                    dataFile.open(filename, O_RDWR | O_CREAT);
+                    break;
+                }
+            }
+            sdCardInitialized = true;
+        }
+    }
+#endif
     // SPI.beginTransaction(SPISettings(40000000, MSBFIRST, SPI_MODE0));
 
     // Initialize all sensors
@@ -137,7 +160,7 @@ void loop()
         #endif
         state->loop();
         #ifdef PRINT_TIMINGS
-        Serial.printf("^^ LOOP TIME: %llu\n", millis() - start);
+        Serial.printf("^^ LOOP TIME: %llu ^^\n", millis() - start);
         #endif
 
         State *nextState = state->nextState();

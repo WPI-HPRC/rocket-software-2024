@@ -1,7 +1,7 @@
 #pragma once
 
 #include <BasicLinearAlgebra.h>
-#include "FS.h"
+#include "SdFat.h"
 #include "Servo.h"
 #include "TelemetryBoard/XBeeProSX.h"
 #include <Arduino.h>
@@ -18,9 +18,15 @@
 
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
 extern bool sdCardInitialized;
-extern fs::File dataFile;
+#ifndef NO_SD
+extern SdFat sd;
+extern File32 dataFile;
+extern uint sd_spi_dma_chan;
+#endif
 extern Servo airbrakesServo;
+#ifndef NO_XBEE
 extern XbeeProSX xbee;
+#endif
 
 class Utility
 {

@@ -19,6 +19,7 @@ constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2]
 #define SERIAL_TELEMETRY
 #define WAIT_FOR_SERIAL
 #define NO_SDCARD
+#define NO_SD
 // #define PRINT_TIMINGS
 
 #endif

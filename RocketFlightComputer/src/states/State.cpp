@@ -157,12 +157,12 @@ void State::loop() {
   #endif
 	this->lastLoopTime = now;
 
-#ifndef NO_SD
+// #ifndef NO_SDCARD
   // if (dma_channel_is_busy(sd_spi_dma_chan)) {
   //   Serial.printf("[ERROR] DMA channel still busy, waiting for finish!");
   //   dma_channel_wait_for_finish_blocking(sd_spi_dma_chan);
   // }
-#endif
+// #endif
 
 #ifndef NO_XBEE
 
@@ -180,20 +180,20 @@ void State::loop() {
     // Serial.println(now);
 #endif
 
-// #ifndef NO_SD
-//   if (sdCardInitialized) {
-//     #ifdef PRINT_TIMINGS
-//     start = millis();
-//     #endif
-//     dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
-//     if (this->loopCount % 20 == 0) {
-//       dataFile.flush();
-//     }
-//     #ifdef PRINT_TIMINGS
-//     Serial.printf("\tSD WRITE TIME: %llu\n", millis() - start);
-//     #endif
-//   }
-// #endif
+#ifndef NO_SDCARD
+  if (sdCardInitialized) {
+    #ifdef PRINT_TIMINGS
+    start = millis();
+    #endif
+    dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
+    if (this->loopCount % 20 == 0) {
+      dataFile.flush();
+    }
+    #ifdef PRINT_TIMINGS
+    Serial.printf("\tSD WRITE TIME: %llu\n", millis() - start);
+    #endif
+  }
+#endif
 
 #ifdef SERIAL_TELEMETRY
     this->telemPacket.debugPrint();

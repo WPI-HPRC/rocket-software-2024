@@ -147,7 +147,7 @@ void State::loop() {
 		this->telemPacket.j = this->stateEstimator->x(2);
 		this->telemPacket.k = this->stateEstimator->x(3);
 	}
-	
+
   #ifdef PRINT_TIMINGS
   start = millis();
   #endif

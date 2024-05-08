@@ -165,48 +165,48 @@ public:
 
 #ifdef SERIAL_TELEMETRY
         void debugPrint() {
-            Serial.println("state: " + String(state) + ", "
+            Serial.print("state: "); Serial.print(state); Serial.print(", ");
 
-                        + "accelX: " + String(accelX) + ", "
-                        + "accelY: " + String(accelY) + ", "
-                        + "accelZ: " + String(accelZ) + ", "
-                        + "gyroX: " + String(gyroX) + ", "
-                        + "gyroY: " + String(gyroY) + ", "
-                        + "gyroZ: " + String(gyroZ) + ", "
-                        + "rawMagX: " + String(rawMagX) + ", "
-                        + "rawMagY: " + String(rawMagY) + ", "
-                        + "rawMagZ: " + String(rawMagZ) + ", "
+            Serial.print("accelX: "); Serial.print(accelX); Serial.print(", ");
+            Serial.print("accelY: "); Serial.print(accelY); Serial.print(", ");
+            Serial.print("accelZ: "); Serial.print(accelZ); Serial.print(", ");
+            Serial.print("gyroX: "); Serial.print(gyroX); Serial.print(", ");
+            Serial.print("gyroY: "); Serial.print(gyroY); Serial.print(", ");
+            Serial.print("gyroZ: "); Serial.print(gyroZ); Serial.print(", ");
+            Serial.print("rawMagX: "); Serial.print(rawMagX); Serial.print(", ");
+            Serial.print("rawMagY: "); Serial.print(rawMagY); Serial.print(", ");
+            Serial.print("rawMagZ: "); Serial.print(rawMagZ); Serial.print(", ");
 
-                        + "pressure: " + String(pressure) + ", "
+            Serial.print("pressure: "); Serial.print(pressure); Serial.print(", ");
 
-                        + "servoPosition: " + String(servoPosition) + ", "
+            Serial.print("servoPosition: "); Serial.print(servoPosition); Serial.print(", ");
 
-                        + "altitude: " + String(altitude) + ", "
-                        + "magX: " + String(magX) + ", "
-                        + "magY: " + String(magY) + ", "
-                        + "magZ: " + String(magZ) + ", "
+            Serial.print("altitude: "); Serial.print(altitude); Serial.print(", ");
+            Serial.print("magX: "); Serial.print(magX); Serial.print(", ");
+            Serial.print("magY: "); Serial.print(magY); Serial.print(", ");
+            Serial.print("magZ: "); Serial.print(magZ); Serial.print(", ");
 
-                        + "w: " + String(w) + ", "
-                        + "i: " + String(i) + ", "
-                        + "j: " + String(j) + ", "
-                        + "k: " + String(k) + ", "
-                        + "posX: " + String(posX) + ", "
-                        + "posY: " + String(posY) + ", "
-                        + "posZ: " + String(posZ) + ", "
-                        + "velX: " + String(velX) + ", "
-                        + "velY: " + String(velY) + ", "
-                        + "velZ: " + String(velZ) + ", "
+            Serial.print("w: "); Serial.print(w); Serial.print(", ");
+            Serial.print("i: "); Serial.print(i); Serial.print(", ");
+            Serial.print("j: "); Serial.print(j); Serial.print(", ");
+            Serial.print("k: "); Serial.print(k); Serial.print(", ");
+            Serial.print("posX: "); Serial.print(posX); Serial.print(", ");
+            Serial.print("posY: "); Serial.print(posY); Serial.print(", ");
+            Serial.print("posZ: "); Serial.print(posZ); Serial.print(", ");
+            Serial.print("velX: "); Serial.print(velX); Serial.print(", ");
+            Serial.print("velY: "); Serial.print(velY); Serial.print(", ");
+            Serial.print("velZ: "); Serial.print(velZ); Serial.print(", ");
 
-                        + "gpsLat: " + String(gpsLat) + ", "
-                        + "gpsLong: " + String(gpsLong) + ", "
-                        + "gpsAltAGL: " + String(gpsAltAGL) + ", "
-                        + "gpsAltMSL: " + String(gpsAltMSL) + ", "
-                        + "epochTime: " + String(epochTime) + ", "
-                        + "satellites: " + String(satellites) + ", "
-                        + "gpsLock: " + String(gpsLock) + ", "
+            Serial.print("gpsLat: "); Serial.print(gpsLat); Serial.print(", ");
+            Serial.print("gpsLong: "); Serial.print(gpsLong); Serial.print(", ");
+            Serial.print("gpsAltAGL: "); Serial.print(gpsAltAGL); Serial.print(", ");
+            Serial.print("gpsAltMSL: "); Serial.print(gpsAltMSL); Serial.print(", ");
+            Serial.print("epochTime: "); Serial.print(epochTime); Serial.print(", ");
+            Serial.print("satellites: "); Serial.print(satellites); Serial.print(", ");
+            Serial.print("gpsLock: "); Serial.print(gpsLock); Serial.print(", ");
 
-                        + "loopCount: " + String(loopCount) + ", "
-                        + "timestamp: " + String(timestamp));
+            Serial.print("loopCount: "); Serial.print(loopCount); Serial.print(", ");
+            Serial.print("timestamp: "); Serial.println(timestamp);
         }
 #endif
     };

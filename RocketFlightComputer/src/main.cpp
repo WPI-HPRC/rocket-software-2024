@@ -71,7 +71,7 @@ void setup()
                 sprintf(filename, "flightData%d.bin", fileIdx++);
                 Serial.printf("Trying file `%s`\n", filename);
                 if (!sd.exists(filename)) {
-                    dataFile.open(filename, O_RDWR | O_CREAT);
+                    dataFile.open(filename, O_WRONLY | O_CREAT);
                     break;
                 }
             }

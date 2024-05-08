@@ -1,0 +1,4 @@
+195c195
+< #define SD_CHIP_SELECT_MODE 0
+---
+> #define SD_CHIP_SELECT_MODE 1

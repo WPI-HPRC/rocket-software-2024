@@ -5,6 +5,7 @@
 #include "utility.hpp"
 #include <SdFat.h>
 #include <hardware/dma.h>
+#include <SpiDriver/SdSpiBaseClass.h>
 
 void spi_dma_irq_handler();
 

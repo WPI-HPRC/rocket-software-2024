@@ -180,20 +180,20 @@ void State::loop() {
     // Serial.println(now);
 #endif
 
-#ifndef NO_SD
-  if (sdCardInitialized) {
-    #ifdef PRINT_TIMINGS
-    start = millis();
-    #endif
-    dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
-    if (this->loopCount % 20 == 0) {
-      dataFile.flush();
-    }
-    #ifdef PRINT_TIMINGS
-    Serial.printf("\tSD WRITE TIME: %llu\n", millis() - start);
-    #endif
-  }
-#endif
+// #ifndef NO_SD
+//   if (sdCardInitialized) {
+//     #ifdef PRINT_TIMINGS
+//     start = millis();
+//     #endif
+//     dataFile.write((uint8_t *)&this->telemPacket, sizeof(this->telemPacket));
+//     if (this->loopCount % 20 == 0) {
+//       dataFile.flush();
+//     }
+//     #ifdef PRINT_TIMINGS
+//     Serial.printf("\tSD WRITE TIME: %llu\n", millis() - start);
+//     #endif
+//   }
+// #endif
 
 #ifdef SERIAL_TELEMETRY
     this->telemPacket.debugPrint();

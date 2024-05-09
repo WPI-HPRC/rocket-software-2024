@@ -43,6 +43,14 @@ State *state = new PreLaunch(&sensors, stateEstimator);
 //     sensors.mag->handleInterrupt();
 // }
 
+int songPitches[] = {
+    NOTE_D6, NOTE_E6, NOTE_FS6, NOTE_G6, NOTE_A6, NOTE_D6, NOTE_B6, NOTE_D7, NOTE_A6, NOTE_FS6, NOTE_G6, NOTE_FS6, NOTE_G6, NOTE_A6, NOTE_FS6, NOTE_E6, NOTE_D6, NOTE_E6, NOTE_D6, NOTE_E6, NOTE_FS6, NOTE_E6
+};
+
+int songDurations[] = {
+    4,8,4,8,4,8,4,8,4,8,4,8,4,8,4,8,4,8,4,8,4,8
+};
+
 void setup()
 {
     Serial.begin(115200);
@@ -138,7 +146,6 @@ void setup()
     }
     Wire.setClock(400000);
 
-
     // pinMode(magInterruptPin, INPUT);
     // attachInterrupt(digitalPinToInterrupt(magInterruptPin), handleMagInterrupt, RISING);
 
@@ -146,6 +153,17 @@ void setup()
     
     // Initialize starting state
     state->initialize();
+
+#ifndef DEBUG_MODE
+    // Play startup song
+    for(int i=0; i < 22; i++) {
+        int noteDuration = 1400 / songDurations[i];
+        tone(BUZZER_PIN, songPitches[i], noteDuration);
+        int pauseBetween = noteDuration * 1.10;
+        delay(pauseBetween);
+        noTone(BUZZER_PIN);
+    }
+#endif
 }
 
 void loop()

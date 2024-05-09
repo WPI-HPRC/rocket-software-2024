@@ -7,6 +7,7 @@
 #include <Arduino.h>
 #include <cstdint>
 #include <cmath>
+#include "buzzerPitches.h"
 
 // #define DEBUG_MODE 
 #define LOOP_RATE 40
@@ -15,6 +16,7 @@
 
 #define SERVO_FEEDBACK_GPIO 27
 #define SERVO_PWM_GPIO 20
+#define BUZZER_PIN 14
 
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
 extern bool sdCardInitialized;

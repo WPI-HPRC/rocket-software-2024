@@ -80,15 +80,39 @@ void PreLaunch::loop_impl()
 
         // Observation Matrix
 
-        BLA::Matrix<3> crossProd1 = Utility::crossProduct(a, m);
-        BLA::Matrix<3> crossProd2 = Utility::crossProduct(a,crossProd1); 
+        BLA::Matrix<3> crossProd1 = Utility::crossProduct(a,m);
+        BLA::Matrix<3> crossProd2 = Utility::crossProduct(crossProd1, a);
+        
+        BLA::Matrix<3,3> C = {
+            crossProd2(0), crossProd1(0), a(0),
+            crossProd2(1), crossProd1(1), a(1),
+            crossProd2(3), crossProd1(2), a(2)
+        };
+
+        // Serial.println("<----- C ----->");
+        // for (int i = 0; i < C.Rows; i++) {
+        //     for (int j = 0; j < C.Cols; j++) {
+        //         Serial.print(String(C(i,j)) + "\t");
+        //     }
+        //     Serial.println("");
+        // };
 
         BLA::Matrix<4> q_0 = {
-            0.5 * sqrt(1 + a(0) + crossProd1(1) + crossProd2(2)),
-            0.5 * std::copysign(sqrt(1 + a(0) - crossProd1(1) - crossProd2(2)), crossProd2(1) - crossProd1(2)),
-            0.5 * std::copysign(sqrt(1 - a(0) + crossProd1(1) - crossProd2(2)), crossProd1(2) - crossProd2(1)),
-            0.5 * std::copysign(sqrt(1 - a(0) - crossProd1(1) + crossProd2(2)), crossProd2(0) - crossProd1(1) + crossProd1(0) - crossProd2(0))
+            0.5 * sqrt(C(1,1) + C(2,2) + C(3,3) + 1),
+            0.5 * std::copysign(1, C(2,1) - C(1,2)) * sqrt(C(0,0) - C(1,1) - C(2,2) + 1),
+            0.5 * std::copysign(1, C(0,2) - C(2,0)) * sqrt(C(1,1) - C(2,2) - C(0,0) + 1),
+            0.5 * std::copysign(1, C(1,0) - C(0,1)) * sqrt(C(2,2) - C(0,0) - C(1,1) + 1)
         };
+
+        // BLA::Matrix<3> crossProd1 = Utility::crossProduct(a, m);
+        // BLA::Matrix<3> crossProd2 = Utility::crossProduct(a,crossProd1); 
+
+        // BLA::Matrix<4> q_0 = {
+        //     0.5 * sqrt(1 + a(0) + crossProd1(1) + crossProd2(2)),
+        //     0.5 * std::copysign(sqrt(1 + a(0) - crossProd1(1) - crossProd2(2)), crossProd2(1) - crossProd1(2)),
+        //     0.5 * std::copysign(sqrt(1 - a(0) + crossProd1(1) - crossProd2(2)), crossProd1(2) - crossProd2(1)),
+        //     0.5 * std::copysign(sqrt(1 - a(0) - crossProd1(1) + crossProd2(2)), crossProd2(0) - crossProd1(1) + crossProd1(0) - crossProd2(0))
+        // };
 
         Serial.println("<----- Initial Quaternion ----->");
         for (int i = 0; i < q_0.Rows; i++) {

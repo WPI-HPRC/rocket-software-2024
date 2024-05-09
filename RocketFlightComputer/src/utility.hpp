@@ -20,7 +20,7 @@
 
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
 extern bool sdCardInitialized;
-#ifndef NO_SD
+#ifndef NO_SDCARD
 extern SdFat sd;
 extern File32 dataFile;
 extern uint sd_spi_dma_chan;

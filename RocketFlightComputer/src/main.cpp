@@ -20,7 +20,7 @@
 #include <CustomSPI.h>
 
 bool sdCardInitialized = false;
-#ifndef NO_SD
+#ifndef NO_SDCARD
 File32 dataFile;
 SdFat sd;
 uint sd_spi_dma_chan = -1;

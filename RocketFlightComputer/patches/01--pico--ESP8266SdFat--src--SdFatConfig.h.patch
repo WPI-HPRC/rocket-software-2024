@@ -1,4 +1,0 @@
-124c124
-< #define SPI_DRIVER_SELECT 0
----
-> #define SPI_DRIVER_SELECT 3

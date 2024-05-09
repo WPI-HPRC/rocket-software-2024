@@ -8,7 +8,7 @@
 #include <hardware/dma.h>
 #include <SpiDriver/SdSpiBaseClass.h>
 
-void spi_dma_irq_handler();
+// void spi_dma_irq_handler();
 
 class CustomSPIClass : public SdSpiBaseClass {
  public:
@@ -29,8 +29,6 @@ class CustomSPIClass : public SdSpiBaseClass {
   }
   // Deactivate SPI hardware.
   void deactivate() {
-    // NOTE: We don't end the transaction here since the `send` call is non-blocking.
-    // The transaction is ended on DMA_IRQ_0
     SPI.endTransaction();
   }
   // Receive a byte.
@@ -77,11 +75,8 @@ class CustomSPIClass : public SdSpiBaseClass {
     m_spiSettings = SPISettings(maxSck, MSBFIRST, SPI_MODE0);
   }
 
-  SdCsPin_t csPin;
-  bool preventDeassert = false;
  private:
   SPISettings m_spiSettings;
-  dma_channel_config c;
 
 } customSpi;
 

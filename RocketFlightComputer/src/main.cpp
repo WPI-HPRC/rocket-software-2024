@@ -1,4 +1,4 @@
-#include "EKF/EKF.h"
+#include "EKF/AttitudeEKF.h"
 #include "FlightParams.hpp"
 #include "utility.hpp"
 #include <Arduino.h>
@@ -35,9 +35,10 @@ uint64_t lastLoopTime = 0;
 uint64_t now = 0;
 
 struct Sensors sensors;
-StateEstimator *stateEstimator = new StateEstimator();
+AttitudeStateEstimator *attitudeStateEstimator = new AttitudeStateEstimator();
+KinematicStateEstimator *kinematicStateEstimator = new KinematicStateEstimator();
 // Start in pre-launch
-State *state = new PreLaunch(&sensors, stateEstimator);
+State *state = new PreLaunch(&sensors, attitudeStateEstimator, kinematicStateEstimator);
 
 // void handleMagInterrupt() {
 //     sensors.mag->handleInterrupt();

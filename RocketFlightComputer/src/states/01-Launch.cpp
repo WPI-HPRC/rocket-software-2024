@@ -3,7 +3,7 @@
 #include "02-Coast.h"
 #include "06-Abort.h"
 
-Launch::Launch(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
+Launch::Launch(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
 
 void Launch::initialize_impl() {}
 
@@ -33,13 +33,13 @@ State *Launch::nextState_impl()
     // Stay in this state for at least 3 seconds to prevent airbrake activation under motor power
     if (this->currentTime >= MOTOR_BURN_TIME && motorBurnout)
     {
-        return new Coast(sensors, stateEstimator);
+        return new Coast(sensors, attitudeStateEstimator, kinematicStateEstimator);
     }
 
     // if state hasn't changed for much more than 2x motor burnout time, go to abort
     if (this->currentTime > 2 * MOTOR_BURN_TIME)
     {
-        return new Abort(sensors, stateEstimator);
+        return new Abort(sensors, attitudeStateEstimator, kinematicStateEstimator);
     }
 
     return nullptr;

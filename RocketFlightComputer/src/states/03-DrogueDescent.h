@@ -6,7 +6,7 @@ class DrogueDescent : public State
 {
     _STATE_CLASS_IMPLS_
 public:
-    DrogueDescent(struct Sensors *sensors, StateEstimator *stateEstimator);
+    DrogueDescent(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator);
 
 private:
     boolean mainDeployVelocityReached = false;

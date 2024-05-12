@@ -1,4 +1,4 @@
-#include "EKF.h"
+#include "AttitudeEKF.h"
 
 // TODO: Fix comments, do be wrong - Dan Pearson
 
@@ -6,13 +6,13 @@
  * @brief Construct a new Quat State Estimator:: Quat State Estimator object
  *
  */
-StateEstimator::StateEstimator() {}
+AttitudeStateEstimator::AttitudeStateEstimator() {}
 
 /**
  * @param initialOrientation
  * @param dt
  */
-void StateEstimator::init(BLA::Matrix<10> initialOrientation, float dt) {
+void AttitudeStateEstimator::init(BLA::Matrix<4> initialOrientation, float dt) {
     this->x = initialOrientation;
     this->x_min = initialOrientation;
     this->dt = dt;
@@ -25,7 +25,7 @@ void StateEstimator::init(BLA::Matrix<10> initialOrientation, float dt) {
  * @param telemPacket Sensor Frame
  * @return BLA::Matrix<4> State Vector
  */
-void StateEstimator::onLoop(Utility::TelemPacket telemPacket)
+void AttitudeStateEstimator::onLoop(Utility::TelemPacket telemPacket)
 {
     /* Read Data from Sensors and Convert to SI Units */
 
@@ -43,22 +43,24 @@ void StateEstimator::onLoop(Utility::TelemPacket telemPacket)
     float magY = telemPacket.magY;
     float magZ = telemPacket.magZ;
 
+
     BLA::Matrix<6> u = {accX, accY, accZ, gyrX, gyrY, gyrZ};
 
     // Apply measurement function to predict priori state of the system
     x_min = measurementFunction(u);
 
     // Take the jacobian to obtain the covariance of the prediction step
-    BLA::Matrix<10, 10> A = measurementJacobian(u);
+    BLA::Matrix<4, 4> A = measurementJacobian(u);
 
     // Update model covariance from previous state
-    BLA::Matrix<10, 6> W = updateModelCovariance(telemPacket);
+    BLA::Matrix<4, 3> W = updateModelCovariance(telemPacket);
+    // BLA::Matrix<4,3> W = {0,0,0, 0,0,0, 0,0,0};
 
     // Apply updated model covariance to process noise covariance matrix
-    BLA::Matrix<10, 10> Q = W * gyroAccelVar * BLA::MatrixTranspose<BLA::Matrix<10, 6>>(W);
+    BLA::Matrix<4, 4> Q = W * Sigma_gyro * BLA::MatrixTranspose<BLA::Matrix<4, 3>>(W);
 
     // Update Priori Error Covariance
-    P_min = A * P * BLA::MatrixTranspose<BLA::Matrix<10, 10>>(A) + Q;
+    P_min = A * P * BLA::MatrixTranspose<BLA::Matrix<4,4>>(A) + Q;
 
     BLA::Matrix<3> magVector = {magX, magY, magZ};
     float magVectorLen = BLA::Norm(magVector);
@@ -75,24 +77,28 @@ void StateEstimator::onLoop(Utility::TelemPacket telemPacket)
     }
 
     // Calculate update function with magnetometer readings to correct orientation
+    // BLA::Matrix<6> z = {
+    //     accelVector(0), accelVector(1), accelVector(2), magVector(0), magVector(1), magVector(2)
+    // };
     BLA::Matrix<6> z = {
-        accelVector(0), accelVector(1), accelVector(2), magVector(0), magVector(1), magVector(2)};
+        accelVector(0), accelVector(1), accelVector(2), 0, 0, 0
+    };
 
     BLA::Matrix<6> h = updateFunction();
 
     // Take the jacobian to obtain the covariance of the correction function
-    BLA::Matrix<6, 10> H = updateJacobian();
+    BLA::Matrix<6, 4> H = updateJacobian();
 
     // Compute the kalman gain from the magnetometer covariance readings
     BLA::Matrix<6> v = z - h;
-    BLA::Matrix<6, 6> S = H * P_min * BLA::MatrixTranspose<BLA::Matrix<6, 10>>(H) + R;
-    BLA::Matrix<10, 6> K = P_min * BLA::MatrixTranspose<BLA::Matrix<6, 10>>(H) * BLA::Inverse(S);
+    BLA::Matrix<6, 6> S = H * P_min * BLA::MatrixTranspose<BLA::Matrix<6, 4>>(H) + R;
+    BLA::Matrix<4, 6> K = P_min * BLA::MatrixTranspose<BLA::Matrix<6, 4>>(H) * BLA::Inverse(S);
 
     // Use our kalman gain and magnetometer readings to correct priori orientation
     x = x_min + K * v;
 
     // Update error covariance matrix
-    P = (eye10 - K * H) * P_min;
+    P = (eye4 - K * H) * P_min;
 
     // Serial.println("<----- State ----->");
     // for (int i = 0; i < x.Rows; i++) {
@@ -128,7 +134,7 @@ void StateEstimator::onLoop(Utility::TelemPacket telemPacket)
     // x(6) = Z_NEW;
 }
 
-BLA::Matrix<10> StateEstimator::measurementFunction(BLA::Matrix<6> u)
+BLA::Matrix<4> AttitudeStateEstimator::measurementFunction(BLA::Matrix<6> u)
 {
     float p = u(3);
     float q = u(4);
@@ -142,94 +148,38 @@ BLA::Matrix<10> StateEstimator::measurementFunction(BLA::Matrix<6> u)
 
     BLA::Matrix<4> f_q = {
         qw - (dt/2.0f)*p*qx - (dt/2.0f)*q*qy - (dt/2.0f)*r*qz,
-        qx + (dt/2.0f)*p*qw - (dt/2.0f)*q*qz - (dt/2.0f)*r*qy,
+        qx + (dt/2.0f)*p*qw - (dt/2.0f)*q*qz + (dt/2.0f)*r*qy,
         qy + (dt/2.0f)*p*qz + (dt/2.0f)*q*qw - (dt/2.0f)*r*qx,
-        qz - (dt/2.0f)*p*qy + (dt/2.0f)*q*qx - (dt/2.0f)*r*qw
+        qz - (dt/2.0f)*p*qy + (dt/2.0f)*q*qx + (dt/2.0f)*r*qw
     };
-    float f_qLen = BLA::Norm(f_q);
 
-    // Calculate linear accelerations in the NED Frame
-    // BLA::Matrix<4> quat = {x(0), x(1), x(2), x(3)};
-
-    // BLA::Matrix<3, 3> R_BT = quat2rotm(quat);
-
-    // Rotate Acceleration into NED
-
-    // BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3,3>>(R_BT) * accelR;
-
-    // Apply Gravity Compensation
-    // BLA::Matrix<3> gravNED = {0, 0, -g};
-    // BLA::Matrix<3> gravB = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * gravNED; // Gravity in body frame
-    // BLA::Matrix<3> accelB = accelR - gravB;                                         // Linear Accelartions in body frame
-
-    // BLA::Matrix<3> accelT = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(R_BT) * accelB;
-
-    // Serial.println("<----- Linear Accel ----->");
-    // for (int i = 0; i < accelT.Rows; i++) {
-    //     for (int j = 0; j < accelT.Cols; j++) {
-    //         Serial.print(String(accelT(i,j)) + "\t");
-    //     }
-    //     Serial.println("");
-    // }
-
-    // Normalize Quaternion Derivative Function
-    // if (f_qLen != 0) {
-    //     f_q /= f_qLen;
-    // }
-
-    // BLA::Matrix<3> f_p = {
-    //     x(4) + (x(7)*dt + 0.5*accelT(0)*(dt*dt)),
-    //     x(5) + (x(8)*dt + 0.5*accelT(1)*(dt*dt)),
-    //     x(6) + (x(9)*dt + 0.5*accelT(2)*(dt*dt))
-    // };
-
-    // BLA::Matrix<3> f_v = {
-    //     x(7) + accelT(0)*dt,
-    //     x(8) + accelT(1)*dt,
-    //     x(9) + accelT(2)*dt
-    // };
-
-    BLA::Matrix<3> f_v = {0, 0, 0};
-    BLA::Matrix<3> f_p = {0, 0, 0};
-
-    BLA::Matrix<10> f = {
+    BLA::Matrix<4> f = {
         f_q(0),
         f_q(1),
         f_q(2),
-        f_q(3),
-        f_v(0),
-        f_v(1),
-        f_v(2),
-        f_p(0),
-        f_p(1),
-        f_p(2)};
+        f_q(3)
+    };
 
     return f;
 };
 
-BLA::Matrix<10, 10> StateEstimator::measurementJacobian(BLA::Matrix<6> u)
+BLA::Matrix<4, 4> AttitudeStateEstimator::measurementJacobian(BLA::Matrix<6> u)
 {
     float p = u(3);
     float q = u(4);
     float r = u(5);
 
-    BLA::Matrix<10, 10> A = {
-        1, -(dt/2.0f)*p, -(dt/2.0f)*q, -(dt/2.0f)*r, 0,0,0,0,0,0,
-        (dt/2.0f)*p, 1, (dt/2.0f)*r, -(dt/2.0f)*q, 0,0,0,0,0,0,
-        (dt/2.0f)*q, -(dt/2.0f)*r, 1, (dt/2.0f)*p, 0,0,0,0,0,0,
-        (dt/2.0f)*r, (dt/2.0f)*q, -(dt/2.0f)*p, 1, 0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,
+    BLA::Matrix<4, 4> A = {
+        1, -(dt/2.0f)*p, -(dt/2.0f)*q, -(dt/2.0f)*r,
+        (dt/2.0f)*p, 1, (dt/2.0f)*r, -(dt/2.0f)*q,
+        (dt/2.0f)*q, -(dt/2.0f)*r, 1, (dt/2.0f)*p,
+        (dt/2.0f)*r, (dt/2.0f)*q, -(dt/2.0f)*p, 1
     };
 
     return A;
 }
 
-BLA::Matrix<6> StateEstimator::updateFunction()
+BLA::Matrix<6> AttitudeStateEstimator::updateFunction()
 {
     BLA::Matrix<3> r = {
         cos(magneticDip), 0, sin(magneticDip)
@@ -257,7 +207,8 @@ BLA::Matrix<6> StateEstimator::updateFunction()
 
     BLA::Matrix<3> a_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * G;
     
-    BLA::Matrix<3> m_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * r;
+    // BLA::Matrix<3> m_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * r;
+    BLA::Matrix<3> m_hat = {0,0,0};
 
     BLA::Matrix<6> h = {
         a_hat(0),
@@ -271,7 +222,7 @@ BLA::Matrix<6> StateEstimator::updateFunction()
     return h;
 };
 
-BLA::Matrix<6, 10> StateEstimator::updateJacobian()
+BLA::Matrix<6, 4> AttitudeStateEstimator::updateJacobian()
 {
     BLA::Matrix<3> r = {
         cos(magneticDip), 0, sin(magneticDip)
@@ -307,38 +258,32 @@ BLA::Matrix<6, 10> StateEstimator::updateJacobian()
     float qy = q(2);
     float qz = q(3);
 
-    BLA::Matrix<6, 10> H = {
-        gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, -gx*qy+gy*qx-gz*qw, -gx*qz+gy*qw+gz*qx, 0,0,0,0,0,0,
-        -gx*qz+gy*qw+gz*qx, gx*qy-gy*qx+gz*qw, gx*qx+gy*qy+gz*qz, -gx*qw-gy*qz+gz*qy, 0,0,0,0,0,0,
-        gx*qy-gy*qx+gz*qw, gx*qz-gy*qw-gz*qx, gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, 0,0,0,0,0,0,
-        rx*qw+ry*qz-rz*qy, rx*qy+ry*qy+rz*qz, -rx*qy+ry*qx-rz*qw, -rx*qz+ry*qw+rz*qx, 0,0,0,0,0,0,
-        -rx*qz+ry*qw+rz*qx, rx*qy-ry*qx+rz*qw, rx*qx+ry*qy+rz*qz, -rx*qw-ry*qz+rz*qy, 0,0,0,0,0,0,
-        rx*qy-ry*qx+rz*qw, rx*qz-ry*qw-rz*qx, rx*qw+ry*qz-rz*qy, rx*qx+ry*qy+rz*qz, 0,0,0,0,0,0
+    BLA::Matrix<6, 4> H = {
+        gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz, -gx*qy+gy*qx-gz*qw, -gx*qz+gy*qw+gz*qx,
+        -gx*qz+gy*qw+gz*qx, gx*qy-gy*qx+gz*qw, gx*qx+gy*qy+gz*qz, -gx*qw-gy*qz+gz*qy,
+        gx*qy-gy*qx+gz*qw, gx*qz-gy*qw-gz*qx, gx*qw+gy*qz-gz*qy, gx*qx+gy*qy+gz*qz,
+        rx*qw+ry*qz-rz*qy, rx*qy+ry*qy+rz*qz, -rx*qy+ry*qx-rz*qw, -rx*qz+ry*qw+rz*qx,
+        -rx*qz+ry*qw+rz*qx, rx*qy-ry*qx+rz*qw, rx*qx+ry*qy+rz*qz, -rx*qw-ry*qz+rz*qy,
+        rx*qy-ry*qx+rz*qw, rx*qz-ry*qw-rz*qx, rx*qw+ry*qz-rz*qy, rx*qx+ry*qy+rz*qz
     };
 
     return H;
 };
 
-BLA::Matrix<10, 6> StateEstimator::updateModelCovariance(Utility::TelemPacket    telemPacket)
+BLA::Matrix<4, 3> AttitudeStateEstimator::updateModelCovariance(Utility::TelemPacket telemPacket)
 {
 
-    BLA::Matrix<10, 6> W = {
-        -x(1), -x(2), -x(3), 0, 0, 0,
-        x(0), -x(3), x(2), 0, 0, 0,
-        x(3), x(0), -x(1), 0, 0, 0,
-        -x(2), x(1), x(0), 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0,
+    BLA::Matrix<4, 3> W = {
+        -x(1), -x(2), -x(3),
+        x(0), -x(3), x(2),
+        x(3), x(0), -x(1),
+        -x(2), x(1), x(0),
     };
 
     return W * (dt / 2.0f);
 };
 
-BLA::Matrix<3, 3> StateEstimator::quat2rotm(BLA::Matrix<4> q)
+BLA::Matrix<3, 3> AttitudeStateEstimator::quat2rotm(BLA::Matrix<4> q)
 {
 
     float qw = q(0);
@@ -355,7 +300,7 @@ BLA::Matrix<3, 3> StateEstimator::quat2rotm(BLA::Matrix<4> q)
     return rotm;
 };
 
-BLA::Matrix<4> StateEstimator::quaternionMultiplication(BLA::Matrix<4> q1, BLA::Matrix<4> q2)
+BLA::Matrix<4> AttitudeStateEstimator::quaternionMultiplication(BLA::Matrix<4> q1, BLA::Matrix<4> q2)
 {
 
     float w1 = q1(0);

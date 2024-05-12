@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <utility.hpp>
 #include <cstdio>
-#include "EKF/EKF.h"
+#include "EKF/AttitudeEKF.h"
 #include "fakeit.hpp"
 #include "states/00-PreLaunch.h"
 #include "Sensors.h"
@@ -72,7 +72,7 @@ void test_basic() {
   Utility::SensorPacket data;
 
   Mock<Sensors> mockSensors;
-  StateEstimator *ekf = new StateEstimator(BLA::Matrix<10> {1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 0.25);
+  AttitudeStateEstimator *ekf = new AttitudeStateEstimator(BLA::Matrix<10> {1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 0.25);
 
   When(Method(ArduinoFake(), millis)).AlwaysDo([&data](){ return data.timestamp; });
   When(Method(ArduinoFake(), pinMode)).AlwaysReturn();

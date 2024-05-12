@@ -122,3 +122,15 @@ int GNSS::getMagneticDeclination() {
 uint32_t GNSS::getEpochTime() {
     return gnss.getUnixEpoch();
 }
+
+int32_t GNSS::getNorthVelocity() {
+    return gnss.getNedNorthVel();
+}
+
+int32_t GNSS::getEastVelocity() {
+    return gnss.getNedEastVel();
+}
+
+int32_t GNSS::getDownVelocity() {
+    return gnss.getNedDownVel();
+}

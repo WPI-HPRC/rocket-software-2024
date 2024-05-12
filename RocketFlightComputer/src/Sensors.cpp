@@ -10,6 +10,7 @@ Utility::SensorPacket Sensors::readSensors() {
   LPS25_data barometerData = this->barometer->read();
 
   sensorPacket.pressure = barometerData.pressure; // [hPa/mBar]
+  sensorPacket.temperature = barometerData.temp;
 
   ICM_data accelerometerData = this->acc->read();
 
@@ -27,9 +28,9 @@ Utility::SensorPacket Sensors::readSensors() {
   sensorPacket.magY = magnetometerData.y;
   sensorPacket.magZ = magnetometerData.z;
 
-  // Serial.print(sensorPacket.magX, 5); Serial.print(",");
-  // Serial.print(sensorPacket.magY, 5); Serial.print(",");
-  // Serial.println(sensorPacket.magZ, 5);
+  // Serial.print(sensorPacket.accelX, 5); Serial.print(",");
+  // Serial.print(sensorPacket.accelY, 5); Serial.print(",");
+  // Serial.println(sensorPacket.accelZ, 5);
 
   sensorPacket.gpsLock = gnss->getLockStatus();
 
@@ -39,6 +40,9 @@ Utility::SensorPacket Sensors::readSensors() {
   sensorPacket.gpsAltMSL = gnss->getAltMSL();
   sensorPacket.satellites = gnss->getSatellites();
   sensorPacket.epochTime = gnss->getEpochTime();
+  sensorPacket.gpsVelocityN = gnss->getNorthVelocity();
+  sensorPacket.gpsVelocityE = gnss->getEastVelocity();
+  sensorPacket.gpsVelocityD = gnss->getDownVelocity();
 
   return sensorPacket;
 }

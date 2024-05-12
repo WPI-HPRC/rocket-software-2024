@@ -3,7 +3,7 @@
 #include "05-Recovery.h"
 #include "State.h"
 
-MainDescent::MainDescent(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
+MainDescent::MainDescent(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
 
 void MainDescent::initialize_impl() {}
 
@@ -36,14 +36,14 @@ State *MainDescent::nextState_impl()
     // Transition state if condition met
     if (landed)
     {
-        return new Recovery(sensors, stateEstimator);
+        return new Recovery(sensors, attitudeStateEstimator, kinematicStateEstimator);
     }
 
     // if the state hasn't changed for much more than the expected MAIN_DESCENT time, go to abort
     // 1.1 * TIME_IN_MAIN_DESCENT == 96.8 seconds
     if (this->currentTime > 1.1 * TIME_IN_MAIN_DESCENT)
     {
-        return new Abort(sensors, stateEstimator);
+        return new Abort(sensors, attitudeStateEstimator, kinematicStateEstimator);
     }
 
     return nullptr;

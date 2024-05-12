@@ -8,7 +8,7 @@
 #include "FlightParams.hpp"
 #include "State.h"
 
-Coast::Coast(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
+Coast::Coast(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
 
 Coast::~Coast() {
     airbrakesServo.write(AIRBRAKE_RETRACTED);
@@ -84,14 +84,14 @@ State *Coast::nextState_impl()
     // Transition state if condition met
     if (apogeePassed)
     {
-        return new DrogueDescent(sensors, stateEstimator);
+        return new DrogueDescent(sensors, attitudeStateEstimator, kinematicStateEstimator);
     }
 
     // if the state hasn't changed for much more than the expected COAST time, go to abort
     // 1.5 * TIME_IN_COAST == 28.5 seconds
     if (this->currentTime > 1.5 * TIME_IN_COAST)
     {
-        return new Abort(sensors, stateEstimator);
+        return new Abort(sensors, attitudeStateEstimator, kinematicStateEstimator);
     }
     return nullptr;
 }

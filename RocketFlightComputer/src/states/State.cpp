@@ -3,7 +3,7 @@
 #include "utility.hpp"
 #include <Arduino.h>
 
-State::State(struct Sensors *sensors, StateEstimator *stateEstimator) : sensors(sensors), stateEstimator(stateEstimator) {}
+State::State(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : sensors(sensors), attitudeStateEstimator(attitudeStateEstimator), kinematicStateEstimator(kinematicStateEstimator) {}
 
 void break_uint16(uint16_t value, uint8_t *byte_array) {
     byte_array[1] = (uint8_t)(value & 0xFF);        // Low byte
@@ -65,6 +65,11 @@ void State::loop() {
 
   this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
   this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
+  this->telemPacket.gpsVelocityN = this->sensorPacket.gpsVelocityN;
+  this->telemPacket.gpsVelocityE = this->sensorPacket.gpsVelocityE;
+  this->telemPacket.gpsVelocityD = this->sensorPacket.gpsVelocityD;
+  this->telemPacket.gpsAltAGL = this->sensorPacket.gpsAltAGL;
+  this->telemPacket.gpsAltMSL = this->sensorPacket.gpsAltMSL;
   this->telemPacket.epochTime = this->sensorPacket.epochTime;
   this->telemPacket.satellites = this->sensorPacket.satellites;
   this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
@@ -102,51 +107,29 @@ void State::loop() {
   this->telemPacket.magY = magCal(1);
   this->telemPacket.magZ = magCal(2);
 
-  // Update sensor packet with the calibrated values
-  // this->telemPacket.accelX = accelCal(0);
-  // this->telemPacket.accelY = accelCal(1);
-  // this->telemPacket.accelZ = accelCal(2);
-
-  // BLA::Matrix<10> testState = {this->stateEstimator->x(0), this->stateEstimator->x(1), this->stateEstimator->x(2), this->stateEstimator->x(3), 0, 0, -305, 0, 0, 0};
-
-  // float apogee = apogeeEstimator->estimate(testState, sensorPacket);
-
-  // Serial.print("[Apogee Estimator] Estimate: "); Serial.println(apogee);
-
-  // Serial.print(sensorPacket.accelX); Serial.print(",");
-  // Serial.print(sensorPacket.accelY); Serial.print(",");
-  // Serial.print(sensorPacket.accelZ); Serial.print(",");
-  // Serial.print(sensorPacket.gyroX); Serial.print(",");
-  // Serial.print(sensorPacket.gyroY); Serial.print(",");
-  // Serial.print(sensorPacket.gyroZ); Serial.print(",");
-  // Serial.print(sensorPacket.magX); Serial.print(",");
-  // Serial.print(sensorPacket.magY); Serial.print(",");
-  // Serial.print(sensorPacket.magZ); Serial.print(",");
-  // Serial.println(sensorPacket.timestamp);
-
-  // double magNorm = sqrt(sensorPacket.magX*sensorPacket.magX + sensorPacket.magY*sensorPacket.magY + sensorPacket.magZ*sensorPacket.magZ);
-
-  // double heading = atan2((sensorPacket.magX / magNorm), 0 - (sensorPacket.magY / magNorm));
-  // heading /= PI;
-  // heading *= 180;
-  // heading += 180;
-  // Serial.print("Heading: "); Serial.println(heading);
-  // Serial.println(sensorPacket.timestamp);  
-
-	if (this->stateEstimator->initialized) {
+	if (this->attitudeStateEstimator->initialized) {
     #ifdef PRINT_TIMINGS
     start = millis();
     #endif
-		this->stateEstimator->onLoop(this->telemPacket);
+		this->attitudeStateEstimator->onLoop(this->telemPacket);
     #ifdef PRINT_TIMINGS
     Serial.printf("\tEKF STEP TIME: %llu\n", millis() - start);
     #endif
 
-		this->telemPacket.w = this->stateEstimator->x(0);
-		this->telemPacket.i = this->stateEstimator->x(1);
-		this->telemPacket.j = this->stateEstimator->x(2);
-		this->telemPacket.k = this->stateEstimator->x(3);
+		this->telemPacket.w = this->attitudeStateEstimator->x(0);
+		this->telemPacket.i = this->attitudeStateEstimator->x(1);
+		this->telemPacket.j = this->attitudeStateEstimator->x(2);
+		this->telemPacket.k = this->attitudeStateEstimator->x(3);
+
+        // Serial.print("QUAT|"); Serial.print(telemPacket.w); Serial.print(",");
+        // Serial.print(telemPacket.i); Serial.print(",");
+        // Serial.print(telemPacket.j); Serial.print(",");
+        // Serial.println(telemPacket.k);
 	}
+
+    if(this->kinematicStateEstimator->initialized) {
+        this->kinematicStateEstimator->onLoop(this->telemPacket);
+    }
 
   #ifdef PRINT_TIMINGS
   start = millis();
@@ -199,10 +182,10 @@ void State::loop() {
     this->telemPacket.debugPrint();
 #endif
 
-  // Serial.print("QUAT|"); Serial.print(this->stateEstimator->x(0)); Serial.print(",");
-  // Serial.print(this->stateEstimator->x(1)); Serial.print(",");
-  // Serial.print(this->stateEstimator->x(2)); Serial.print(",");
-  // Serial.println(this->stateEstimator->x(3));
+  // Serial.print("QUAT|"); Serial.print(this->attitudeStateEstimator->x(0)); Serial.print(",");
+  // Serial.print(this->attitudeStateEstimator->x(1)); Serial.print(",");
+  // Serial.print(this->attitudeStateEstimator->x(2)); Serial.print(",");
+  // Serial.println(this->attitudeStateEstimator->x(3));
 
     /** Loop Radio and Send Data */
 

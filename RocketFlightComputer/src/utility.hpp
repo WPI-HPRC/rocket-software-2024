@@ -56,23 +56,29 @@ public:
         float qy = q(2);
         float qz = q(3);
 
-        BLA::Matrix<3, 3> rotm = {
-            qw*qw + qx*qx - qy*qy - qz*qz, 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy),
-            2 * (qx * qy + qw * qz), qw*qw - qx*qx + qy*qy - qz*qz, 2 * (qy * qz - qw * qx),
-            2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), qw*qw - qx*qx - qy*qy + qz*qz
+        BLA::Matrix<3,3> rotm = {
+                2*(qw*qw + qx*qx) - 1, 2*(qx*qy - qw*qz), 2*(qx*qz + qw*qy),
+                2*(qx*qy + qw*qz), 2*(qw*qw + qy*qy) + 1, 2*(qy*qz - qw*qx),
+                2*(qx*qz - qw*qy), 2*(qy*qz + qw*qx), 2*(qw*qw + qz*qz) - 1,
         };
+
+//        BLA::Matrix<3, 3> rotm = {
+//            qw*qw + qx*qx - qy*qy - qz*qz, 2 * (qx * qy - qw * qz), 2 * (qx * qz + qw * qy),
+//            2 * (qx * qy + qw * qz), qw*qw - qx*qx + qy*qy - qz*qz, 2 * (qy * qz - qw * qx),
+//            2 * (qx * qz - qw * qy), 2 * (qw * qx + qy * qz), qw*qw - qx*qx - qy*qy + qz*qz
+//        };
 
         return rotm;
     };
 
     float densityAtAltitude(float altitude) {
 
-        return rho_sl * pow(temperatureAtAltitude(altitude) / t_sl, -1 - (g / (a_1 / R)));
+        return rho_sl * pow(temperatureAtAltitude(altitude) / T_sl, -1 - (g / (a_1 / R)));
     };
 
     float temperatureAtAltitude(float altitude) {
 
-        return t_sl + a_1*altitude;
+        return T_sl + a_1*altitude;
     };
 
     static BLA::Matrix<3> crossProduct(const BLA::Matrix<3>& vec1, const BLA::Matrix<3>& vec2) {
@@ -96,12 +102,16 @@ public:
         float magY = 0.0;
         float magZ = 0.0;
         float pressure = 0.0;
+        float temperature = 0.0f;
 
         // GPS Inputs
         float gpsLat = 0.0;
         float gpsLong = 0.0;
         float gpsAltMSL = 0.0;
         float gpsAltAGL = 0.0;
+        int32_t gpsVelocityN = 0;
+        int32_t gpsVelocityE = 0;
+        int32_t gpsVelocityD = 0;
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
         bool gpsLock = false;
@@ -132,6 +142,7 @@ public:
         float rawMagY = 0.0f;
         float rawMagZ = 0.0f;
         float pressure = 0.0f;
+        float temperature = 0.0f;
 
         uint32_t servoPosition = 0;
 
@@ -158,6 +169,9 @@ public:
         float gpsLong = 0.0f;
         float gpsAltMSL = 0.0f;
         float gpsAltAGL = 0.0f;
+        int32_t gpsVelocityN = 0;
+        int32_t gpsVelocityE = 0;
+        int32_t gpsVelocityD = 0;
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
         bool gpsLock = false;
@@ -203,6 +217,9 @@ public:
             Serial.print("gpsLong: "); Serial.print(gpsLong); Serial.print(", ");
             Serial.print("gpsAltAGL: "); Serial.print(gpsAltAGL); Serial.print(", ");
             Serial.print("gpsAltMSL: "); Serial.print(gpsAltMSL); Serial.print(", ");
+            Serial.print("gpsVelN: "); Serial.print(gpsVelocityN); Serial.print(", ");
+            Serial.print("gpsVelE: "); Serial.print(gpsVelocityE); Serial.print(", ");
+            Serial.print("gpsVelD: "); Serial.print(gpsVelocityD); Serial.print(", ");
             Serial.print("epochTime: "); Serial.print(epochTime); Serial.print(", ");
             Serial.print("satellites: "); Serial.print(satellites); Serial.print(", ");
             Serial.print("gpsLock: "); Serial.print(gpsLock); Serial.print(", ");
@@ -257,7 +274,8 @@ public:
 
     // Standard Atmospheric Model Constants
     constexpr static float rho_sl = 1.225; // [kg/m^3] Density at Sea Level
-    constexpr static float t_sl = 288.16; // [K] Temperature at Sea Level
+    constexpr static float P_sl = 101325; // [Pa] Pressure at Sea Level
+    constexpr static float T_sl = 288.16; // [K] Temperature at Sea Level
     constexpr static float a_1 = -6.5e-3; // [K/m] Temperature Gradient
     constexpr static float R = 287; // [J/kgK] Universal Gas Constant
 };

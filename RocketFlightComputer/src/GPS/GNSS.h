@@ -90,6 +90,27 @@ public:
      */
     uint32_t getEpochTime();
 
+    /**
+     * @brief Get the North Velocity
+     * 
+     * @return float 
+     */
+    int32_t getNorthVelocity();
+
+    /**
+     * @brief Get the East Velocity
+     * 
+     * @return float 
+     */
+    int32_t getEastVelocity();
+
+    /**
+     * @brief Get the Down Velocity
+     * 
+     * @return float 
+     */
+    int32_t getDownVelocity();
+
 private:
     SFE_UBLOX_GNSS gnss;
 

@@ -5,7 +5,7 @@
 #include "06-Abort.h"
 #include "State.h"
 
-Abort::Abort(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
+Abort::Abort(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
 
 void Abort::initialize_impl() {}
 

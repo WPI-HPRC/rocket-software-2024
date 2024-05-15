@@ -77,12 +77,12 @@ void AttitudeStateEstimator::onLoop(Utility::TelemPacket telemPacket)
     }
 
     // Calculate update function with magnetometer readings to correct orientation
-    // BLA::Matrix<6> z = {
-    //     accelVector(0), accelVector(1), accelVector(2), magVector(0), magVector(1), magVector(2)
-    // };
     BLA::Matrix<6> z = {
-        accelVector(0), accelVector(1), accelVector(2), 0, 0, 0
+        accelVector(0), accelVector(1), accelVector(2), magVector(0), magVector(1), magVector(2)
     };
+    // BLA::Matrix<6> z = {
+    //     accelVector(0), accelVector(1), accelVector(2), 0, 0, 0
+    // };
 
     BLA::Matrix<6> h = updateFunction();
 
@@ -207,8 +207,8 @@ BLA::Matrix<6> AttitudeStateEstimator::updateFunction()
 
     BLA::Matrix<3> a_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * G;
     
-    // BLA::Matrix<3> m_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * r;
-    BLA::Matrix<3> m_hat = {0,0,0};
+    BLA::Matrix<3> m_hat = BLA::MatrixTranspose<BLA::Matrix<3, 3>>(quatRotm) * r;
+    // BLA::Matrix<3> m_hat = {0,0,0};
 
     BLA::Matrix<6> h = {
         a_hat(0),

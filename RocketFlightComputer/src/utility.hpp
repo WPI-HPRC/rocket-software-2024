@@ -4,6 +4,7 @@
 #include "SdFat.h"
 #include "Servo.h"
 #include "TelemetryBoard/XBeeProSX.h"
+#include "SparkFun_u-blox_GNSS_v3.h"
 #include <Arduino.h>
 #include <cstdint>
 #include <cmath>

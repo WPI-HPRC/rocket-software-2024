@@ -17,31 +17,39 @@ bool GNSS::init() {
         return false;
     }
 
+    // this->gnss.setI2COutput(COM_TYPE_UBX);
     this->gnss.setI2COutput(COM_TYPE_UBX);
-    this->gnss.setNavigationFrequency(5);
+    this->gnss.setNavigationFrequency(40);
     this->gnss.setAutoPVT(true);
 
-    // Enable the jamming / interference monitor
-    // UBX_CFG_ITFM_data_t jammingConfig; // Create storage for the jamming configuration
-    // if (gnss.getJammingConfiguration(&jammingConfig)) // Read the jamming configuration
-    // {
-    //     Serial.print(F("[GNSS] The jamming / interference monitor is "));
-    //     if (jammingConfig.config.bits.enable == 0) // Check if the monitor is already enabled
-    //     Serial.print(F("not "));
-    //     Serial.println(F("enabled"));
+    //Disable Beidou
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_BDS_ENA, 0);
 
-    //     if (jammingConfig.config.bits.enable == 0) // Check if the monitor is already enabled
-    //     {
-    //     Serial.print(F("[GNSS] Enabling the jamming / interference monitor: "));
-    //     (jammingConfig.config.bits.enable = 1); // Enable the monitor
-    //     if (gnss.setJammingConfiguration(&jammingConfig)) // Set the jamming configuration
-    //         Serial.println(F(" -> success"));
-    //     else
-    //         Serial.println(F(" -> failed!"));
-    //     }
-    // }
+    // //Disable Galileo
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_GAL_E1_ENA, 0);
 
-    // this->gnss.saveConfiguration();
+    // //Enable GPS
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_GPS_ENA, 1);
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_GPS_L1CA_ENA, 1);
+
+    // //Enable SBAS
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_SBAS_ENA, 1);
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_SBAS_L1CA_ENA, 1);
+
+    // //Enable QZSS
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_QZSS_ENA, 1);
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_QZSS_L1CA_ENA, 1);
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_QZSS_L1S_ENA, 1);
+
+    // //Enable GLONASS
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_GLO_ENA, 1);
+    // this->gnss.addCfgValset(UBLOX_CFG_SIGNAL_GLO_L1_ENA, 1);
+
+    // this->gnss.addCfgValset(UBLOX_CFG_HW_ANT_CFG_VOLTCTRL, 1);
+
+    // Serial.print("[GNSS] Voltage Control: "); Serial.println(this->gnss.getVal8(UBLOX_CFG_HW_ANT_CFG_VOLTCTRL));
+
+    this->gnss.saveConfiguration();
 
     return true;
 }
@@ -133,4 +141,8 @@ int32_t GNSS::getEastVelocity() {
 
 int32_t GNSS::getDownVelocity() {
     return gnss.getNedDownVel();
+}
+
+sfe_ublox_antenna_status_e GNSS::getAntStatus() {
+    return gnss.getAntennaStatus();
 }

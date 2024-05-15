@@ -28,6 +28,10 @@ void setUp() {
   When(OverloadedMethod(ArduinoFake(SPI), transfer, unsigned char (unsigned char))).AlwaysReturn();
 }
 
+void tearDown() {
+  (void)chdir("..");
+}
+
 int parseLine(FILE *dataFile, Utility::SensorPacket *packet) {
   int read = 0;
   read += fscanf(dataFile, "%f,", &packet->accelX);
@@ -68,6 +72,7 @@ void writeLine(FILE *outFile, Utility::TelemPacket packet) {
     fprintf(outFile, "%f,", packet.rawMagY);
     fprintf(outFile, "%f,", packet.rawMagZ);
     fprintf(outFile, "%f,", packet.pressure);
+    fprintf(outFile, "%f,", packet.temperature);
     fprintf(outFile, "%d,", packet.servoPosition);
     fprintf(outFile, "%f,", packet.altitude);
     fprintf(outFile, "%f,", packet.magX);
@@ -129,7 +134,7 @@ void test_basic() {
 
 void irec2023() {
   FILE * dataFile = fopen("mock_data_irec2023.csv", "r");
-  TEST_ASSERT_MESSAGE(dataFile != nullptr, "No data file found (mock_data_basic.csv)");
+  TEST_ASSERT_MESSAGE(dataFile != nullptr, "No data file found (mock_data_irec2023.csv)");
   FILE * outFile = fopen("mock_data_irec2023_telem.csv", "w");
 
   Utility::SensorPacket data;
@@ -163,8 +168,8 @@ void irec2023() {
 int main(int argc, char** argv) {
   UNITY_BEGIN();
 
-  // RUN_TEST(irec2023);
   RUN_TEST(test_basic);
+  RUN_TEST(irec2023);
 
   return UNITY_END();
 }

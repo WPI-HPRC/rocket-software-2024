@@ -6,7 +6,7 @@ class Launch : public State
 {
     _STATE_CLASS_IMPLS_
 public:
-    Launch(struct Sensors *sensors, StateEstimator *stateEstimator);
+    Launch(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator);
 
 private:
     bool motorBurnout = false;

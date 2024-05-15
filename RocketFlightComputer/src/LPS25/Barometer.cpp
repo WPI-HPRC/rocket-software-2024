@@ -9,7 +9,7 @@ bool Barometer::init(int addr) {
     if (!this->sensor.begin_I2C(addr)) {
         return false;
     }
-    this->sensor.setDataRate(LPS25_RATE_12_5_HZ);
+    this->sensor.setDataRate(LPS25_RATE_25_HZ);
     return true;
 }
 

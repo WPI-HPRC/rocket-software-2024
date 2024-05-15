@@ -4,7 +4,9 @@
 #include "Sensors.h"
 #include "Arduino.h"
 #include <TelemetryBoard/XBeeProSX.h>
-#include <EKF/EKF.h>
+#include <Controls/ApogeeEstimation.h>
+#include <EKF/AttitudeEKF.h>
+#include <EKF/KinematicEKF.h>
 
 //! @brief Enum representing the id of the state, to be used in logging and communication with ground station
 enum StateId
@@ -56,7 +58,7 @@ public:
 
 protected:
     //! @note Constructor to be called from subclasses to initialize the `sensors` object
-    State(struct Sensors *sensors, StateEstimator *stateEstimator);
+    State(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator);
     //! @brief number of milliseconds since the initialize call
     long long currentTime = 0;
     //! @brief number of milliseconds since the last loop call
@@ -65,10 +67,9 @@ protected:
     long long loopCount = 0;
     //! @brief "global" sensors object
     struct Sensors *sensors;
-    StateEstimator *stateEstimator;
-    bool stateEstimatorInitialized = false;
-
-    XbeeProSX *xbee = new XbeeProSX(17); // CS GPIO17
+    AttitudeStateEstimator *attitudeStateEstimator;
+    KinematicStateEstimator *kinematicStateEstimator;
+    // ApogeeEstimation *apogeeEstimator; //TODO - Implement
 
 private:
     //! @brief number of milliseconds from boot to the initialize call

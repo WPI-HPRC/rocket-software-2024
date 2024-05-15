@@ -5,16 +5,13 @@
 #include "06-Abort.h"
 #include "State.h"
 
-Abort::Abort(struct Sensors *sensors, StateEstimator *stateEstimator) : State(sensors, stateEstimator) {}
+Abort::Abort(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
 
 void Abort::initialize_impl() {}
 
 void Abort::loop_impl()
 {
-    // shut down all systems, log slowly
-
-    // busy wait
-    delay(500);
+    // Just continue logging
 }
 
 State *Abort::nextState_impl()

@@ -11,7 +11,7 @@
 struct Sensors {
     Barometer *barometer;
     GNSS *gnss;
-    BNO055 *bno055;
+    // BNO055 *bno055;
     Magnetometer *mag;
     Accelerometer *acc;
 

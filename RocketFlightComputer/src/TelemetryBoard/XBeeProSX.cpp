@@ -1,4 +1,5 @@
 #include "XBeeProSX.h"
+#include <cstdarg>
 
 XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin), XBeeDevice()
 {
@@ -56,7 +57,6 @@ void XbeeProSX::log(const char *format, ...)
 {
     va_list args;
     va_start(args, format);  
-    Serial.printf(format, args);
 
     va_end(args);
 }

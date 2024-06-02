@@ -23,4 +23,4 @@ def pressureToAlt(pressure_mBar: float) -> float:
 with open("irec2023-flash.csv", newline="") as fd:
     reader = csv.DictReader(fd)
     for row in reader:
-        print(f'{float(row["AccelX"]) / 100},{float(row["AccelY"]) / 100},{float(row["AccelZ"]) / 100},{float(row["GyroX"]) / 10},{float(row["GyroY"]) / 10},{float(row["GyroZ"]) / 10},0,0,0,{altToPressure(float(row["Altitude"]))},{float(row["Temperature"])},0,0,0,0,0,0,0,0,0,0,{row["Timestamp"]}')
+        print(f'{float(row["AccelX"]) / 100},{float(row["AccelY"]) / 100},{float(row["AccelZ"]) / 100 + 1},{float(row["GyroX"]) / 10},{float(row["GyroY"]) / 10},{float(row["GyroZ"]) / 10},0,0,0,{altToPressure(float(row["Altitude"]))},{float(row["Temperature"])},0,0,0,0,0,0,0,0,0,0,{row["Timestamp"]}')

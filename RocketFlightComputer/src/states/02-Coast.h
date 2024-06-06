@@ -15,7 +15,7 @@ private:
     float verticalVelocityBuffer[10] = {0};
     int bufferIndex = 0;
     float lastAltitude = 0;
-    Debouncer apogeeDebouncer = Debouncer(30);
+    Debouncer apogeeDebouncer = Debouncer(10);
 
     enum AirbrakeServoState {
         WAIT = 0,

@@ -12,5 +12,5 @@ private:
     bool motorBurnout = false;
     float accelerationBuffer[10] = {0};
     int bufferIndex = 0;
-    Debouncer motorBurnoutDebouncer = Debouncer(30);
+    Debouncer motorBurnoutDebouncer = Debouncer(10);
 };

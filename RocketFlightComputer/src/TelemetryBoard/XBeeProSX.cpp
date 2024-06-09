@@ -5,6 +5,7 @@ XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin), XBeeDevice()
 {
     sendTransmitRequestsImmediately = true;
     sendFramesImmediately = true;
+    logTransmitStatus = false;
 }
 
 void XbeeProSX::start()
@@ -55,8 +56,11 @@ void XbeeProSX::didCycle()
 
 void XbeeProSX::log(const char *format, ...)
 {
+    return; // dont need it
+    /*
     va_list args;
     va_start(args, format);  
 
     va_end(args);
+    */
 }

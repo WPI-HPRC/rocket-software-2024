@@ -1,7 +1,9 @@
 //
 // Created by William Scheirey on 3/15/24.
 //
-#pragma once
+
+#ifndef HPRC_XBEEUTILITY_H
+#define HPRC_XBEEUTILITY_H
 
 #include <cstdint>
 #include <cstddef>
@@ -11,12 +13,19 @@
 /*
  * XBee namespace with constants for utility.
  *
- * NOTE: PacketBytes and FrameBytes fields represent the *minimum* number of bytes for their respective fields
+ * NOTE: PacketBytes and FrameBytes fields represent the minimum number of bytes for their respective fields
+ *
+ * Info from:
+ * https://www.digi.com/resources/documentation/digidocs/pdfs/90001477.pdf
+ * https://www.digi.com/resources/documentation/Digidocs/90002002/Reference/r_cmd_ND.htm
+ *
  */
 
 namespace XBee
 {
     const uint8_t StartDelimiter = 0x7E;
+    const uint8_t EscapeCharacter = 0x7D;
+    const uint8_t EscapeXorByte = 0x20;
 
     struct RemoteDevice
     {
@@ -32,6 +41,16 @@ namespace XBee
         uint32_t digiDeviceType;
         uint8_t lastHopRssi;
     };
+
+    namespace ApiOptions
+    {
+        enum ApiOptions
+        {
+            TransparentMode = 0x00,
+            ApiWithoutEscapes = 0x01,
+            ApiWithEscapes = 0x02
+        };
+    }
 
     namespace FrameType
     {
@@ -52,6 +71,7 @@ namespace XBee
             AtCommandResponse = 0x88,
             ModemStatus = 0x8A,
             TransmitStatus = 0x89,
+            ExtendedTransmitStatus = 0x8B,
             ReceivePacket = 0x90,
             ReceivePacket64Bit = 0x80,
             ExplicitRxIndicator = 0x91,
@@ -197,6 +217,27 @@ namespace XBee
         };
     }
 
+    namespace ExplicitRxIndicator
+    {/*
+     * +1 for frame type, +8 for sender address, +2 for reserved, +1 for source endpoint, +1 for destination endpoint,
+     * +2 for cluster ID, +2 for profile ID, +1 for receive options,
+     *
+     */
+        const uint8_t PacketBytes = 18;
+        const uint8_t FrameBytes = XBee::FrameBytes + PacketBytes;
+        const uint8_t BytesBeforePacket = 4;
+        const uint8_t BytesBeforeAddress = 4;
+        const uint8_t BytesBeforePayload = 21;
+
+        struct Struct
+        {
+            uint8_t dataLength_bytes;
+            uint8_t negativeRssi;
+            uint64_t senderAddress;
+            const uint8_t *data;
+        };
+    }
+
 
     namespace AtCommandResponse
     {
@@ -235,6 +276,91 @@ namespace XBee
         }
     }
 
+    namespace TransmitStatus
+    {
+        const uint8_t PacketBytes = 3;// +1 for frame type, +1 for frameID, +1 for delivery status
+        const uint8_t FrameBytes = XBee::FrameBytes + PacketBytes;
+        const uint8_t BytesBeforeFrameID = 4;
+        const uint8_t BytesBeforeStatus = 5;
+
+        struct Struct
+        {
+            uint8_t frameID;
+            uint8_t deliveryStatus;
+        };
+
+        enum StatusCode
+        {
+            Success = 0x00,
+            NoAckReceived = 0x01,
+            CcaFailure = 0x02,
+            IndirectMessageUnrequested = 0x03,
+            TransceiverUnableToCompleteTransmission = 0x04,
+            NetworkAckFailure = 0x21,
+            NotJoinedToNetwork = 0x22,
+            InvalidFrameValues = 0x2C,
+            InternalError = 0x31,
+            ResourceError = 0x32,
+            NoSecureSessionConnection = 0x34,
+            EncryptionFailure = 0x35,
+            MessageTooLong = 0x74,
+            SocketClosedUnexpectedly = 0x76,
+            InvalidUdpPort = 0x78,
+            InvalidTcpPort = 0x79,
+            InvalidHostAddress = 0x7A,
+            InvalidDataMode = 0x7B,
+            InvalidInterface = 0x7C,
+            InterfaceNotAcceptingFrames = 0x7D,
+            ModemUpdateInProgress = 0x7E,
+            ConnectionRefused = 0x80,
+            SocketConnectionLost = 0x81,
+            NoServer = 0x82,
+            SocketClosed = 0x83,
+            UnknownServer = 0x84,
+            UnknownError = 0x85,
+            InvalidTlsConfiguration = 0x86,
+            SocketNotConnected = 0x87,
+            SocketNotBound = 0x88
+        };
+    }
+
+    namespace ExtendedTransmitStatus
+    {
+        const uint8_t PacketBytes = 6; // +1 for frame type, +1 for frame ID, +1 for reserved, +1 for transmit retry count, +1 for delivery status, +1 for discovery
+        const uint8_t FrameBytes = XBee::FrameBytes + PacketBytes;
+
+        const uint8_t BytesBeforeFrameID = 4;
+        const uint8_t BytesBeforeRetryCount = 7;
+        const uint8_t BytesBeforeStatus = 8;
+        const uint8_t BytesBeforeDiscovery = 9;
+
+#pragma pack(push, 1)
+        struct Struct
+        {
+            uint8_t frameID;
+            uint16_t reserved;
+            uint8_t retryCount;
+            uint8_t deliveryStatus;
+            uint8_t discovery;
+        };
+#pragma pack(pop)
+
+        enum StatusCode
+        {
+            Success = 0x00,
+            MacAckFailure = 0x01,
+            CcaLbtFailure = 0x02,
+            IndirectMessageUnrequestedNoSpectrum = 0x03,
+            NetworkAckFailure = 0x21,
+            RouteNotFound = 0x25,
+            InternalResourceError = 0x31,
+            ResourceError = 0x32,
+            DataPayloadTooLarge = 0x74,
+            IndirectMessageUnrequested = 0x75
+        };
+
+    }
+
     // --- For Convenience ---
     /*
     namespace AtCommandResponseLocal = XBee::AtCommandResponse;
@@ -242,3 +368,4 @@ namespace XBee
     namespace NodeDiscoveryResponseLocal = AtCommandResponseLocal::NodeDiscovery;
      */
 }
+#endif //HPRC_XBEEUTILITY_H

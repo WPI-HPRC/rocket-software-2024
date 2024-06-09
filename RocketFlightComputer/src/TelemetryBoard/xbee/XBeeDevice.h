@@ -1,14 +1,12 @@
 //
 // Created by William Scheirey on 3/12/24.
 //
-#pragma once
 
-#include <queue>
+#ifndef HPRC_XBEEDEVICE_H
+#define HPRC_XBEEDEVICE_H
+
 #include "XBeeUtility.h"
-#include "CircularBuffer.hpp"
 #include "circularQueue.hpp"
-
-#define BUFFER_LENGTH 2048
 
 class XBeeDevice
 {
@@ -64,6 +62,10 @@ public:
 
     bool logWrongChecksums = true;
 
+    bool logTransmitStatus = false;
+
+    XBee::ApiOptions::ApiOptions apiOptions;
+
 private:
     virtual void writeBytes(const char *data, size_t length_bytes) = 0;
 
@@ -71,9 +73,9 @@ private:
 
     virtual void packetRead() = 0;
 
-    virtual void _handleRemoteAtCommandResponse(const uint8_t *frame, uint8_t length_bytes, bool paramWasBeingWaitedOn);
+    virtual void _handleRemoteAtCommandResponse(const uint8_t *frame, uint8_t length_bytes);
 
-    virtual void _handleAtCommandResponse(const uint8_t *frame, uint8_t length_bytes, bool paramWasBeingWaitedOn);
+    virtual void _handleAtCommandResponse(const uint8_t *frame, uint8_t length_bytes);
 
     virtual void remoteDeviceDiscovered(XBee::RemoteDevice *device);
 
@@ -81,13 +83,21 @@ private:
 
     virtual void handleReceivePacket64Bit(XBee::ReceivePacket64Bit::Struct *frame) = 0;
 
+    virtual void _handleExtendedTransmitStatus(const uint8_t *frame, uint8_t length_bytes) = 0;
+
+    virtual void handleTransmitStatus(const uint8_t *frame, uint8_t length_bytes);
+
     virtual void incorrectChecksum(uint8_t calculated, uint8_t received) = 0;
 
-    virtual void didCycle() = 0;
+    virtual void didCycle();
+
+    virtual void sentFrame(uint8_t frameID);
 
     void parseReceivePacket(const uint8_t *frame, uint8_t length);
 
     void parseReceivePacket64Bit(const uint8_t *frame, uint8_t length_bytes);
+
+    void parseExplicitReceivePacket(const uint8_t *frame, uint8_t length_bytes);
 
     bool handleFrame(const uint8_t *frame);
 
@@ -97,33 +107,53 @@ private:
 
     void handleNodeDiscoveryResponse(const uint8_t *frame, uint8_t length_bytes);
 
+    void handleExtendedTransmitStatus(const uint8_t *frame, uint8_t length_bytes);
+
     uint8_t *transmitRequestFrame;
     uint8_t *atCommandFrame;
 
     uint8_t currentFrameID;
 
-    CircularQueue<XBee::BasicFrame> *transmitFrameQueue;
+    CircularQueue<XBee::BasicFrame> *frameQueue;
 
     XBee::BasicFrame tempFrame{};
 
-    CircularQueue<uint16_t> *atParamConfirmationsBeingWaitedOn;
+    bool waitingOnAtCommandResponse = false;
+    bool waitingOnTransmitStatus = false;
+
+    bool sendNextFrameImmediately = false;
+    bool dontWaitOnNextFrame = false;
 
     XBee::ReceivePacket::Struct *receivePacketStruct = new XBee::ReceivePacket::Struct;
     XBee::ReceivePacket64Bit::Struct *receivePacket64BitStruct = new XBee::ReceivePacket64Bit::Struct;
 
     uint8_t *receiveFrame;
     char *nodeID;
-    CircularBuffer *buffer;
+
 protected:
-    static uint16_t getRemoteAtCommand(const uint8_t *frame);
+    static uint8_t calcChecksum(const uint8_t *packet, uint8_t size_bytes);
 
     static uint8_t getFrameType(const uint8_t *packet);
 
+    static uint8_t getFrameID(const uint8_t *packet);
+
+    static uint64_t getAddressBigEndian(const uint8_t *packet, size_t *index_io);
+
+    static uint64_t getAddressBigEndian(const uint8_t *packet);
+
+    static uint64_t getAddressLittleEndian(const uint8_t *packet, size_t *index_io);
+
+    static uint64_t getAddressLittleEndian(const uint8_t *packet);
+
+    static void loadAddressBigEndian(uint8_t *packet, uint64_t address, size_t *index_io);
+
+    static void loadAddressBigEndian(uint8_t *packet, uint64_t address);
+
     static uint16_t getAtCommand(const uint8_t *frame);
 
-    static uint64_t getAddress(const uint8_t *packet, int *initialIndex);
+    static uint16_t getRemoteAtCommand(const uint8_t *frame);
 
-    static uint64_t getAddress(const uint8_t *packet);
-
-    static uint8_t calcChecksum(const uint8_t *packet, uint8_t size_bytes);
 };
+
+
+#endif //HPRC_XBEEDEVICE_H

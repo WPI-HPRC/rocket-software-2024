@@ -148,7 +148,8 @@ void State::loop() {
 // #endif
 
 #ifndef NO_XBEE
-
+  if(this->loopCount % 2 == 0)
+  {
     #ifdef PRINT_TIMINGS
     start = millis();
     #endif
@@ -161,6 +162,7 @@ void State::loop() {
 
     // Serial.print("Packet Success: ");
     // Serial.println(now);
+  }
 #endif
 
 #ifndef NO_SDCARD

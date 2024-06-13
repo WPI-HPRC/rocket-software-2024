@@ -2,7 +2,7 @@
 #include "05-Recovery.h"
 #include "State.h"
 
-Recovery::Recovery(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
+Recovery::Recovery(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
 
 void Recovery::initialize_impl() {}
 

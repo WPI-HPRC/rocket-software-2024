@@ -7,7 +7,7 @@ class Coast : public State
 {
     _STATE_CLASS_IMPLS_
 public:
-    Coast(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator);
+    Coast(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator);
     ~Coast();
 
 private:

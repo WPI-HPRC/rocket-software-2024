@@ -3,7 +3,7 @@
 #include "01-Launch.h"
 #include "utility.hpp"
 
-PreLaunch::PreLaunch(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
+PreLaunch::PreLaunch(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
 
 float PreLaunch::avgAccelZ()
 {
@@ -31,7 +31,7 @@ void PreLaunch::loop_impl()
         // delay(100);
         // return;
     }
-    if (this->attitudeStateEstimator->initialized && this->kinematicStateEstimator->initialized)
+    if (this->attitudeStateEstimator->initialized)
     {
         this->accelReadingBuffer[this->buffIdx++] = this->telemPacket.accelZ;
         this->buffIdx %= sizeof(this->accelReadingBuffer) / sizeof(float);
@@ -87,27 +87,13 @@ void PreLaunch::loop_impl()
         
         Serial.println("[Prelaunch] Initialized Attitude EKF");
     }
-
-    if (!this->kinematicStateEstimator->initialized) {
-        // float r_adj = Utility::r_earth + sensorPacket.gpsAltMSL; // [m]
-        // float N_earth = Utility::a_earth / sqrt(1 - pow(Utility::e_earth, 2) * pow(sin(sensorPacket.gpsLat), 2));
-
-        // float X_0 = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * cos(sensorPacket.gpsLong * DEG_TO_RAD);
-        // float Y_0 = (N_earth + sensorPacket.gpsAltAGL) * cos(sensorPacket.gpsLat * DEG_TO_RAD) * sin(sensorPacket.gpsLong * DEG_TO_RAD);
-        // float Z_0 = (((Utility::b_earth * Utility::b_earth) / (Utility::a_earth * Utility::a_earth)) * N_earth + sensorPacket.gpsAltAGL) * sin(sensorPacket.gpsLat * DEG_TO_RAD);
-        // float Z_0 = (N_earth*(1-pow(Utility::e_earth,2))+sensorPacket.gpsAltAGL)*sin(sensorPacket.gpsLat);
-        BLA::Matrix<6> x_0 = {0,0,0, 0,0,0};
-        this->kinematicStateEstimator->init(x_0, telemPacket.altitude, 0.025);
-
-        Serial.println("[Prelaunch] Initialized Kinematic EKF");
-    }
 }
 
 State *PreLaunch::nextState_impl()
 {
     if (launched)
     {
-        return new Launch(sensors, attitudeStateEstimator, kinematicStateEstimator);
+        return new Launch(sensors, attitudeStateEstimator);
     }
 
     return nullptr;

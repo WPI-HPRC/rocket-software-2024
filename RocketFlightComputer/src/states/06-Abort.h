@@ -5,5 +5,5 @@ class Abort : public State
 {
     _STATE_CLASS_IMPLS_
 public:
-    Abort(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator);
+    Abort(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator);
 };

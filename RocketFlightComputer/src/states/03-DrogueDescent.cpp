@@ -3,7 +3,7 @@
 #include "04-MainDescent.h"
 #include "06-Abort.h"
 
-DrogueDescent::DrogueDescent(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
+DrogueDescent::DrogueDescent(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
 
 void DrogueDescent::initialize_impl() {}
 
@@ -37,14 +37,14 @@ State *DrogueDescent::nextState_impl()
     // Transition state if condition met
     if (mainDeployVelocityReached)
     {
-        return new MainDescent(sensors, attitudeStateEstimator, kinematicStateEstimator);
+        return new MainDescent(sensors, attitudeStateEstimator);
     }
 
     // if the state hasn't changed for much more than the expected DROGUE time, go to abort
     // 1.2 * TIME_IN_DROGUE_DESCENT == 85.2 seconds
     if (this->currentTime > 1.2 * TIME_IN_DROGUE_DESCENT)
     {
-        return new Abort(sensors, attitudeStateEstimator, kinematicStateEstimator);
+        return new Abort(sensors, attitudeStateEstimator);
     }
 
     return nullptr;

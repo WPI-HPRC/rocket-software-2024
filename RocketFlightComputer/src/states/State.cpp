@@ -1,13 +1,10 @@
 #include "State.h"
 
-#ifndef NO_SDCARD
-#include "hardware/dma.h"
-#endif
-
 #include "utility.hpp"
 #include <Arduino.h>
 
-State::State(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : sensors(sensors), attitudeStateEstimator(attitudeStateEstimator), kinematicStateEstimator(kinematicStateEstimator) {}
+State::State(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : sensors(sensors), attitudeStateEstimator(attitudeStateEstimator) {}
+
 
 void break_uint16(uint16_t value, uint8_t *byte_array) {
     byte_array[1] = (uint8_t)(value & 0xFF);        // Low byte
@@ -133,16 +130,6 @@ void State::loop() {
         // Serial.print(telemPacket.j); Serial.print(",");
         // Serial.println(telemPacket.k);
 	}
-
-  if(this->kinematicStateEstimator->initialized) {
-    #ifdef PRINT_TIMINGS
-    start = millis();
-    #endif
-		this->kinematicStateEstimator->onLoop(this->telemPacket);
-    #ifdef PRINT_TIMINGS
-    Serial.printf("\tKINEMATIC EKF STEP TIME: %llu\n", millis() - start);
-    #endif
-  }
 
   #ifdef PRINT_TIMINGS
   start = millis();

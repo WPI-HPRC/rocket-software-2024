@@ -39,9 +39,8 @@ uint64_t now = 0;
 
 struct Sensors sensors;
 AttitudeStateEstimator *attitudeStateEstimator = new AttitudeStateEstimator();
-KinematicStateEstimator *kinematicStateEstimator = new KinematicStateEstimator();
 // Start in pre-launch
-State *state = new PreLaunch(&sensors, attitudeStateEstimator, kinematicStateEstimator);
+State *state = new PreLaunch(&sensors, attitudeStateEstimator);
 
 // void handleMagInterrupt() {
 //     sensors.mag->handleInterrupt();

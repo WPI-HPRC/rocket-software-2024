@@ -48,35 +48,26 @@ void Coast::loop_impl()
     switch (this->servoState) {
     case WAIT:
         airbrakesServo.write(AIRBRAKE_RETRACTED);
-        if (this->currentTime >= 1000) {
-            this->servoState = FULL;
+        if (this->currentTime - this->lastTransitionTime >= AIRBRAKE_WAIT_AFTER_TRANSITION) {
+            this->lastTransitionTime = this->currentTime;
+            this->servoState = FIRST_STEP;
         }
         break;
-    case FULL:
-        airbrakesServo.write(AIRBRAKE_FULL_EXTENSION);
-        if (this->currentTime >= 3000) {
-            this->servoState = THREE_QUARTERS;
+    case FIRST_STEP:
+        airbrakesServo.write(AIRBRAKE_FIRST_EXTENSION);
+        if (this->currentTime - this->lastTransitionTime >= AIRBRAKE_FIRST_EXTENSION_TIME) {
+            this->lastTransitionTime = this->currentTime;
+            this->servoState = SECOND_STEP;
         }
         break;
-    case THREE_QUARTERS:
-        airbrakesServo.write(AIRBRAKE_75_EXTENSION);
-        if (this->currentTime >= 5000) {
-            this->servoState = HALF;
+    case SECOND_STEP:
+        airbrakesServo.write(AIRBRAKE_SECOND_EXTENSION);
+        if (this->currentTime - this->lastTransitionTime >= AIRBRAKE_SECOND_EXTENSION_TIME) {
+            this->lastTransitionTime = this->currentTime;
+            this->servoState = DONE;
         }
         break;
-    case HALF:
-        airbrakesServo.write(AIRBRAKE_HALF_EXTENSION);
-        if (this->currentTime >= 7000) {
-            this->servoState = ONE_QUARTER;
-        }
-        break;
-    case ONE_QUARTER:
-        airbrakesServo.write(AIRBRAKE_25_EXTENSION);
-        if (this->currentTime >= 9000) {
-            this->servoState = RETRACTED;
-        }
-        break;
-    case RETRACTED:
+    case DONE:
         airbrakesServo.write(AIRBRAKE_RETRACTED);
         break;
     }

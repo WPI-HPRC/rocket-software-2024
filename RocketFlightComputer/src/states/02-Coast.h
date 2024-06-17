@@ -18,10 +18,9 @@ private:
 
     enum AirbrakeServoState {
         WAIT = 0,
-        FULL = 1,
-        THREE_QUARTERS = 2,
-        HALF = 3,
-        ONE_QUARTER = 4,
-        RETRACTED = 5,
+        FIRST_STEP,
+        SECOND_STEP,
+        DONE,
     } servoState = WAIT;
+    int lastTransitionTime = 0;
 };

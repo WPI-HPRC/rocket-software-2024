@@ -1,10 +1,21 @@
 #pragma once
 
 #include <BasicLinearAlgebra.h>
+
+#include "FlightParams.hpp"
+
+#ifndef NO_SDCARD
 #include "SdFat.h"
+#endif
+
+#ifndef NO_SERVO
 #include "Servo.h"
+#endif
+
+#ifndef NO_XBEE
 #include "TelemetryBoard/XBeeProSX.h"
-#include "SparkFun_u-blox_GNSS_v3.h"
+#endif
+
 #include <Arduino.h>
 #include <cstdint>
 #include <cmath>
@@ -20,13 +31,17 @@
 #define BUZZER_PIN 14
 
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
-extern bool sdCardInitialized;
 #ifndef NO_SDCARD
+extern bool sdCardInitialized;
 extern SdFat sd;
 extern File32 dataFile;
 extern uint sd_spi_dma_chan;
 #endif
+
+#ifndef NO_SERVO
 extern Servo airbrakesServo;
+#endif
+
 #ifndef NO_XBEE
 extern XbeeProSX xbee;
 #endif
@@ -231,39 +246,6 @@ public:
 #endif
     };
     #pragma pack(pop)
-
-#if 0 // NOTE: REMOVES FLASH CODE
-    static void logData(FlashChip *flash, SensorPacket sensorPacket)
-    {
-        String structString = String(sensorPacket.accelX) + "," +
-                              String(sensorPacket.accelY) + "," +
-                              String(sensorPacket.accelZ) + "," +
-                              String(sensorPacket.gyroX) + "," +
-                              String(sensorPacket.gyroY) + "," +
-                              String(sensorPacket.gyroZ) + "," +
-                              String(sensorPacket.magX) + "," +
-                              String(sensorPacket.magY) + "," +
-                              String(sensorPacket.magZ) + "," +
-                              String(sensorPacket.pressure) + "," +
-                              String(sensorPacket.altitude) + "," +
-                              String(sensorPacket.w) + "," +
-                              String(sensorPacket.i) + "," +
-                              String(sensorPacket.j) + "," +
-                              String(sensorPacket.k) + "," +
-                              String(sensorPacket.X) + "," +
-                              String(sensorPacket.Y) + "," +
-                              String(sensorPacket.Z) + "," +
-                              String(sensorPacket.gpsLat) + "," +
-                              String(sensorPacket.gpsLong) + "," +
-                              String(sensorPacket.gpsAltMSL) + "," +
-                              String(sensorPacket.gpsAltAGL) + "," +
-                              String(sensorPacket.gpsLock) + "," +
-                              String(sensorPacket.satellites) + "," +
-                              String(sensorPacket.timestamp);
-        flash->writeStruct(structString);
-    }
-#endif // NOTE: REMOVES FLASH CODE
-
 
     /** -----EARTH CONSTANTS----- **/
     // WGS84 Ellipsoid Model Constants

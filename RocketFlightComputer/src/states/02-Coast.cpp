@@ -11,7 +11,9 @@
 Coast::Coast(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : State(sensors, attitudeStateEstimator, kinematicStateEstimator) {}
 
 Coast::~Coast() {
+#ifndef NO_SERVO
     airbrakesServo.write(AIRBRAKE_RETRACTED);
+#endif
 }
 
 void Coast::initialize_impl() {}
@@ -41,6 +43,8 @@ void Coast::loop_impl()
 
     // Handle airbrake control
     // TODO: I don't really know which values correspond to which positions yet, so these values are subject to change
+    // TODO (maybe) mock servo for fun, wouldn't be all that useful tho
+#ifndef NO_SERVO
     switch (this->servoState) {
     case WAIT:
         airbrakesServo.write(AIRBRAKE_RETRACTED);
@@ -76,6 +80,7 @@ void Coast::loop_impl()
         airbrakesServo.write(AIRBRAKE_RETRACTED);
         break;
     }
+#endif
 }
 
 //! @details max 8 seconds until deploy

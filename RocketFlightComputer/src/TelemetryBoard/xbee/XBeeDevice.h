@@ -3,7 +3,6 @@
 //
 #pragma once
 
-#include <queue>
 #include "XBeeUtility.h"
 #include "CircularBuffer.hpp"
 #include "circularQueue.hpp"

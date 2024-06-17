@@ -43,8 +43,8 @@ constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2]
 // Launch to Abort Conditions
     // time in Launch > 2 * MOTOR_BURN_TIME
 
-// 3.1 second timeout, as defined in OpenRocket for Test Launch 2/17
-constexpr float MOTOR_BURN_TIME = 3.1 * 1000.0;
+// 3.1 second timeout, as defined in OpenRocket for IREC 2024
+constexpr float MOTOR_BURN_TIME = 3 * 1000.0;
 
 // Acceleration threshold for burnout detection, in G's
 // checking if average Z acceleration is less than 0.3 G's
@@ -63,13 +63,14 @@ constexpr float MOTOR_BURN_TIME = 3.1 * 1000.0;
 // Each loop is about 25ms
 #define COAST_AIRBRAKE_INCREMENT_LOOPS 4
 
+// Check and verify extension numbers
 #define AIRBRAKE_FULL_EXTENSION 1775
 #define AIRBRAKE_75_EXTENSION 1734
 #define AIRBRAKE_HALF_EXTENSION 1693
 #define AIRBRAKE_25_EXTENSION 1651
 #define AIRBRAKE_RETRACTED 1500
-// seconds, OpenRocket for Test Launch 2/17
-constexpr float TIME_IN_COAST = 18.4 * 1000.0;
+// seconds, OpenRocket for IREC 2024
+constexpr float TIME_IN_COAST = 22 * 1000.0;
 
 // DrogueDescent -------------------------
 // DrogueDescent to MainDescent Conditions
@@ -77,15 +78,17 @@ constexpr float TIME_IN_COAST = 18.4 * 1000.0;
 // DrogueDescent to Abort Conditions
     // time in DrogueDescent > 1.2 * TIME_IN_DROGUE_DESCENT
 
-// converts ft/s to m/s, OpenRocket sim Test Launch 2/17
+// converts ft/s to m/s
 #define FPS_TO_MPS 3.281
 
-// Given in FPS from OpenRocket, convert to m/s
+// Given in FPS from OpenRocket, convert to m/s 
 // checking if average vertical velocity is less than or equal to 82.6 ft/s
-constexpr float MAIN_DEPLOY_VELOCITY = 82.6 / FPS_TO_MPS;
+// constexpr float MAIN_DEPLOY_VELOCITY = 82.6 / FPS_TO_MPS;
+// m/s, OpenRocket for IREC 2024
+constexpr float MAIN_DEPLOY_VELOCITY = 23;
 
-// seconds, OpenRocket for Test Launch 2/17
-constexpr float TIME_IN_DROGUE_DESCENT = 67.6 * 1000.0;
+// seconds, OpenRocket for IREC 2024
+constexpr float TIME_IN_DROGUE_DESCENT = 115.5 * 1000.0;
 
 // MainDescent -------------------------
 // MainDescent to Recovery Conditions
@@ -93,7 +96,7 @@ constexpr float TIME_IN_DROGUE_DESCENT = 67.6 * 1000.0;
 // MainDescent to Abort Conditions
     // time in MainDescent > 1.1 * TIME_IN_MAIN_DESCENT
 
-// 88 seconds, OpenRocket for Test Launch 2/17
+// 88 seconds, OpenRocket for IREC 2024
 constexpr float TIME_IN_MAIN_DESCENT = 90.0 * 1000.0;
 
 // Upper bound for landing velocity

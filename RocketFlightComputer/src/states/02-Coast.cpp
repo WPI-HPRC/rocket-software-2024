@@ -41,6 +41,10 @@ void Coast::loop_impl()
     // If the average vertical velocity <= 0 for more than 30 cycles, rocket has passed apogee
     apogeePassed = apogeeDebouncer.checkOut(averageVerticalVelocity <= 0);
 
+    #ifdef SERVO_TEST
+    Serial.printf("Servo position: %d\n", this->telemPacket.servoPosition);
+    #endif
+
     // Handle airbrake control
     // TODO: I don't really know which values correspond to which positions yet, so these values are subject to change
     // TODO (maybe) mock servo for fun, wouldn't be all that useful tho

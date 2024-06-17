@@ -1,0 +1,11 @@
+--- .pio/libdeps/native/BasicLinearAlgebra/impl/NotSoBasicLinearAlgebra.h	2023-12-31 23:47:36.000000000 -0500
++++ patches/native/NotSoBasicLinearAlgebra.h	2024-06-06 16:53:45.007464920 -0400
+@@ -1,5 +1,8 @@
+ #pragma once
+ 
++#include <algorithm>
++using std::max;
++
+ namespace BLA
+ {
+ template <typename T>

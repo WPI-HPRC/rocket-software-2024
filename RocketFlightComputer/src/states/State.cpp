@@ -1,5 +1,5 @@
 #include "State.h"
-#include "hardware/dma.h"
+
 #include "utility.hpp"
 #include <Arduino.h>
 
@@ -61,8 +61,11 @@ void State::loop() {
   this->telemPacket.rawMagZ = this->sensorPacket.magZ;
 
   this->telemPacket.pressure = this->sensorPacket.pressure;
+  this->telemPacket.temperature = this->sensorPacket.temperature;
 
+#ifndef NO_SERVO
   this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
+#endif
 
   this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
   this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
@@ -114,7 +117,7 @@ void State::loop() {
     #endif
 		this->attitudeStateEstimator->onLoop(this->telemPacket);
     #ifdef PRINT_TIMINGS
-    Serial.printf("\tEKF STEP TIME: %llu\n", millis() - start);
+    Serial.printf("\tATTITUDE EKF STEP TIME: %llu\n", millis() - start);
     #endif
 
 		this->telemPacket.w = this->attitudeStateEstimator->x(0);

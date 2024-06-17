@@ -3,7 +3,6 @@
 #include "Arduino.h"
 #include <BasicLinearAlgebra.h>
 #include "../../src/utility.hpp"
-#include "../../src/FlightParams.hpp"
 
 /**
  * @author @frostydev99 - Daniel Pearson

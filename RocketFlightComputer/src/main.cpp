@@ -2,7 +2,6 @@
 #include "FlightParams.hpp"
 #include "utility.hpp"
 #include <Arduino.h>
-#include <Metro.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <SdFat.h>
@@ -19,13 +18,17 @@
 #include <Sensors.h>
 #include <CustomSPI.h>
 
-bool sdCardInitialized = false;
 #ifndef NO_SDCARD
+bool sdCardInitialized = false;
 File32 dataFile;
 SdFat sd;
 uint sd_spi_dma_chan = -1;
 #endif
+
+#ifndef NO_SERVO
 Servo airbrakesServo = Servo();
+#endif
+
 #ifndef NO_XBEE
 XbeeProSX xbee = XbeeProSX(17); // CS GPIO17
 #endif
@@ -97,9 +100,11 @@ void setup()
         .mag = new Magnetometer(),
         .acc = new Accelerometer(0x68),
     };
+#ifndef NO_SERVO
     pinMode(SERVO_FEEDBACK_GPIO, INPUT);
     airbrakesServo.attach(SERVO_PWM_GPIO);
     airbrakesServo.write(AIRBRAKE_RETRACTED);
+#endif
 
 #ifndef NO_XBEE
     xbee.start();

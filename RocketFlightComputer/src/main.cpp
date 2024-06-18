@@ -13,7 +13,11 @@
 #include <ICM42688.h>
 
 #include <states/State.h>
+#ifdef SERVO_TEST
+#include <states/02-Coast.h>
+#else
 #include <states/00-PreLaunch.h>
+#endif
 
 #include <Sensors.h>
 #include <CustomSPI.h>
@@ -40,7 +44,11 @@ uint64_t now = 0;
 struct Sensors sensors;
 AttitudeStateEstimator *attitudeStateEstimator = new AttitudeStateEstimator();
 // Start in pre-launch
+#ifdef SERVO_TEST
+State *state = new Coast(&sensors, attitudeStateEstimator);
+#else
 State *state = new PreLaunch(&sensors, attitudeStateEstimator);
+#endif
 
 // void handleMagInterrupt() {
 //     sensors.mag->handleInterrupt();

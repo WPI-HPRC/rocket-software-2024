@@ -2,7 +2,6 @@
 #include "FlightParams.hpp"
 #include "utility.hpp"
 #include <Arduino.h>
-#include <Metro.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <SdFat.h>
@@ -14,18 +13,26 @@
 #include <ICM42688.h>
 
 #include <states/State.h>
+#ifdef SERVO_TEST
+#include <states/02-Coast.h>
+#else
 #include <states/00-PreLaunch.h>
+#endif
 
 #include <Sensors.h>
 #include <CustomSPI.h>
 
-bool sdCardInitialized = false;
 #ifndef NO_SDCARD
+bool sdCardInitialized = false;
 File32 dataFile;
 SdFat sd;
 uint sd_spi_dma_chan = -1;
 #endif
+
+#ifndef NO_SERVO
 Servo airbrakesServo = Servo();
+#endif
+
 #ifndef NO_XBEE
 XbeeProSX xbee = XbeeProSX(17); // CS GPIO17
 #endif
@@ -36,9 +43,12 @@ uint64_t now = 0;
 
 struct Sensors sensors;
 AttitudeStateEstimator *attitudeStateEstimator = new AttitudeStateEstimator();
-KinematicStateEstimator *kinematicStateEstimator = new KinematicStateEstimator();
 // Start in pre-launch
-State *state = new PreLaunch(&sensors, attitudeStateEstimator, kinematicStateEstimator);
+#ifdef SERVO_TEST
+State *state = new Coast(&sensors, attitudeStateEstimator);
+#else
+State *state = new PreLaunch(&sensors, attitudeStateEstimator);
+#endif
 
 // void handleMagInterrupt() {
 //     sensors.mag->handleInterrupt();
@@ -98,9 +108,11 @@ void setup()
         .mag = new Magnetometer(),
         .acc = new Accelerometer(0x68),
     };
+#ifndef NO_SERVO
     pinMode(SERVO_FEEDBACK_GPIO, INPUT);
     airbrakesServo.attach(SERVO_PWM_GPIO);
     airbrakesServo.write(AIRBRAKE_RETRACTED);
+#endif
 
 #ifndef NO_XBEE
     xbee.start();

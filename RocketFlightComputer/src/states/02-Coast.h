@@ -1,5 +1,4 @@
 #pragma once
-#include "Servo.h"
 #include "State.h"
 #include "Debouncer.h"
 
@@ -7,7 +6,7 @@ class Coast : public State
 {
     _STATE_CLASS_IMPLS_
 public:
-    Coast(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator);
+    Coast(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator);
     ~Coast();
 
 private:
@@ -19,10 +18,9 @@ private:
 
     enum AirbrakeServoState {
         WAIT = 0,
-        FULL = 1,
-        THREE_QUARTERS = 2,
-        HALF = 3,
-        ONE_QUARTER = 4,
-        RETRACTED = 5,
+        FIRST_STEP,
+        SECOND_STEP,
+        DONE,
     } servoState = WAIT;
+    int lastTransitionTime = 0;
 };

@@ -1,9 +1,10 @@
 #include "State.h"
-#include "hardware/dma.h"
+
 #include "utility.hpp"
 #include <Arduino.h>
 
-State::State(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator, KinematicStateEstimator *kinematicStateEstimator) : sensors(sensors), attitudeStateEstimator(attitudeStateEstimator), kinematicStateEstimator(kinematicStateEstimator) {}
+State::State(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : sensors(sensors), attitudeStateEstimator(attitudeStateEstimator) {}
+
 
 void break_uint16(uint16_t value, uint8_t *byte_array) {
     byte_array[1] = (uint8_t)(value & 0xFF);        // Low byte
@@ -60,8 +61,11 @@ void State::loop() {
   this->telemPacket.rawMagZ = this->sensorPacket.magZ;
 
   this->telemPacket.pressure = this->sensorPacket.pressure;
+  this->telemPacket.temperature = this->sensorPacket.temperature;
 
+#ifndef NO_SERVO
   this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
+#endif
 
   this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
   this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
@@ -113,7 +117,7 @@ void State::loop() {
     #endif
 		this->attitudeStateEstimator->onLoop(this->telemPacket);
     #ifdef PRINT_TIMINGS
-    Serial.printf("\tEKF STEP TIME: %llu\n", millis() - start);
+    Serial.printf("\tATTITUDE EKF STEP TIME: %llu\n", millis() - start);
     #endif
 
 		this->telemPacket.w = this->attitudeStateEstimator->x(0);
@@ -126,10 +130,6 @@ void State::loop() {
         // Serial.print(telemPacket.j); Serial.print(",");
         // Serial.println(telemPacket.k);
 	}
-
-    if(this->kinematicStateEstimator->initialized) {
-        this->kinematicStateEstimator->onLoop(this->telemPacket);
-    }
 
   #ifdef PRINT_TIMINGS
   start = millis();

@@ -28,7 +28,7 @@ inline uint8_t *circularBufferGetLastValue(CircularBuffer *buffer)
 
 inline CircularBuffer *circularBufferCreate(unsigned int length, unsigned int dataSize_bytes)
 {
-    auto *buffer = (CircularBuffer *) malloc(dataSize_bytes * length);
+    CircularBuffer *buffer = (CircularBuffer *) malloc(sizeof *buffer);
 
     buffer->length = length;
     buffer->dataSize_bytes = dataSize_bytes;

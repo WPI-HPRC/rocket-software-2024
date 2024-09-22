@@ -1,6 +1,6 @@
-#include <SensorBoardLibraries\IMU\IMU_SB.h>
-#include <SensorBoardLibraries\Barometer\Barometer_SB.h>
-#include <SensorBoardLibraries\Magnetometer\Magnetometer_SB.h>
+#include <SensorBoardLibraries/IMU/IMU_SB.h>
+#include <SensorBoardLibraries/Barometer/Barometer_SB.h>
+#include <SensorBoardLibraries/Magnetometer/Magnetometer_SB.h>
 #include "Config.h"
 #include "Sensor_Frames.hpp"
 // #include <libs/MMC5983/SparkFun_MMC5983MA_Arduino_Library.h>

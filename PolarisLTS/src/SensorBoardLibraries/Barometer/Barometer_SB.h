@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <SensorBoardLibraries\Sensor.h>
+#include <SensorBoardLibraries/Sensor.h>
 
 struct MS5611_Calibration_Data{
     uint16_t C1;

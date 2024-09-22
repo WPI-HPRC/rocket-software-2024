@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <SensorBoardLibraries\Sensor.h>
+#include <SensorBoardLibraries/Sensor.h>
 #include "MMC5983_Registers.h"
 
 /*

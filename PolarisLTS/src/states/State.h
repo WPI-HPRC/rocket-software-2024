@@ -1,10 +1,10 @@
 #pragma once
 #include "FlightParams.hpp"
 #include "utility.hpp"
-#include "Sensors.h"
 #include "Arduino.h"
 #include <TelemetryBoard/XBeeProSX.h>
 #include <EKF/AttitudeEKF.h>
+#include <SensorBoardLibraries/SensorBoard.hpp>
 
 //! @brief Enum representing the id of the state, to be used in logging and communication with ground station
 enum StateId
@@ -56,7 +56,7 @@ public:
 
 protected:
     //! @note Constructor to be called from subclasses to initialize the `sensors` object
-    State(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator);
+    State(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator);
     //! @brief number of milliseconds since the initialize call
     long long currentTime = 0;
     //! @brief number of milliseconds since the last loop call
@@ -64,7 +64,7 @@ protected:
     //! @brief loop count since initialization
     long long loopCount = 0;
     //! @brief "global" sensors object
-    struct Sensors *sensors;
+    Sensorboard *sensors;
     AttitudeStateEstimator *attitudeStateEstimator;
 
 private:

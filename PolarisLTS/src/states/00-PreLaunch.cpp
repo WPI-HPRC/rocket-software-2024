@@ -3,7 +3,7 @@
 #include "01-Launch.h"
 #include "utility.hpp"
 
-PreLaunch::PreLaunch(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
+PreLaunch::PreLaunch(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
 
 float PreLaunch::avgAccelZ()
 {

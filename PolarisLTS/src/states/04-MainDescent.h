@@ -6,7 +6,7 @@ class MainDescent : public State
 {
     _STATE_CLASS_IMPLS_
 public:
-    MainDescent(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator);
+    MainDescent(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator);
 
 private:
     float verticalVelocityBuffer[10] = {0};

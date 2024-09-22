@@ -3,7 +3,7 @@
 #include "utility.hpp"
 #include <Arduino.h>
 
-State::State(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : sensors(sensors), attitudeStateEstimator(attitudeStateEstimator) {}
+State::State(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator) : sensors(sensors), attitudeStateEstimator(attitudeStateEstimator) {}
 
 
 void break_uint16(uint16_t value, uint8_t *byte_array) {
@@ -39,7 +39,7 @@ void State::loop() {
   #ifdef PRINT_TIMINGS
   uint64_t start = millis();
   #endif
-	this->sensorPacket = this->sensors->readSensors();
+	this->sensors->readInertialSensors();
   #ifdef PRINT_TIMINGS
   Serial.printf("\tREAD SENSORS TIME: %llu\n", millis() - start);
   #endif
@@ -48,35 +48,35 @@ void State::loop() {
    */
   this->telemPacket.altitude = Utility::pressureToAltitude(this->sensorPacket.pressure);
   this->telemPacket.state = this->getId();
-  this->telemPacket.accelX = this->sensorPacket.accelX;
-  this->telemPacket.accelY = this->sensorPacket.accelY;
-  this->telemPacket.accelZ = this->sensorPacket.accelZ;
+  this->telemPacket.accelX = this->sensors->Inertial_Baro_frame.ac_x;
+  this->telemPacket.accelY = this->sensors->Inertial_Baro_frame.ac_y;
+  this->telemPacket.accelZ = this->sensors->Inertial_Baro_frame.ac_z;
 
-  this->telemPacket.gyroX = this->sensorPacket.gyroX;
-  this->telemPacket.gyroY = this->sensorPacket.gyroY;
-  this->telemPacket.gyroZ = this->sensorPacket.gyroZ;
+  this->telemPacket.gyroX = this->sensors->Inertial_Baro_frame.gy_x;
+  this->telemPacket.gyroY = this->sensors->Inertial_Baro_frame.gy_y;
+  this->telemPacket.gyroZ = this->sensors->Inertial_Baro_frame.gy_z;
 
-  this->telemPacket.rawMagX = this->sensorPacket.magX;
-  this->telemPacket.rawMagY = this->sensorPacket.magY;
-  this->telemPacket.rawMagZ = this->sensorPacket.magZ;
+  this->telemPacket.rawMagX = this->sensors->Inertial_Baro_frame.mag_x;
+  this->telemPacket.rawMagY = this->sensors->Inertial_Baro_frame.mag_y;
+  this->telemPacket.rawMagZ = this->sensors->Inertial_Baro_frame.mag_z;
 
-  this->telemPacket.pressure = this->sensorPacket.pressure;
-  this->telemPacket.temperature = this->sensorPacket.temperature;
+  this->telemPacket.pressure = this->sensors->Inertial_Baro_frame.Pressure;
+  this->telemPacket.temperature = this->sensors->Inertial_Baro_frame.Temperature;
 
 #ifndef NO_SERVO
   this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
 #endif
 
-  this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
-  this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
-  this->telemPacket.gpsVelocityN = this->sensorPacket.gpsVelocityN;
-  this->telemPacket.gpsVelocityE = this->sensorPacket.gpsVelocityE;
-  this->telemPacket.gpsVelocityD = this->sensorPacket.gpsVelocityD;
-  this->telemPacket.gpsAltAGL = this->sensorPacket.gpsAltAGL;
-  this->telemPacket.gpsAltMSL = this->sensorPacket.gpsAltMSL;
-  this->telemPacket.epochTime = this->sensorPacket.epochTime;
-  this->telemPacket.satellites = this->sensorPacket.satellites;
-  this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
+  // this->telemPacket.gpsLat = this->sensorPacket.gpsLat;
+  // this->telemPacket.gpsLong = this->sensorPacket.gpsLong;
+  // this->telemPacket.gpsVelocityN = this->sensorPacket.gpsVelocityN;
+  // this->telemPacket.gpsVelocityE = this->sensorPacket.gpsVelocityE;
+  // this->telemPacket.gpsVelocityD = this->sensorPacket.gpsVelocityD;
+  // this->telemPacket.gpsAltAGL = this->sensorPacket.gpsAltAGL;
+  // this->telemPacket.gpsAltMSL = this->sensorPacket.gpsAltMSL;
+  // this->telemPacket.epochTime = this->sensorPacket.epochTime;
+  // this->telemPacket.satellites = this->sensorPacket.satellites;
+  // this->telemPacket.gpsLock = this->sensorPacket.gpsLock;
   this->telemPacket.loopCount = this->loopCount;
   this->telemPacket.timestamp = now;
   /* Apply Accelerometer Biases */

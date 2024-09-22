@@ -3,7 +3,7 @@
 #include "02-Coast.h"
 #include "06-Abort.h"
 
-Launch::Launch(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
+Launch::Launch(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
 
 void Launch::initialize_impl() {}
 

@@ -1,3 +1,4 @@
+#include "EKF/AttitudeEKF.h"
 #include <Arduino.h>
 #include <Metro.h>
 
@@ -16,14 +17,26 @@ SensorFrame sensorFrame;
 
 // FlashChip flash = FlashChip();
 
-constexpr static int LOOP_RATE = 100;
-
 uint64_t previousTime = 0;
 uint64_t currentTime = 0;
 
 State * state;
 
 Sensorboard sensorBoard;
+AttitudeStateEstimator *attitudeStateEstimator = new AttitudeStateEstimator();
+
+#ifndef NO_SDCARD
+bool sdCardInitialized = false;
+File dataFile;
+#endif
+
+#ifndef NO_SERVO
+Servo airbrakesServo = Servo();
+#endif
+
+#ifndef NO_XBEE
+XbeeProSX xbee = XbeeProSX(17); // CS GPIO17
+#endif
 
 void setup() {
 	Serial.begin(115200);
@@ -40,7 +53,7 @@ void setup() {
 		while(1) {};
 	}
 
-	state = (State *)new PreLaunch();
+	state = (State *)new PreLaunch(&sensorBoard, attitudeStateEstimator);
 
 	state->initialize();
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SensorBoardLibraries/IMU/IMU_SB.h>
 #include <SensorBoardLibraries/Barometer/Barometer_SB.h>
 #include <SensorBoardLibraries/Magnetometer/Magnetometer_SB.h>

@@ -8,7 +8,7 @@
 #include "FlightParams.hpp"
 #include "State.h"
 
-Coast::Coast(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
+Coast::Coast(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
 
 Coast::~Coast() {
 #ifndef NO_SERVO

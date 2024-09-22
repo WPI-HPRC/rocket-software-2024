@@ -3,7 +3,7 @@
 #include "04-MainDescent.h"
 #include "06-Abort.h"
 
-DrogueDescent::DrogueDescent(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
+DrogueDescent::DrogueDescent(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
 
 void DrogueDescent::initialize_impl() {}
 

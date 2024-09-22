@@ -3,7 +3,7 @@
 #include "05-Recovery.h"
 #include "State.h"
 
-MainDescent::MainDescent(struct Sensors *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
+MainDescent::MainDescent(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
 
 void MainDescent::initialize_impl() {}
 

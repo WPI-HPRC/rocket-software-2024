@@ -1,0 +1,3 @@
+[submodule "PolarisLTS/src/TelemetryBoard/xbee"]
+	path = PolarisLTS/src/TelemetryBoard/xbee
+	url = https://github.com/wpi-hprc/xbee

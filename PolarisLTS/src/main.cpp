@@ -35,15 +35,17 @@ Servo airbrakesServo = Servo();
 #endif
 
 #ifndef NO_XBEE
-XbeeProSX xbee = XbeeProSX(17); // CS GPIO17
+XbeeProSX xbee = XbeeProSX(9); // CS 30
 #endif
 
 void setup() {
-	Serial.begin(115200);
+	Serial.begin(9600);
 
 	while(!Serial);
 	Wire.begin();
 	Wire.setClock(400000);
+
+	SPI.begin();
 
 	Serial.println("[Polaris] Initializing Sensor Board");
 	if(sensorBoard.setup()) {
@@ -71,6 +73,7 @@ void setup() {
 void loop() {
 	currentTime = millis();
 	if(currentTime - previousTime >= (1000 / LOOP_RATE)) {
+		previousTime = currentTime;
 		state->loop();
 
 		// String timestamp = (String) millis();

@@ -51,7 +51,6 @@ public:
     virtual enum StateId getId() = 0;
     virtual ~State() {}
 
-    Utility::SensorPacket sensorPacket;
     Utility::TelemPacket telemPacket;
 
 protected:

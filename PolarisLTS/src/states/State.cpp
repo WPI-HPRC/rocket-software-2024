@@ -3,6 +3,8 @@
 #include "utility.hpp"
 #include <Arduino.h>
 
+#include <SD.h>
+
 State::State(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator) : sensors(sensors), attitudeStateEstimator(attitudeStateEstimator) {}
 
 
@@ -46,7 +48,6 @@ void State::loop() {
   /**
    * Assemble Telemetry packet from sensor packet, this is stuff we want done every loop
    */
-  this->telemPacket.altitude = Utility::pressureToAltitude(this->sensorPacket.pressure);
   this->telemPacket.state = this->getId();
   this->telemPacket.accelX = this->sensors->Inertial_Baro_frame.ac_x;
   this->telemPacket.accelY = this->sensors->Inertial_Baro_frame.ac_y;
@@ -62,6 +63,7 @@ void State::loop() {
 
   this->telemPacket.pressure = this->sensors->Inertial_Baro_frame.Pressure;
   this->telemPacket.temperature = this->sensors->Inertial_Baro_frame.Temperature;
+  this->telemPacket.altitude = Utility::pressureToAltitude(this->telemPacket.pressure);
 
 #ifndef NO_SERVO
   this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
@@ -103,7 +105,7 @@ void State::loop() {
 
   static const BLA::Matrix<3> hardIronCal = {54062.849827, 5545.343210, 89181.770655};
 
-  BLA::Matrix<3> magVector = {sensorPacket.magX, sensorPacket.magY, sensorPacket.magZ};
+  BLA::Matrix<3> magVector = {telemPacket.magX, telemPacket.magY, telemPacket.magZ};
 
   BLA::Matrix<3> magCal = softIronCal * (magVector - hardIronCal);
 

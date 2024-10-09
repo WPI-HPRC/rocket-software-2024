@@ -32,7 +32,8 @@
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
 #ifndef NO_SDCARD
 extern bool sdCardInitialized;
-extern File dataFile;
+extern FsFile dataFile;
+extern SdFs sd;
 #endif
 
 #ifndef NO_SERVO
@@ -101,36 +102,6 @@ public:
         result(2) = vec1(0) * vec2(1) - vec1(1) * vec2(0);
         return result;
     }
-
-    struct SensorPacket
-    {
-        // Raw Sensor Readings
-        float accelX = 0.0;
-        float accelY = 0.0;
-        float accelZ = 0.0;
-        float gyroX = 0.0;
-        float gyroY = 0.0;
-        float gyroZ = 0.0;
-        float magX = 0.0;
-        float magY = 0.0;
-        float magZ = 0.0;
-        float pressure = 0.0;
-        float temperature = 0.0f;
-
-        // GPS Inputs
-        float gpsLat = 0.0;
-        float gpsLong = 0.0;
-        float gpsAltMSL = 0.0;
-        float gpsAltAGL = 0.0;
-        int32_t gpsVelocityN = 0;
-        int32_t gpsVelocityE = 0;
-        int32_t gpsVelocityD = 0;
-        uint32_t epochTime = 0;
-        uint8_t satellites = 0;
-        bool gpsLock = false;
-
-        uint32_t timestamp = 0;
-    };
 
     #pragma pack(push,1)
     struct TelemPacket {

@@ -15,29 +15,8 @@ void XbeeProSX::start()
 void XbeeProSX::writeBytes(const char *data, size_t length_bytes)
 {
     digitalWrite(_cs_pin, LOW);
-    // #define W(b) SPI.transfer(b)
-    // W(0x7e);
-    // W(0x00);
-    // W(0x0f);
-    // W(0x10);
-    // W(0x01);
-    // W(0x00);
-    // W(0x13);
-    // W(0xa2);
-    // W(0x00);
-    // W(0x42);
-    // W(0x3f);
-    // W(0x47);
-    // W(0x4c);
-    // W(0xff);
-    // W(0xfe);
-    // W(0x00);
-    // W(0xc0);
-    // W(0xaa);
-    // W(0xbe);
     for (size_t i = 0; i < length_bytes; i++)
     {
-        Serial.printf("%02x ", data[i]);
         uint8_t byte = SPI.transfer(data[i]);
     }
     Serial.printf("\n");

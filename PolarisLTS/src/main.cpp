@@ -80,6 +80,10 @@ void setup() {
 
   state->initialize();
 
+#ifndef NO_XBEE
+  xbee.start();
+#endif
+
   // flash.init();
   // int startAddress = 0;
   // startAddress = flash.rememberAddress();

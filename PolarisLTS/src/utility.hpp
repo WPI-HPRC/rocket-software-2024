@@ -32,8 +32,7 @@
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor
 #ifndef NO_SDCARD
 extern bool sdCardInitialized;
-extern FsFile dataFile;
-extern SdFs sd;
+extern File dataFile;
 #endif
 
 #ifndef NO_SERVO
@@ -153,9 +152,6 @@ public:
         float gpsLong = 0.0f;
         float gpsAltMSL = 0.0f;
         float gpsAltAGL = 0.0f;
-        int32_t gpsVelocityN = 0;
-        int32_t gpsVelocityE = 0;
-        int32_t gpsVelocityD = 0;
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
         bool gpsLock = false;
@@ -201,9 +197,9 @@ public:
             Serial.print("gpsLong: "); Serial.print(gpsLong); Serial.print(", ");
             Serial.print("gpsAltAGL: "); Serial.print(gpsAltAGL); Serial.print(", ");
             Serial.print("gpsAltMSL: "); Serial.print(gpsAltMSL); Serial.print(", ");
-            Serial.print("gpsVelN: "); Serial.print(gpsVelocityN); Serial.print(", ");
-            Serial.print("gpsVelE: "); Serial.print(gpsVelocityE); Serial.print(", ");
-            Serial.print("gpsVelD: "); Serial.print(gpsVelocityD); Serial.print(", ");
+            // Serial.print("gpsVelN: "); Serial.print(gpsVelocityN); Serial.print(", ");
+            // Serial.print("gpsVelE: "); Serial.print(gpsVelocityE); Serial.print(", ");
+            // Serial.print("gpsVelD: "); Serial.print(gpsVelocityD); Serial.print(", ");
             Serial.print("epochTime: "); Serial.print(epochTime); Serial.print(", ");
             Serial.print("satellites: "); Serial.print(satellites); Serial.print(", ");
             Serial.print("gpsLock: "); Serial.print(gpsLock); Serial.print(", ");

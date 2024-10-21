@@ -10,6 +10,7 @@ XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin), XBeeDevice(SerialInterfa
 void XbeeProSX::start()
 {
     pinMode(_cs_pin, OUTPUT);
+    digitalWrite(_cs_pin, HIGH);
 }
 
 void XbeeProSX::writeBytes(const char *data, size_t length_bytes)
@@ -18,8 +19,9 @@ void XbeeProSX::writeBytes(const char *data, size_t length_bytes)
     for (size_t i = 0; i < length_bytes; i++)
     {
         uint8_t byte = SPI.transfer(data[i]);
+        // Serial.printf("%x ", byte);
     }
-    Serial.printf("\n");
+    // Serial.println();
     
     digitalWrite(_cs_pin, HIGH);
 }

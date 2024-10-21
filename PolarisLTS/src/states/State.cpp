@@ -105,7 +105,7 @@ void State::loop() {
 
   static const BLA::Matrix<3> hardIronCal = {54062.849827, 5545.343210, 89181.770655};
 
-  BLA::Matrix<3> magVector = {telemPacket.magX, telemPacket.magY, telemPacket.magZ};
+  BLA::Matrix<3> magVector = {telemPacket.rawMagX, telemPacket.rawMagY, telemPacket.rawMagZ};
 
   BLA::Matrix<3> magCal = softIronCal * (magVector - hardIronCal);
 

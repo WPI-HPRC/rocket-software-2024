@@ -29,8 +29,7 @@ AttitudeStateEstimator *attitudeStateEstimator = new AttitudeStateEstimator();
 
 #ifndef NO_SDCARD
 bool sdCardInitialized = false;
-FsFile dataFile;
-SdFs sd;
+File dataFile;
 #endif
 
 #ifndef NO_SERVO
@@ -44,26 +43,31 @@ XbeeProSX xbee = XbeeProSX(30); // CS 30
 void setup() {
   Serial.begin(9600);
 
-  while (!Serial)
-    ;
+#ifdef WAIT_FOR_SERIAL
+  while (!Serial) {
+    yield();
+  }
+#endif
   Wire.begin();
   Wire.setClock(400000);
 
   SPI.begin();
 
 #ifndef NO_SDCARD
-  if (sd.begin(SdSpiConfig(31, SHARED_SPI, SD_SCK_MHZ(50)))) {
+  if (SD.begin(31)) {
     int fileIdx = 0;
     while (1) {
       char filename[100];
       sprintf(filename, "flightData%d.bin", fileIdx++);
       Serial.printf("Trying file `%s`\n", filename);
-      if (!sd.exists(filename)) {
-        dataFile.open(filename, O_WRONLY | O_CREAT);
+      if (!SD.exists(filename)) {
+        dataFile = SD.open(filename, O_WRONLY | O_CREAT);
         break;
       }
     }
     sdCardInitialized = true;
+  } else {
+    Serial.println("SD Init failed");
   }
 #endif
 
@@ -75,6 +79,9 @@ void setup() {
     while (1) {
     };
   }
+
+  pinMode(6, OUTPUT);
+  digitalWrite(6, HIGH);
 
   state = (State *)new PreLaunch(&sensorBoard, attitudeStateEstimator);
 
@@ -96,8 +103,20 @@ void setup() {
 // sizeof(sensorBoard.Inertial_Baro_frame));
 // };
 
+bool val = false;
+long lastBlink = 0;
+
 void loop() {
   currentTime = millis();
+  if (currentTime - lastBlink >= 1000) {
+    lastBlink = currentTime;
+    val = !val;
+    if (sdCardInitialized) {
+      digitalWrite(6, HIGH);
+    } else {
+      digitalWrite(6, val);
+    }
+  }
   if (currentTime - previousTime >= (1000 / LOOP_RATE)) {
     previousTime = currentTime;
     state->loop();

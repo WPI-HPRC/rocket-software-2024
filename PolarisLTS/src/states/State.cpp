@@ -65,6 +65,10 @@ void State::loop() {
   this->telemPacket.temperature = this->sensors->Inertial_Baro_frame.Temperature;
   this->telemPacket.altitude = Utility::pressureToAltitude(this->telemPacket.pressure);
 
+  this->telemPacket.gpsLat = this->sensors->Inertial_Baro_frame.gps_lat;
+  this->telemPacket.gpsLong = this->sensors->Inertial_Baro_frame.gps_lon;
+  this->telemPacket.gpsLock = this->sensors->Inertial_Baro_frame.gps_lock;
+
 #ifndef NO_SERVO
   this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
 #endif
@@ -155,7 +159,7 @@ void State::loop() {
     start = millis();
     #endif
     if (loopCount % 5 == 0) {
-      SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+      SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
       xbee.sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket));
       SPI.endTransaction();
     }

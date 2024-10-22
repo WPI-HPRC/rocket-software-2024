@@ -3,6 +3,7 @@
 #include <SensorBoardLibraries/IMU/IMU_SB.h>
 #include <SensorBoardLibraries/Barometer/Barometer_SB.h>
 #include <SensorBoardLibraries/Magnetometer/Magnetometer_SB.h>
+#include <SparkFun_u-blox_GNSS_v3.h>
 #include "Config.h"
 #include "Sensor_Frames.hpp"
 // #include <libs/MMC5983/SparkFun_MMC5983MA_Arduino_Library.h>
@@ -19,7 +20,7 @@ class Sensorboard{
     // SFE_MMC5983MA mag;
     MMC5983MA mag = MMC5983MA(Wire, MAG_I2C_ADDRESS); // Magnetometer
     // MMC5983MA mag = MMC5983MA(Wire, MAG_I2C_ADDRESS); // Magnetometer
-    // SFE_UBLOX_GNSS gps; // GPS
+    SFE_UBLOX_GNSS gps; // GPS
 
     uint8_t Buffer[29] = {0};
     uint32_t MagData[3] = {0}; // x,y,z
@@ -36,7 +37,10 @@ class Sensorboard{
         if (!imu.setup()) return false;
         if (!barometer.setup()) return false;
         if (!mag.setup()) return false;
-        // if(!mag.begin()) return false;
+        if (!gps.begin()) return false;
+        gps.setI2COutput(COM_TYPE_UBX);
+        gps.setNavigationFrequency(40);
+        gps.setAutoPVT(true);
 
         // mag.softReset();
 
@@ -59,6 +63,12 @@ class Sensorboard{
 
         // mag.readSensor(*magData);
         this->ProcessBuffer();
+
+        Inertial_Baro_frame.gps_lat = gps.getLatitude();
+        Inertial_Baro_frame.gps_lon = gps.getLongitude();
+        Inertial_Baro_frame.gps_lock = gps.getGnssFixOk();
+        Inertial_Baro_frame.gps_alt_agl = gps.getAltitude();
+        Inertial_Baro_frame.gps_alt_agl = gps.getAltitudeMSL();
     }
 
     void ProcessBuffer(){

@@ -13,4 +13,11 @@ struct SensorFrame
     float mag_z;
     float Pressure; // Pressure in mBar
     float Temperature; // Temperature in degrees C
+    float gps_lat;
+    float gps_lon;
+    float gps_satellites;
+    bool gps_lock;
+    float gps_alt_agl;
+    float gps_alt_msl;
+    uint32_t gps_epoch_time;
 };

@@ -76,8 +76,8 @@ void setup() {
     Serial.println("[Polaris] Sensor Setup Complete!");
   } else {
     Serial.println("[Polaris] Sensor Setup Failed!");
-    while (1) {
-    };
+    // while (1) {
+    // };
   }
 
   pinMode(6, OUTPUT);

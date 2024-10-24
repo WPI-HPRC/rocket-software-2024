@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 #include <BasicLinearAlgebra.h>
-#include "../../src/utility.hpp"
+#include "utility.hpp"
 
 /**
  * @author @frostydev99 - Daniel Pearson
@@ -19,7 +19,7 @@ class AttitudeStateEstimator {
 
     BLA::Matrix<3,3> quat2rotm(BLA::Matrix<4> q);
 
-    BLA::Matrix<4> x;
+    BLA::Matrix<10> x;
 
     bool initialized = false;
     
@@ -32,21 +32,26 @@ class AttitudeStateEstimator {
     const float accelZ_Var = 0.00686; // [m/s^2]
     const float gyroVar = 0.000489; // [rad/s]
     const float magVar = 120; // [nT]
+
+    // Bias Variance - (TUNABLE)
+    const float std_dev_gyrBias  = 0.001;
+    const float std_dev_accBias  = 0.001;
+
+
     float dt = 1.0 / LOOP_RATE;
 
-    BLA::Matrix<4,4> P = {
-        1,0,0,0,
-        0,1,0,0,
-        0,0,1,0,
-        0,0,0,1
-    }; // Process Error Covariance
+    // BLA::Matrix<4,4> P = {
+    //     1,0,0,0,
+    //     0,1,0,0,
+    //     0,0,1,0,
+    //     0,0,0,1
+    // }; // Process Error Covariance
 
-    BLA::Matrix<4,4> P_min = {
-        1,0,0,0,
-        0,1,0,0,
-        0,0,1,0,
-        0,0,0,1
-    }; // Process Error Covariance
+    // Initialize Error Covariance
+    BLA::Matrix<10,10> P;
+
+    // Initialize Process Noise Covariance
+    BLA::Matrix<10,10> Q_k;
 
     const BLA::Matrix<6,6> R = {
         accelXY_Var*accelXY_Var, 0, 0, 0, 0, 0,
@@ -62,23 +67,17 @@ class AttitudeStateEstimator {
         0, gyroVar*gyroVar, 0,
         0, 0, gyroVar*gyroVar
     };
-    
-    const BLA::Matrix<4,4> eye4 = {
-        1,0,0,0,
-        0,1,0,0,
-        0,0,1,0,
-        0,0,0,1,
-    }; // 10 Element Identity Matrix
 
-    BLA::Matrix<4> measurementFunction(BLA::Matrix<6> u);
-    BLA::Matrix<4,4> measurementJacobian(BLA::Matrix<6> u);
+    BLA::Matrix<10> measurementFunction(BLA::Matrix<10> x_temp, BLA::Matrix<6> u);
+    BLA::Matrix<10,10> measurementJacobian(BLA::Matrix<10> x_temp, BLA::Matrix<6> u);
 
     BLA::Matrix<6> updateFunction();
     BLA::Matrix<6,4> updateJacobian();
 
     BLA::Matrix<4,3> updateModelCovariance(Utility::TelemPacket sensorPacket);
 
-    BLA::Matrix<4> x_min;
+    BLA::Matrix<10> x_min;
+    BLA::Matrix<10,10> P_min;
 
     constexpr static float g = Utility::g;
 

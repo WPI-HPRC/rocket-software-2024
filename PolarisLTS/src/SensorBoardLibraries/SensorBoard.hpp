@@ -67,6 +67,7 @@ class Sensorboard{
         Inertial_Baro_frame.gps_lat = gps.getLatitude();
         Inertial_Baro_frame.gps_lon = gps.getLongitude();
         Inertial_Baro_frame.gps_lock = gps.getGnssFixOk();
+        Inertial_Baro_frame.gps_satellites = gps.getSIV();
         Inertial_Baro_frame.gps_alt_agl = gps.getAltitude();
         Inertial_Baro_frame.gps_alt_agl = gps.getAltitudeMSL();
     }

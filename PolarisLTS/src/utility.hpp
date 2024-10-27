@@ -25,8 +25,8 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
-#define SERVO_FEEDBACK_GPIO 27
-#define SERVO_PWM_GPIO 20
+#define SERVO_FEEDBACK_PIN 27
+#define SERVO_PWM_PIN 7
 #define BUZZER_PIN 14
 
 // FIXME: This seems bad but I need somewhere to track this and I don't want to have to pass it to every state constructor

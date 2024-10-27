@@ -1,4 +1,6 @@
 #include "EKF/AttitudeEKF.h"
+#include "FlightParams.hpp"
+#include "SpiDriver/SdSpiDriver.h"
 #include <Arduino.h>
 #include <Metro.h>
 
@@ -34,6 +36,10 @@ File dataFile;
 
 #ifndef NO_SERVO
 Servo airbrakesServo = Servo();
+// Servo s1 = Servo();
+// Servo s2 = Servo();
+// Servo s3 = Servo();
+// Servo s4 = Servo();
 #endif
 
 #ifndef NO_XBEE
@@ -54,7 +60,9 @@ void setup() {
   SPI.begin();
 
 #ifndef NO_SDCARD
-  if (SD.begin(31)) {
+  // XXX: If using 5v only SD breakout board, make sure the first line is uncommented and the second line commented
+  if (SD.sdfs.begin(31, SPI_SIXTEENTH_SPEED)) { // REQUIRED for the non 3.3v tolerant SD breakout boards to work
+  // if (SD.begin(31)) {
     int fileIdx = 0;
     while (1) {
       char filename[100];
@@ -84,6 +92,14 @@ void setup() {
   digitalWrite(6, HIGH);
 
   state = (State *)new PreLaunch(&sensorBoard, attitudeStateEstimator);
+
+#ifndef NO_SERVO
+  airbrakesServo.attach(SERVO_PWM_PIN);
+  // s1.attach(25);
+  // s2.attach(24);
+  // s3.attach(8);
+  // s4.attach(7);
+#endif
 
   state->initialize();
 
@@ -117,6 +133,25 @@ void loop() {
       digitalWrite(6, val);
     }
   }
+
+  // s1.write(2000);
+  // s2.write(1100);
+  // s3.write(2000);
+  // s4.write(1100);
+
+  // Serial.println(analogRead(20));
+  // airbrakesServo.write(AIRBRAKE_RETRACTED);
+  // delay(1000);
+  // airbrakesServo.write(AIRBRAKE_25_EXTENSION);
+  // delay(1000);
+  // airbrakesServo.write(AIRBRAKE_HALF_EXTENSION);
+  // delay(1000);
+  // airbrakesServo.write(AIRBRAKE_75_EXTENSION);
+  // delay(1000);
+  // airbrakesServo.write(AIRBRAKE_FULL_EXTENSION);
+  // delay(1000);
+
+  // return;
   if (currentTime - previousTime >= (1000 / LOOP_RATE)) {
     previousTime = currentTime;
     state->loop();

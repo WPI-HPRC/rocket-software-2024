@@ -71,7 +71,7 @@ void State::loop() {
   this->telemPacket.satellites = this->sensors->Inertial_Baro_frame.gps_satellites;
 
 #ifndef NO_SERVO
-  this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_GPIO);
+  this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_PIN);
 #endif
 
   // this->telemPacket.gpsLat = this->sensorPacket.gpsLat;

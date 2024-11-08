@@ -1,0 +1,11 @@
+--- .pio/libdeps/airbrake-test/ESP8266SdFat/src/SdFatConfig.h	2024-06-17 13:40:28.897689193 -0400
++++ patches/pico/SdFatConfig.h	2024-06-17 13:16:15.307788532 -0400
+@@ -121,7 +121,7 @@
+  * 3 - An external SPI driver derived from SdSpiBaseClass is always used.
+  */
+ #ifndef SPI_DRIVER_SELECT
+-#define SPI_DRIVER_SELECT 0
++#define SPI_DRIVER_SELECT 3
+ #endif  // SPI_DRIVER_SELECT
+ /**
+  * If USE_SPI_ARRAY_TRANSFER is one and the standard SPI library is

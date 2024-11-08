@@ -76,15 +76,15 @@ void AttitudeStateEstimator::onLoop(Utility::TelemPacket telemPacket)
 
     // Convert Accel values to m/s/s
         // Subtract current bias estimate
-    float accX = telemPacket.accelX * g - x(8);
-    float accY = telemPacket.accelY * g - x(9);
-    float accZ = telemPacket.accelZ * g - x(10);
+    float accX = telemPacket.accelX * g - x(7);
+    float accY = telemPacket.accelY * g - x(8);
+    float accZ = telemPacket.accelZ * g - x(9);
 
     // Convert gyro values from deg/s to rad/s
         // Subtract current bias estimate
-    float gyrX = telemPacket.gyroX * (PI / 180) - x(5);
-    float gyrY = telemPacket.gyroY * (PI / 180) - x(6);
-    float gyrZ = telemPacket.gyroZ * (PI / 180) - x(7);
+    float gyrX = telemPacket.gyroX * (PI / 180) - x(4);
+    float gyrY = telemPacket.gyroY * (PI / 180) - x(5);
+    float gyrZ = telemPacket.gyroZ * (PI / 180) - x(6);
 
     float magX = telemPacket.magX;
     float magY = telemPacket.magY;
@@ -92,19 +92,20 @@ void AttitudeStateEstimator::onLoop(Utility::TelemPacket telemPacket)
 
     BLA::Matrix<6> u = {gyrX, gyrY, gyrZ, accX, accY, accZ};
 
-    BLA::Matrix<10> x_temp = x;
-    
-    BLA::Matrix<10> k1 = measurementFunction(x_temp, u) * dt;
-    BLA::Matrix<10> k2 = measurementFunction(x_temp + (k1 * 0.5f), u) * dt;
-    BLA::Matrix<10> k3 = measurementFunction(x_temp + (k2 * 0.5f), u) * dt;
-    BLA::Matrix<10> k4 = measurementFunction(x_temp + k3, u) * dt;
+    // First order, forward euler
+    BLA::Matrix<10> k1 = measurementFunction(u) * dt;
+    // BLA::Matrix<10> k2 = measurementFunction(x_temp + (k1 * 0.5f), u) * dt;
+    // BLA::Matrix<10> k3 = measurementFunction(x_temp + (k2 * 0.5f), u) * dt;
+    // BLA::Matrix<10> k4 = measurementFunction(x_temp + k3, u) * dt;
 
-    // x_min = x_temp + k1 * (1.0f/6.0f) + k2 * (1.0f/3.0f) + k3 * (1.0f/3.0f) + k4 * (1.0f/6.0f);
     x_min = x + k1;
 
-    BLA::Matrix<10,10> F = measurementJacobian(x, u);
+    BLA::Matrix<10,10> F = measurementJacobian(u);
 
-    BLA::Matrix<10,10> phi = BLA::Eye<10,10>() + F * dt;
+    // // x_min = x_temp + k1 * (1.0f/6.0f) + k2 * (1.0f/3.0f) + k3 * (1.0f/3.0f) + k4 * (1.0f/6.0f);
+    // x_min = x + k1;
+
+    BLA::Matrix<10,10> phi = BLA::Eye<10,10>() + (F * dt);
 
     P_min = phi * P * BLA::MatrixTranspose<BLA::Matrix<10,10>>(phi) + Q_k;
 
@@ -116,6 +117,14 @@ void AttitudeStateEstimator::onLoop(Utility::TelemPacket telemPacket)
     for (int i = 0; i < x.Rows; i++) {
         for (int j = 0; j < x.Cols; j++) {
             Serial.print(String(x(i,j)) + "\t");
+        }
+        Serial.println("");
+    }
+
+    Serial.println("<----- Error Covariance ----->");
+    for (int i = 0; i < P.Rows; i++) {
+        for (int j = 0; j < P.Cols; j++) {
+            Serial.print(String(P(i,j)) + "\t");
         }
         Serial.println("");
     }
@@ -195,46 +204,58 @@ void AttitudeStateEstimator::onLoop(Utility::TelemPacket telemPacket)
     // }
 }
 
-BLA::Matrix<10> AttitudeStateEstimator::measurementFunction(BLA::Matrix<10> x_temp, BLA::Matrix<6> u)
+BLA::Matrix<10> AttitudeStateEstimator::measurementFunction(BLA::Matrix<6> u)
 {
     float p = u(0);
     float q = u(1);
     float r = u(2);
 
-    BLA::Matrix<4,4> quatMat = {
-        0, -p, -q, -r,
-        p,  0,  r, -q,
-        q, -r,  0,  p,
-        r,  q, -p,  0,
+    BLA::Matrix<4,3> quatMat = {
+        -x(1), -x(2), -x(3),
+         x(0), -x(3),  x(2),
+         x(3),  x(0), -x(1),
+        -x(2),  x(1),  x(0)
     };
 
-    BLA::Matrix<4,1> quat = {x_temp(0), x_temp(1), x_temp(2), x_temp(3)};
+    quatMat = quatMat * 0.5f;
 
-    BLA::Matrix<4,1> f_q = quatMat * quat;
+    BLA::Matrix<3> w_ib_b = {p, q, r};
 
-    BLA::Matrix<10,1> f = {f_q(0), f_q(1), f_q(2), f_q(3), 0, 0, 0, 0, 0, 0};
+    BLA::Matrix<4> f_q = quatMat * w_ib_b;
+
+    BLA::Matrix<10> f = {f_q(0), f_q(1), f_q(2), f_q(3), 0, 0, 0, 0, 0, 0};
 
     return f;
 };
 
-BLA::Matrix<10,10> AttitudeStateEstimator::measurementJacobian(BLA::Matrix<10> x_temp, BLA::Matrix<6> u) {
+BLA::Matrix<10,10> AttitudeStateEstimator::measurementJacobian(BLA::Matrix<6> u) {
     float p = u(0);
     float q = u(1);
     float r = u(2);
 
-    BLA::Matrix<10,10> F = {
-        0, x(4)/2 - p/2, x(4)/2 - q/2, x(6)/2 - r/2,   x(1)/2 + x(2)/2, 0,  x(3)/2, 0, 0, 0,
-        p/2 - x(4)/2,          0, r/2 - x(6)/2, x(4)/2 - q/2,   x(3)/2 - x(0)/2, 0, -x(2)/2, 0, 0, 0,
-        q/2 - x(4)/2, x(6)/2 - r/2,          0, p/2 - x(4)/2, - x(0)/2 - x(3)/2, 0,  x(1)/2, 0, 0, 0,
-        r/2 - x(6)/2, q/2 - x(4)/2, x(4)/2 - p/2,          0,   x(2)/2 - x(1)/2, 0, -x(0)/2, 0, 0, 0,
-        0,          0,          0,          0,             0, 0,     0, 0, 0, 0,
-        0,          0,          0,          0,             0, 0,     0, 0, 0, 0,
-        0,          0,          0,          0,             0, 0,     0, 0, 0, 0,
-        0,          0,          0,          0,             0, 0,     0, 0, 0, 0,
-        0,          0,          0,          0,             0, 0,     0, 0, 0, 0,
-        0,          0,          0,          0,             0, 0,     0, 0, 0, 0,
-    };
+    float gbx = x(4);
+    float gby = x(5);
+    float gbz = x(6);
 
+    float qw = x(0);
+    float qx = x(1);
+    float qy = x(2);
+    float qz = x(3);
+
+    BLA::Matrix<10,10> F = {
+        0, gbx/2 - p/2, gby/2 - q/2, gbz/2 - r/2,  qx/2,  qy/2,  qz/2, 0, 0, 0,
+        p/2 - gbx/2,           0, r/2 - gbz/2, gby/2 - q/2, -qw/2,  qz/2, -qy/2, 0, 0, 0,
+        q/2 - gby/2, gbz/2 - r/2,           0, p/2 - gbx/2, -qz/2, -qw/2,  qx/2, 0, 0, 0,
+        r/2 - gbz/2, q/2 - gby/2, gbx/2 - p/2,           0,  qy/2, -qx/2, -qw/2, 0, 0, 0,
+                  0,           0,           0,           0,     0,     0,     0, 0, 0, 0,
+                  0,           0,           0,           0,     0,     0,     0, 0, 0, 0,
+                  0,           0,           0,           0,     0,     0,     0, 0, 0, 0,
+                  0,           0,           0,           0,     0,     0,     0, 0, 0, 0,
+                  0,           0,           0,           0,     0,     0,     0, 0, 0, 0,
+                  0,           0,           0,           0,     0,     0,     0, 0, 0, 0,
+    };
+    
+    return F;
 
 }
 

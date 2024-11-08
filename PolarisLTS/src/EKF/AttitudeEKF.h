@@ -68,8 +68,8 @@ class AttitudeStateEstimator {
         0, 0, gyroVar*gyroVar
     };
 
-    BLA::Matrix<10> measurementFunction(BLA::Matrix<10> x_temp, BLA::Matrix<6> u);
-    BLA::Matrix<10,10> measurementJacobian(BLA::Matrix<10> x_temp, BLA::Matrix<6> u);
+    BLA::Matrix<10> measurementFunction(BLA::Matrix<6> u);
+    BLA::Matrix<10,10> measurementJacobian(BLA::Matrix<6> u);
 
     BLA::Matrix<6> updateFunction();
     BLA::Matrix<6,4> updateJacobian();

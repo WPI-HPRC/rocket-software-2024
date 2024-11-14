@@ -28,9 +28,9 @@ class AttitudeStateEstimator {
 
     // Declare sensor variance from datasheets
 
-    const float accelXY_Var = 0.00637; // [m/s^2]
-    const float accelZ_Var = 0.00686; // [m/s^2]
-    const float gyroVar = 0.000489; // [rad/s]
+    const float accelXY_Var = 0.0006374; // [m/s^2]
+    const float accelZ_Var = 0.0006864655; // [m/s^2]
+    const float gyroVar = 0.0000488692; // [rad/s]
     const float magVar = 120; // [nT]
     float dt = 1.0 / LOOP_RATE;
 

@@ -23,6 +23,8 @@ public:
 
     void log(const char *format, ...) override;
 
+    void _handleTransmitStatus(uint8_t frameID, uint8_t statusCode) override;
+
 private:
     uint8_t _cs_pin;
 

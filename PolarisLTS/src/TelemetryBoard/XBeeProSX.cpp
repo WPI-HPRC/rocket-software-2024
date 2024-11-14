@@ -22,6 +22,11 @@ void XbeeProSX::writeBytes_spi(char *data_io, size_t length_bytes)
     digitalWrite(_cs_pin, HIGH);
 }
 
+void XbeeProSX::_handleTransmitStatus(uint8_t frameID, uint8_t statusCode)
+{
+    Serial.log("Received Transmit Status!?");
+}
+
 void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
 {
 

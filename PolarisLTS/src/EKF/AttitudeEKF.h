@@ -35,8 +35,8 @@ class AttitudeStateEstimator {
     const float magVar = 120; // [nT]
 
     // Bias Variance - (TUNABLE)
-    const float std_dev_gyrBias  = 0.0005;
-    const float std_dev_accBias  = 0.0005;
+    const float std_dev_gyrBias  = 0.05;
+    const float std_dev_accBias  = 0.05;
 
 
     float dt = 1.0 / LOOP_RATE;

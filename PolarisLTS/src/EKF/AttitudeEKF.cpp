@@ -34,12 +34,12 @@ void AttitudeStateEstimator::init(BLA::Matrix<4> initialOrientation, float dt) {
 
     // Initialize random small number (tunable) for gyro bias covariance
     for (int i = 4; i < 7; i++) {
-        P(i, i) = 0.0001;
+        P(i, i) = 0.1;
     }
 
     // Intialize random small number (tunable) for accel bias covariance
     for (int i = 7; i < 10; i++) {
-        P(i, i) = 0.0001;
+        P(i, i) = 0.1;
     }
 
     /* ---- Initialize Process Noise covariance ----- */
@@ -127,13 +127,27 @@ void AttitudeStateEstimator::onLoop(Utility::TelemPacket telemPacket)
 
     P = (BLA::Eye<10,10>() - K*H) * P_min;
 
-    Serial.println("<----- State ----->");
-    for (int i = 0; i < x.Rows; i++) {
-        for (int j = 0; j < x.Cols; j++) {
-            Serial.print(String(x(i,j)) + "\t");
-        }
-        Serial.println("");
-    }
+    Serial.print(">GbX:");
+    Serial.println(x(4));
+    Serial.print(">GbY:");
+    Serial.println(x(5));
+    Serial.print(">GbZ:");
+    Serial.println(x(6));
+
+    Serial.print(">AbX:");
+    Serial.println(x(7));
+    Serial.print(">AbY:");
+    Serial.println(x(8));
+    Serial.print(">AbZ:");
+    Serial.println(x(9));
+
+    // Serial.println("<----- State ----->");
+    // for (int i = 0; i < x.Rows; i++) {
+    //     for (int j = 0; j < x.Cols; j++) {
+    //         Serial.print(String(x(i,j)) + "\t");
+    //     }
+    //     Serial.println("");
+    // }
 
     Serial.println("<----- Error Covariance ----->");
     for (int i = 0; i < P.Rows; i++) {

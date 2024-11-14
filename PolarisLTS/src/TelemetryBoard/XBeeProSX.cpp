@@ -13,15 +13,11 @@ void XbeeProSX::start()
     digitalWrite(_cs_pin, HIGH);
 }
 
-void XbeeProSX::writeBytes(const char *data, size_t length_bytes)
+void XbeeProSX::writeBytes_spi(char *data_io, size_t length_bytes)
 {
     digitalWrite(_cs_pin, LOW);
-    for (size_t i = 0; i < length_bytes; i++)
-    {
-        uint8_t byte = SPI.transfer(data[i]);
-        // Serial.printf("%x ", byte);
-    }
-    // Serial.println();
+    
+    SPI.transfer((const uint8_t *)data_io, length_bytes);
     
     digitalWrite(_cs_pin, HIGH);
 }

@@ -9,7 +9,7 @@ class XbeeProSX: public XBeeDevice {
 public:
     XbeeProSX(uint8_t cs_pin);
 
-    void writeBytes(const char *data, size_t length_bytes) override;
+    void writeBytes_spi(char *data_io, size_t length_bytes) override;
 
     void handleReceivePacket(XBee::ReceivePacket::Struct *frame) override;
 

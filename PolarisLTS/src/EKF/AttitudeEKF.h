@@ -30,12 +30,13 @@ class AttitudeStateEstimator {
 
     const float accelXY_Var = 0.00637; // [m/s^2]
     const float accelZ_Var = 0.00686; // [m/s^2]
-    const float gyroVar = 0.000489; // [rad/s]
+    // const float gyroVar = 0.000489; // [rad/s]
+    const float gyroVar = 0.00000854; // [rad/s]
     const float magVar = 120; // [nT]
 
     // Bias Variance - (TUNABLE)
-    const float std_dev_gyrBias  = 0.001;
-    const float std_dev_accBias  = 0.001;
+    const float std_dev_gyrBias  = 0.0005;
+    const float std_dev_accBias  = 0.0005;
 
 
     float dt = 1.0 / LOOP_RATE;
@@ -53,14 +54,20 @@ class AttitudeStateEstimator {
     // Initialize Process Noise Covariance
     BLA::Matrix<10,10> Q_k;
 
-    const BLA::Matrix<6,6> R = {
-        accelXY_Var*accelXY_Var, 0, 0, 0, 0, 0,
-        0, accelXY_Var*accelXY_Var, 0, 0, 0, 0,
-        0, 0, accelZ_Var*accelZ_Var, 0, 0, 0,
-        0, 0, 0, magVar*magVar, 0, 0,
-        0, 0, 0, 0, magVar*magVar, 0,
-        0, 0, 0, 0, 0, magVar*magVar
-    }; // Sensor Noise Covariance - Accel and Mag
+    // const BLA::Matrix<6,6> R = {
+    //     accelXY_Var*accelXY_Var, 0, 0, 0, 0, 0,
+    //     0, accelXY_Var*accelXY_Var, 0, 0, 0, 0,
+    //     0, 0, accelZ_Var*accelZ_Var, 0, 0, 0,
+    //     0, 0, 0, magVar*magVar, 0, 0,
+    //     0, 0, 0, 0, magVar*magVar, 0,
+    //     0, 0, 0, 0, 0, magVar*magVar
+    // }; // Sensor Noise Covariance - Accel and Mag
+
+    const BLA::Matrix<3,3> R = {
+        accelXY_Var*accelXY_Var, 0, 0,
+        0, accelXY_Var*accelXY_Var, 0,
+        0, 0, accelZ_Var*accelZ_Var
+    };
 
     const BLA::Matrix<3,3> Sigma_gyro = {
         gyroVar*gyroVar, 0, 0,
@@ -71,10 +78,8 @@ class AttitudeStateEstimator {
     BLA::Matrix<10> measurementFunction(BLA::Matrix<6> u);
     BLA::Matrix<10,10> measurementJacobian(BLA::Matrix<6> u);
 
-    BLA::Matrix<6> updateFunction();
-    BLA::Matrix<6,4> updateJacobian();
-
-    BLA::Matrix<4,3> updateModelCovariance(Utility::TelemPacket sensorPacket);
+    BLA::Matrix<3> updateFunction();
+    BLA::Matrix<3,10> updateJacobian();
 
     BLA::Matrix<10> x_min;
     BLA::Matrix<10,10> P_min;

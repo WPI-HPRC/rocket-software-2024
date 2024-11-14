@@ -10,10 +10,12 @@ const uint8_t IMU_I2C_ADDRESS = 0x68;
 // IMU Register sets - LOOK AT THE DATASHEET FOR MORE INFO
 const uint8_t SENSOR_ENABLE = 0x0F; // 0000 1111 = Enable all sensors
 
-const uint8_t ACCEL_ODR = 0x05; // 0000 0101 = 2 kHz 
+// const uint8_t ACCEL_ODR = 0x05; // 0000 0101 = 2 kHz 
+const uint8_t ACCEL_ODR    = 0x07; // 0000 0111 = 200Hz
 const uint8_t ACCEL_FS_SEL = 0x00; // 0000 0000 = +/- 16g
 
-const uint8_t GYRO_ODR = 0x05; // 0000 0101 = 2 kHz
+// const uint8_t GYRO_ODR = 0x05; // 0000 0101 = 2 kHz
+const uint8_t GYRO_ODR    = 0x07; // 0000 0111 = 200Hz
 const uint8_t GYRO_FS_SEL = 0x00; // 0000 0000 = +/- 2000 deg/s
 
 // ACCEL AAF: 3dB cutoff frequency: 126 Hz

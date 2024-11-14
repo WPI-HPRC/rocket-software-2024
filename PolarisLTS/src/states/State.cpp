@@ -102,20 +102,23 @@ void State::loop() {
   /* Apply Magnetometer Calibration */
 
   static const BLA::Matrix<3,3> softIronCal = {
-     1.120602,    -0.003242,   0.005510,
-    -0.003242,     1.143276,   0.013794,
-     0.005510,     0.013794,   1.104641,
+      0.9528,   -0.0462,    0.0153,
+     -0.0462,    1.0266,    0.0041,
+      0.0153,    0.0041,    1.0248
   };
 
-  static const BLA::Matrix<3> hardIronCal = {54062.849827, 5545.343210, 89181.770655};
+  static const BLA::Matrix<3> hardIronCal = {0.4172, -0.2165, 0.2624};
 
   BLA::Matrix<3> magVector = {telemPacket.rawMagX, telemPacket.rawMagY, telemPacket.rawMagZ};
 
   BLA::Matrix<3> magCal = softIronCal * (magVector - hardIronCal);
 
-  this->telemPacket.magX = magCal(0);
-  this->telemPacket.magY = magCal(1);
-  this->telemPacket.magZ = magCal(2);
+  // this->telemPacket.magX = magCal(0);
+  // this->telemPacket.magY = magCal(1);
+  // this->telemPacket.magZ = magCal(2);
+  this->telemPacket.magX = magVector(0);
+  this->telemPacket.magY = magVector(1);
+  this->telemPacket.magZ = magVector(2);
 
 	if (this->attitudeStateEstimator->initialized) {
     #ifdef PRINT_TIMINGS

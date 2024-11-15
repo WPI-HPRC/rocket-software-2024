@@ -9,17 +9,19 @@ constexpr static float rocketMass = 22.745; // [kg] Rocket mass from ORK
 constexpr static float C_d = 0.5; // Eyeball averaged from ORK
 constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2] Cross Sectional Area -- Body Tube + 4 Fins
 
+// #define SERVO_TEST
+
 // Debug things
 // #ifdef DEBUG_MODE
 
-#define NO_TRANSITION
-#define NO_FLASH
+// #define NO_TRANSITION
+// #define NO_FLASH
 // #define NO_XBEE
-#define SERIAL_TELEMETRY
+// #define SERIAL_TELEMETRY
 // #define WAIT_FOR_SERIAL
 // #define NO_SDCARD
 // #define NO_SERVO
-#define PRINT_TIMINGS
+// #define PRINT_TIMINGS
 
 // #endif
 
@@ -44,7 +46,7 @@ constexpr static float S_r = (PI/4) * (0.1524*0.1524) + (0.00088386*4); // [m^2]
     // time in Launch > 2 * MOTOR_BURN_TIME
 
 // 3.1 second timeout, as defined in OpenRocket for IREC 2024
-constexpr float MOTOR_BURN_TIME = 3 * 1000.0;
+constexpr float MOTOR_BURN_TIME = 2.2 * 1000.0;
 
 // Acceleration threshold for burnout detection, in G's
 // checking if average Z acceleration is less than 0.3 G's
@@ -58,25 +60,34 @@ constexpr float MOTOR_BURN_TIME = 3 * 1000.0;
 
 // Check and verify extension numbers
 #define AIRBRAKE_FULL_EXTENSION 1775
-#define AIRBRAKE_75_EXTENSION 1734
-#define AIRBRAKE_HALF_EXTENSION 1693
-#define AIRBRAKE_25_EXTENSION 1651
+// #define AIRBRAKE_75_EXTENSION 1734
+// #define AIRBRAKE_HALF_EXTENSION 1693
+// #define AIRBRAKE_25_EXTENSION 1651
+#define AIRBRAKE_75_EXTENSION 1680
+#define AIRBRAKE_HALF_EXTENSION 1600
+#define AIRBRAKE_25_EXTENSION 1540
 #define AIRBRAKE_RETRACTED 1500
 
 // Airbrake profile
 // How long to wait after motor burnout before using the airbrakes (ms)
-constexpr int AIRBRAKE_WAIT_AFTER_TRANSITION = 1000 * 0;
+constexpr int AIRBRAKE_WAIT_AFTER_TRANSITION = 1000 * 2;
 // How far to extend for the first airbrake step (%)
-#define AIRBRAKE_FIRST_EXTENSION AIRBRAKE_HALF_EXTENSION
+#define AIRBRAKE_FIRST_EXTENSION AIRBRAKE_25_EXTENSION
 // How long to stay at the first extension (ms)
 constexpr int AIRBRAKE_FIRST_EXTENSION_TIME = 1000 * 2;
 // How far to extend for the second airbrake step (%)
-#define AIRBRAKE_SECOND_EXTENSION AIRBRAKE_FULL_EXTENSION
+#define AIRBRAKE_SECOND_EXTENSION AIRBRAKE_HALF_EXTENSION
 // How long to stay at the second extension (ms)
-constexpr int AIRBRAKE_SECOND_EXTENSION_TIME = 1000 * 3; 
+constexpr int AIRBRAKE_SECOND_EXTENSION_TIME = 1000 * 2; 
+
+#define AIRBRAKE_THIRD_EXTENSION AIRBRAKE_75_EXTENSION
+constexpr int AIRBRAKE_THIRD_EXTENSION_TIME = 1000 * 2; 
+
+#define AIRBRAKE_FOURTH_EXTENSION AIRBRAKE_FULL_EXTENSION
+constexpr int AIRBRAKE_FOURTH_EXTENSION_TIME = 1000 * 2; 
 
 // seconds, OpenRocket for IREC 2024
-constexpr float TIME_IN_COAST = 22 * 1000.0;
+constexpr float TIME_IN_COAST = 13.8 * 1000.0;
 
 // DrogueDescent -------------------------
 // DrogueDescent to MainDescent Conditions
@@ -85,16 +96,18 @@ constexpr float TIME_IN_COAST = 22 * 1000.0;
     // time in DrogueDescent > 1.2 * TIME_IN_DROGUE_DESCENT
 
 // converts ft/s to m/s
-#define FPS_TO_MPS 3.281
+#define FEET_TO_METERS 3.281
 
 // Given in FPS from OpenRocket, convert to m/s 
-// checking if average vertical velocity is less than or equal to 82.6 ft/s
-// constexpr float MAIN_DEPLOY_VELOCITY = 82.6 / FPS_TO_MPS;
+// checking if average vertical velocity is less than or equal to 18 ft/s
+// constexpr float MAIN_DEPLOY_VELOCITY = 18 / FPS_TO_MPS;
 // m/s, OpenRocket for IREC 2024
-constexpr float MAIN_DEPLOY_VELOCITY = 23;
+constexpr float MAIN_DEPLOY_VELOCITY = 18 / FEET_TO_METERS;
+
+constexpr float MAIN_DEPLOY_ALTITUDE = 1500 / FEET_TO_METERS;
 
 // seconds, OpenRocket for IREC 2024
-constexpr float TIME_IN_DROGUE_DESCENT = 115.5 * 1000.0;
+constexpr float TIME_IN_DROGUE_DESCENT = 30 * 1000.0;
 
 // MainDescent -------------------------
 // MainDescent to Recovery Conditions
@@ -103,7 +116,7 @@ constexpr float TIME_IN_DROGUE_DESCENT = 115.5 * 1000.0;
     // time in MainDescent > 1.1 * TIME_IN_MAIN_DESCENT
 
 // 88 seconds, OpenRocket for IREC 2024
-constexpr float TIME_IN_MAIN_DESCENT = 90.0 * 1000.0;
+constexpr float TIME_IN_MAIN_DESCENT = 80.0 * 1000.0;
 
 // Upper bound for landing velocity
 // checking if average vertical velocity is less than 5 m/s

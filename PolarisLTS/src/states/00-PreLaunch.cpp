@@ -1,6 +1,7 @@
 #include "00-PreLaunch.h"
 #include "State.h"
 #include "01-Launch.h"
+#include "02-Coast.h"
 #include "utility.hpp"
 
 PreLaunch::PreLaunch(Sensorboard *sensors, AttitudeStateEstimator *attitudeStateEstimator) : State(sensors, attitudeStateEstimator) {}
@@ -85,16 +86,23 @@ void PreLaunch::loop_impl()
 
         this->attitudeStateEstimator->init(q_0, 0.025);
         
+        launchAltitude = telemPacket.altitude;
         Serial.println("[Prelaunch] Initialized Attitude EKF");
     }
 }
 
 State *PreLaunch::nextState_impl()
 {
+    #ifdef SERVO_TEST
+    if (attitudeStateEstimator->initialized) {
+        return new Coast(sensors, attitudeStateEstimator);
+    }
+    #else
     if (launched)
     {
         return new Launch(sensors, attitudeStateEstimator);
     }
+    #endif
 
     return nullptr;
 }

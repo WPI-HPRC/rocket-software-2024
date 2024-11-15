@@ -69,6 +69,9 @@ void State::loop() {
   this->telemPacket.gpsLong = this->sensors->Inertial_Baro_frame.gps_lon;
   this->telemPacket.gpsLock = this->sensors->Inertial_Baro_frame.gps_lock;
   this->telemPacket.satellites = this->sensors->Inertial_Baro_frame.gps_satellites;
+  this->telemPacket.gpsVelN = this->sensors->Inertial_Baro_frame.gps_vel_n;
+  this->telemPacket.gpsVelE = this->sensors->Inertial_Baro_frame.gps_vel_e;
+  this->telemPacket.gpsVelD = this->sensors->Inertial_Baro_frame.gps_vel_d;
 
 #ifndef NO_SERVO
   this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_PIN);
@@ -118,6 +121,8 @@ void State::loop() {
   this->telemPacket.magY = magCal(1);
   this->telemPacket.magZ = magCal(2);
 
+  this->telemPacket.launchAltitude = launchAltitude;
+
 	if (this->attitudeStateEstimator->initialized) {
     #ifdef PRINT_TIMINGS
     start = millis();
@@ -131,6 +136,11 @@ void State::loop() {
 		this->telemPacket.i = this->attitudeStateEstimator->x(1);
 		this->telemPacket.j = this->attitudeStateEstimator->x(2);
 		this->telemPacket.k = this->attitudeStateEstimator->x(3);
+
+		this->telemPacket.covQW = this->attitudeStateEstimator->P(0,0);
+		this->telemPacket.covQX = this->attitudeStateEstimator->P(1,1);
+		this->telemPacket.covQY = this->attitudeStateEstimator->P(2,2);
+		this->telemPacket.covQZ = this->attitudeStateEstimator->P(3,3);
 
         // Serial.print("QUAT|"); Serial.print(telemPacket.w); Serial.print(",");
         // Serial.print(telemPacket.i); Serial.print(",");
@@ -161,7 +171,7 @@ void State::loop() {
     #endif
     if (loopCount % 5 == 0) {
       SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
-      xbee.sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket));
+      xbee.sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket) - 4 * 4 - 2);
       SPI.endTransaction();
     }
     #ifdef PRINT_TIMINGS

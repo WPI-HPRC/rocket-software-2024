@@ -37,10 +37,10 @@ State *Launch::nextState_impl()
     }
 
     // if state hasn't changed for much more than 2x motor burnout time, go to abort
-    if (this->currentTime > 2 * MOTOR_BURN_TIME)
-    {
-        return new Abort(sensors, attitudeStateEstimator);
-    }
+    // if (this->currentTime > 2 * MOTOR_BURN_TIME)
+    // {
+    //     return new Abort(sensors, attitudeStateEstimator);
+    // }
 
     return nullptr;
 }

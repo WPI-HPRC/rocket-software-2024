@@ -25,7 +25,7 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
-#define SERVO_FEEDBACK_PIN 27
+#define SERVO_FEEDBACK_PIN 20
 #define SERVO_PWM_PIN 7
 #define BUZZER_PIN 14
 
@@ -42,6 +42,8 @@ extern Servo airbrakesServo;
 #ifndef NO_XBEE
 extern XbeeProSX xbee;
 #endif
+
+extern float launchAltitude;
 
 class Utility
 {
@@ -131,6 +133,7 @@ public:
 
         // Calculated Values
         float altitude = 0.0f;
+        float launchAltitude = 0.0f;
         float magX = 0.0f;
         float magY = 0.0f;
         float magZ = 0.0f;
@@ -152,12 +155,22 @@ public:
         float gpsLong = 0.0f;
         float gpsAltMSL = 0.0f;
         float gpsAltAGL = 0.0f;
+        uint32_t gpsVelN = 0.0f;
+        uint32_t gpsVelE = 0.0f;
+        uint32_t gpsVelD = 0.0f;
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
         bool gpsLock = false;
 
         uint32_t loopCount = 0;
         uint32_t timestamp = 0;
+
+        float covQW = 0.0;
+        float covQX = 0.0;
+        float covQY = 0.0;
+        float covQZ = 0.0;
+        bool drougeDeploy = false;
+        bool mainDeploy = true;
 
 #ifdef SERIAL_TELEMETRY
         void debugPrint() {

@@ -68,7 +68,25 @@ void Coast::loop_impl()
         airbrakesServo.write(AIRBRAKE_SECOND_EXTENSION);
         if (this->currentTime - this->lastTransitionTime >= AIRBRAKE_SECOND_EXTENSION_TIME) {
             this->lastTransitionTime = this->currentTime;
+            this->servoState = THIRD_STEP;
+        }
+        break;
+    case THIRD_STEP:
+        airbrakesServo.write(AIRBRAKE_THIRD_EXTENSION);
+        if (this->currentTime - this->lastTransitionTime >= AIRBRAKE_THIRD_EXTENSION_TIME) {
+            this->lastTransitionTime = this->currentTime;
+            this->servoState = FOURTH_STEP;
+        }
+        break;
+    case FOURTH_STEP:
+        airbrakesServo.write(AIRBRAKE_FOURTH_EXTENSION);
+        if (this->currentTime - this->lastTransitionTime >= AIRBRAKE_FOURTH_EXTENSION_TIME) {
+            this->lastTransitionTime = this->currentTime;
+            #ifdef SERVO_TEST
+            this->servoState = WAIT;
+            #else
             this->servoState = DONE;
+            #endif
         }
         break;
     case DONE:
@@ -76,23 +94,29 @@ void Coast::loop_impl()
         break;
     }
 #endif
+
+    if (apogeePassed) {
+        telemPacket.drougeDeploy = true;
+    }
 }
 
 //! @details max 8 seconds until deploy
 State *Coast::nextState_impl()
 {
     // Transition state if condition met
+    #ifndef SERVO_TEST
     if (apogeePassed)
     {
         return new DrogueDescent(sensors, attitudeStateEstimator);
     }
+    #endif
 
     // if the state hasn't changed for much more than the expected COAST time, go to abort
     // 1.5 * TIME_IN_COAST == 28.5 seconds
-    if (this->currentTime > 1.5 * TIME_IN_COAST)
-    {
-        return new Abort(sensors, attitudeStateEstimator);
-    }
+    // if (this->currentTime > 1.5 * TIME_IN_COAST)
+    // {
+    //     return new Abort(sensors, attitudeStateEstimator);
+    // }
     return nullptr;
 }
 

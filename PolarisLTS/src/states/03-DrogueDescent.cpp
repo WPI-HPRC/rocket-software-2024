@@ -30,6 +30,10 @@ void DrogueDescent::loop_impl()
 
     // if the average vertical velocity is less that the expected velocity at main deploy for 30 cycles, main has deployed
     mainDeployVelocityReached = drogueDescentDebouncer.checkOut(abs(averageVerticalVelocity) <= MAIN_DEPLOY_VELOCITY);
+
+    if (telemPacket.altitude - telemPacket.launchAltitude < MAIN_DEPLOY_ALTITUDE) {
+        telemPacket.mainDeploy = true;
+    }
 }
 
 State *DrogueDescent::nextState_impl()

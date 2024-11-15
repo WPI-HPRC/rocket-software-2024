@@ -24,6 +24,8 @@ SensorFrame sensorFrame;
 uint64_t previousTime = 0;
 uint64_t currentTime = 0;
 
+float launchAltitude = -1;
+
 State *state;
 
 Sensorboard sensorBoard;
@@ -49,6 +51,8 @@ XbeeProSX xbee = XbeeProSX(30); // CS 30
 void setup() {
   Serial.begin(9600);
 
+  delay(1000);
+
 #ifdef WAIT_FOR_SERIAL
   while (!Serial) {
     yield();
@@ -61,12 +65,18 @@ void setup() {
 
 #ifndef NO_SDCARD
   // XXX: If using 5v only SD breakout board, make sure the first line is uncommented and the second line commented
-  if (SD.sdfs.begin(31, SPI_SIXTEENTH_SPEED)) { // REQUIRED for the non 3.3v tolerant SD breakout boards to work
-  // if (SD.begin(31)) {
+  // if (SD.sdfs.begin(31, SPI_SIXTEENTH_SPEED)) { // REQUIRED for the non 3.3v tolerant SD breakout boards to work
+  if (SD.begin(31)) {
     int fileIdx = 0;
     while (1) {
       char filename[100];
+
+      #ifdef SERVO_TEST
+      sprintf(filename, "ServoTest-flightData%d.bin", fileIdx++);
+      #else
       sprintf(filename, "flightData%d.bin", fileIdx++);
+      #endif
+
       Serial.printf("Trying file `%s`\n", filename);
       if (!SD.exists(filename)) {
         dataFile = SD.open(filename, O_WRONLY | O_CREAT);
@@ -139,6 +149,7 @@ void loop() {
   // s3.write(2000);
   // s4.write(1100);
 
+  // #ifdef SERVO_TEST
   // Serial.println(analogRead(20));
   // airbrakesServo.write(AIRBRAKE_RETRACTED);
   // delay(1000);
@@ -150,6 +161,7 @@ void loop() {
   // delay(1000);
   // airbrakesServo.write(AIRBRAKE_FULL_EXTENSION);
   // delay(1000);
+  // #endif
 
   // return;
   if (currentTime - previousTime >= (1000 / LOOP_RATE)) {

@@ -16,6 +16,9 @@ struct SensorFrame
     float gps_lat;
     float gps_lon;
     float gps_satellites;
+    uint32_t gps_vel_n;
+    uint32_t gps_vel_e;
+    uint32_t gps_vel_d;
     bool gps_lock;
     float gps_alt_agl;
     float gps_alt_msl;

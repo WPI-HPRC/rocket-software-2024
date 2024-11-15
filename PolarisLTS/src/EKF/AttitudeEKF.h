@@ -22,6 +22,12 @@ class AttitudeStateEstimator {
     BLA::Matrix<4> x;
 
     bool initialized = false;
+    BLA::Matrix<4,4> P = {
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+    }; // Process Error Covariance
     
     private:
     constexpr static int initialLoopIters = 1000;
@@ -34,12 +40,6 @@ class AttitudeStateEstimator {
     const float magVar = 120; // [nT]
     float dt = 1.0 / LOOP_RATE;
 
-    BLA::Matrix<4,4> P = {
-        1,0,0,0,
-        0,1,0,0,
-        0,0,1,0,
-        0,0,0,1
-    }; // Process Error Covariance
 
     BLA::Matrix<4,4> P_min = {
         1,0,0,0,

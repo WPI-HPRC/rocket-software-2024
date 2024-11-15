@@ -31,6 +31,7 @@ struct TelemPacket {
 
         // Calculated Values
         float altitude = 0.0f;
+        float launchAltitude = 0.0f;
         float magX = 0.0f;
         float magY = 0.0f;
         float magZ = 0.0f;
@@ -52,12 +53,21 @@ struct TelemPacket {
         float gpsLong = 0.0f;
         float gpsAltMSL = 0.0f;
         float gpsAltAGL = 0.0f;
+        uint32_t gpsVelN = 0.0f;
+        uint32_t gpsVelE = 0.0f;
+        uint32_t gpsVelD = 0.0f;
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
         bool gpsLock = false;
 
         uint32_t loopCount = 0;
         uint32_t timestamp = 0;
+        float covQW = 0.0;
+        float covQX = 0.0;
+        float covQY = 0.0;
+        float covQZ = 0.0;
+        bool drougeDeploy = false;
+        bool mainDeploy = true;
 };
 #pragma pack(pop)
 
@@ -75,6 +85,7 @@ int main(int argc, char **argv) {
   uint8_t buf[sizeof(struct TelemPacket)];
   struct TelemPacket packet;
 
+  printf("state,accelX,accelY,accelZ,gyroX,gyroY,gyroZ,rawMagX,rawMagY,rawMagZ,pressure,servoPosition,altitude,magX,magY,magZ,w,i,j,k,posX,posY,posZ,velX,velY,velZ,gpsLat,gpsLong,gpsAltMSL,gpsAltAGL,epochTime,satellites,gpsLock,loopCount,timestamp,covQW,covQX,covQY,covQZ\n");
   while (fread(buf, sizeof(struct TelemPacket), 1, file)) {
     packet = *(struct TelemPacket *)buf;
     printf("%hhd,", packet.state);
@@ -111,7 +122,12 @@ int main(int argc, char **argv) {
     printf("%hhd,", packet.satellites);
     printf("%hhd,", packet.gpsLock);
     printf("%d,", packet.loopCount);
-    printf("%d\n", packet.timestamp);
+    printf("%d,", packet.timestamp);
+    printf("%f,", packet.covQW);
+    printf("%f,", packet.covQX);
+    printf("%f,", packet.covQY);
+    printf("%hhd,", packet.drougeDeploy);
+    printf("%hhd\n", packet.mainDeploy);
   }
   return 0;
 }

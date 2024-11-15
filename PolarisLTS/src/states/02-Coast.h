@@ -20,6 +20,8 @@ private:
         WAIT = 0,
         FIRST_STEP,
         SECOND_STEP,
+        THIRD_STEP,
+        FOURTH_STEP,
         DONE,
     } servoState = WAIT;
     int lastTransitionTime = 0;

@@ -70,6 +70,9 @@ class Sensorboard{
         Inertial_Baro_frame.gps_satellites = gps.getSIV();
         Inertial_Baro_frame.gps_alt_agl = gps.getAltitude();
         Inertial_Baro_frame.gps_alt_agl = gps.getAltitudeMSL();
+        Inertial_Baro_frame.gps_vel_n = gps.getNedDownVel();
+        Inertial_Baro_frame.gps_vel_e = gps.getNedEastVel();
+        Inertial_Baro_frame.gps_vel_d = gps.getNedNorthVel();
     }
 
     void ProcessBuffer(){

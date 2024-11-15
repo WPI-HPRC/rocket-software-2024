@@ -41,10 +41,10 @@ State *MainDescent::nextState_impl()
 
     // if the state hasn't changed for much more than the expected MAIN_DESCENT time, go to abort
     // 1.1 * TIME_IN_MAIN_DESCENT == 96.8 seconds
-    if (this->currentTime > 1.1 * TIME_IN_MAIN_DESCENT)
-    {
-        return new Abort(sensors, attitudeStateEstimator);
-    }
+    // if (this->currentTime > 1.1 * TIME_IN_MAIN_DESCENT)
+    // {
+    //     return new Abort(sensors, attitudeStateEstimator);
+    // }
 
     return nullptr;
 }

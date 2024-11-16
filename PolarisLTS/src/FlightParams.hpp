@@ -70,7 +70,7 @@ constexpr float MOTOR_BURN_TIME = 2.2 * 1000.0;
 
 // Airbrake profile
 // How long to wait after motor burnout before using the airbrakes (ms)
-constexpr int AIRBRAKE_WAIT_AFTER_TRANSITION = 1000 * 2;
+constexpr int AIRBRAKE_WAIT_AFTER_TRANSITION = 500;
 // How far to extend for the first airbrake step (%)
 #define AIRBRAKE_FIRST_EXTENSION AIRBRAKE_25_EXTENSION
 // How long to stay at the first extension (ms)

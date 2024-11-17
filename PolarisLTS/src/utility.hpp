@@ -169,8 +169,8 @@ public:
         float covQX = 0.0;
         float covQY = 0.0;
         float covQZ = 0.0;
-        bool drougeDeploy = false;
-        bool mainDeploy = true;
+        bool drogueDeploy = false;
+        bool mainDeploy = false;
 
 #ifdef SERIAL_TELEMETRY
         void debugPrint() {

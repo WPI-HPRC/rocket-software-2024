@@ -96,7 +96,7 @@ void Coast::loop_impl()
 #endif
 
     if (apogeePassed) {
-        telemPacket.drougeDeploy = true;
+        telemPacket.drogueDeploy = true;
     }
 }
 

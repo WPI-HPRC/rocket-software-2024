@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
   uint8_t buf[sizeof(struct TelemPacket)];
   struct TelemPacket packet;
 
-  printf("state,accelX,accelY,accelZ,gyroX,gyroY,gyroZ,rawMagX,rawMagY,rawMagZ,pressure,servoPosition,altitude,magX,magY,magZ,w,i,j,k,posX,posY,posZ,velX,velY,velZ,gpsLat,gpsLong,gpsAltMSL,gpsAltAGL,epochTime,satellites,gpsLock,loopCount,timestamp,covQW,covQX,covQY,covQZ,drogue,main\n");
+  printf("state,accelX,accelY,accelZ,gyroX,gyroY,gyroZ,rawMagX,rawMagY,rawMagZ,pressure,servoPosition,altitude,launchAltitude,magX,magY,magZ,w,i,j,k,posX,posY,posZ,velX,velY,velZ,gpsLat,gpsLong,gpsAltMSL,gpsAltAGL,epochTime,satellites,gpsLock,loopCount,timestamp,covQW,covQX,covQY,covQZ,drogue,main\n");
   while (fread(buf, sizeof(struct TelemPacket), 1, file)) {
     packet = *(struct TelemPacket *)buf;
     printf("%hhd,", packet.state);
@@ -101,6 +101,7 @@ int main(int argc, char **argv) {
     printf("%f,", packet.pressure);
     printf("%d,", packet.servoPosition);
     printf("%f,", packet.altitude);
+    printf("%f,", packet.launchAltitude);
     printf("%f,", packet.magX);
     printf("%f,", packet.magY);
     printf("%f,", packet.magZ);

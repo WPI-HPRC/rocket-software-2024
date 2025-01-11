@@ -105,7 +105,7 @@ State *Coast::nextState_impl()
 {
     // Transition state if condition met
     #ifndef SERVO_TEST
-    if (apogeePassed)
+    if (apogeePassed && this->servoState == DONE)
     {
         return new DrogueDescent(sensors, attitudeStateEstimator);
     }

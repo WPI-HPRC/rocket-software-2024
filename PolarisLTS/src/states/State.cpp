@@ -72,6 +72,9 @@ void State::loop() {
   this->telemPacket.gpsVelN = this->sensors->Inertial_Baro_frame.gps_vel_n;
   this->telemPacket.gpsVelE = this->sensors->Inertial_Baro_frame.gps_vel_e;
   this->telemPacket.gpsVelD = this->sensors->Inertial_Baro_frame.gps_vel_d;
+  this->telemPacket.gpsAltAGL = this->sensors->Inertial_Baro_frame.gps_alt_agl;
+  this->telemPacket.gpsAltMSL = this->sensors->Inertial_Baro_frame.gps_alt_msl;
+  this->telemPacket.epochTime = this->sensors->Inertial_Baro_frame.gps_epoch_time;
 
 #ifndef NO_SERVO
   this->telemPacket.servoPosition = analogRead(SERVO_FEEDBACK_PIN);

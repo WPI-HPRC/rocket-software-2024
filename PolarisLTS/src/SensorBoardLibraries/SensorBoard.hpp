@@ -69,10 +69,11 @@ class Sensorboard{
         Inertial_Baro_frame.gps_lock = gps.getGnssFixOk();
         Inertial_Baro_frame.gps_satellites = gps.getSIV();
         Inertial_Baro_frame.gps_alt_agl = gps.getAltitude();
-        Inertial_Baro_frame.gps_alt_agl = gps.getAltitudeMSL();
+        Inertial_Baro_frame.gps_alt_msl = gps.getAltitudeMSL();
         Inertial_Baro_frame.gps_vel_n = gps.getNedDownVel();
         Inertial_Baro_frame.gps_vel_e = gps.getNedEastVel();
         Inertial_Baro_frame.gps_vel_d = gps.getNedNorthVel();
+        Inertial_Baro_frame.gps_epoch_time = gps.getUnixEpoch();
     }
 
     void ProcessBuffer(){

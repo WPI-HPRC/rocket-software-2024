@@ -60,6 +60,8 @@ struct TelemPacket {
         uint8_t satellites = 0;
         bool gpsLock = false;
 
+        int sdFileNo = -1;
+
         uint32_t loopCount = 0;
         uint32_t timestamp = 0;
         float covQW = 0.0;
@@ -123,6 +125,7 @@ int main(int argc, char **argv) {
     printf("%d,", packet.epochTime);
     printf("%hhd,", packet.satellites);
     printf("%hhd,", packet.gpsLock);
+    printf("%d,", packet.sdFileNo);
     printf("%d,", packet.loopCount);
     printf("%d,", packet.timestamp);
     printf("%f,", packet.covQW);

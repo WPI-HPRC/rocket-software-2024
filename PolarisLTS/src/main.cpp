@@ -72,13 +72,13 @@ void setup() {
     while (1) {
       char filename[100];
 
+      sdFileNo = fileIdx;
+
       #ifdef SERVO_TEST
       sprintf(filename, "ServoTest-flightData%d.bin", fileIdx++);
       #else
       sprintf(filename, "flightData%d.bin", fileIdx++);
       #endif
-
-      sdFileNo = fileIdx;
       
       Serial.printf("Trying file `%s`\n", filename);
       if (!SD.exists(filename)) {

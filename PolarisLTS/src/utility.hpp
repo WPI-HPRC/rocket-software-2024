@@ -33,6 +33,7 @@
 #ifndef NO_SDCARD
 extern bool sdCardInitialized;
 extern File dataFile;
+extern unsigned int sdFileNo;
 #endif
 
 #ifndef NO_SERVO
@@ -161,6 +162,8 @@ public:
         uint32_t epochTime = 0;
         uint8_t satellites = 0;
         bool gpsLock = false;
+
+        int sdFileNo = -1;
 
         uint32_t loopCount = 0;
         uint32_t timestamp = 0;

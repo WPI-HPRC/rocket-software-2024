@@ -195,6 +195,7 @@ void State::loop() {
     Serial.printf("\tSD WRITE TIME: %llu\n", millis() - start);
     #endif
   }
+  this->telemPacket.sdFileNo = sdFileNo;
 #endif
 
 #ifdef SERIAL_TELEMETRY

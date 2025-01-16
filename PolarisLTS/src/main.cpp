@@ -34,6 +34,7 @@ AttitudeStateEstimator *attitudeStateEstimator = new AttitudeStateEstimator();
 #ifndef NO_SDCARD
 bool sdCardInitialized = false;
 File dataFile;
+unsigned int sdFileNo;
 #endif
 
 #ifndef NO_SERVO
@@ -77,6 +78,8 @@ void setup() {
       sprintf(filename, "flightData%d.bin", fileIdx++);
       #endif
 
+      sdFileNo = fileIdx;
+      
       Serial.printf("Trying file `%s`\n", filename);
       if (!SD.exists(filename)) {
         dataFile = SD.open(filename, O_WRONLY | O_CREAT);

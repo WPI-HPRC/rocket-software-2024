@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <cmath>
 
-// #define DEBUG_MODE 
+#define DEBUG_MODE 
 #define LOOP_RATE 100
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))

@@ -9,8 +9,7 @@ class XbeeProSX: public XBeeDevice {
 public:
     XbeeProSX(uint8_t cs_pin);
 
-    void writeBytes(const char *data, size_t length_bytes) override;
-
+    void writeBytes_spi(char *data_io, size_t length_bytes) override;
     void handleReceivePacket(XBee::ReceivePacket::Struct *frame) override;
 
     void handleReceivePacket64Bit(XBee::ReceivePacket64Bit::Struct *frame) override;
@@ -30,4 +29,6 @@ private:
     size_t num_subscribers;
 
     void add_subscriber(uint64_t address);
+
+    bool canReadSPI() override;
 };

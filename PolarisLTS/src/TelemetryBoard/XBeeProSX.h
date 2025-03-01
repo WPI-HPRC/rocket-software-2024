@@ -31,4 +31,6 @@ private:
     void add_subscriber(uint64_t address);
 
     bool canReadSPI() override;
+
+    void readBytes_spi(uint8_t *buffer, size_t length_bytes) override;
 };

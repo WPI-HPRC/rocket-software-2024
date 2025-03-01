@@ -21,18 +21,15 @@ void XbeeProSX::writeBytes_spi(char *data_io, size_t length_bytes)
     digitalWrite(_cs_pin, LOW);
     for (size_t i = 0; i < length_bytes; i++)
     {
-        uint8_t byte = SPI.transfer(data_io[i]);
-        data_io[i] = (char)byte;
-        // Serial.printf("%x ", byte);
+        data_io[i] = (char)SPI.transfer(data_io[i]);
     }
-    // Serial.println();
     
     digitalWrite(_cs_pin, HIGH);
 }
 
 void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
 {
-
+    
 }
 
 void XbeeProSX::handleReceivePacket64Bit(XBee::ReceivePacket64Bit::Struct *frame)
@@ -50,9 +47,19 @@ void XbeeProSX::didCycle()
 
 }
 
+void XbeeProSX::readBytes_spi(uint8_t *buffer, size_t length_bytes)
+{
+    digitalWrite(_cs_pin, LOW);
+    for (size_t i = 0; i < length_bytes; i++)
+    {
+        buffer[i] = SPI.transfer(0x00);
+    }
+    digitalWrite(_cs_pin, HIGH);
+}
+
 bool XbeeProSX::canReadSPI()
 {
-    return digitalRead(33);;
+    return digitalRead(33) == LOW;
 }
 
 void XbeeProSX::log(const char *format, ...)

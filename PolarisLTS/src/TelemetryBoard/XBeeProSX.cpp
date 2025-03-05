@@ -1,5 +1,6 @@
 #include "XBeeProSX.h"
 #include <cstdarg>
+#include "utility.hpp"
 
 XbeeProSX::XbeeProSX(uint8_t cs_pin) : _cs_pin(cs_pin), XBeeDevice(SerialInterface::SPI)
 {
@@ -29,7 +30,10 @@ void XbeeProSX::writeBytes_spi(char *data_io, size_t length_bytes)
 
 void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
 {
-    
+    if(frame->data[0] == 0xAB)
+    {
+        airbrakesServo.write(*(uint16_t*)&frame->data[1]);
+    }
 }
 
 void XbeeProSX::handleReceivePacket64Bit(XBee::ReceivePacket64Bit::Struct *frame)

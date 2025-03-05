@@ -175,6 +175,7 @@ void State::loop() {
     if (loopCount % 5 == 0) {
       SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
       xbee.sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&telemPacket, sizeof(telemPacket) - 4 * 4 - 2);
+      xbee.doCycle();
       SPI.endTransaction();
     }
     #ifdef PRINT_TIMINGS

@@ -24,7 +24,6 @@ void XbeeProSX::writeBytes_spi(char *data_io, size_t length_bytes)
     {
         data_io[i] = (char)SPI.transfer(data_io[i]);
     }
-    
     digitalWrite(_cs_pin, HIGH);
 }
 

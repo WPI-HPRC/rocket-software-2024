@@ -46,7 +46,7 @@ Servo airbrakesServo = Servo();
 #endif
 
 #ifndef NO_XBEE
-XbeeProSX xbee = XbeeProSX(30); // CS 30
+XbeeProSX xbee = XbeeProSX(30, 33); // CS 30, ATTN 33
 #endif
 
 void setup() {

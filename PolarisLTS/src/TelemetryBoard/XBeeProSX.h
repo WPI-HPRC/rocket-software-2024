@@ -32,5 +32,6 @@ private:
     void actuateAirbrakes(XBee::ReceivePacket::Struct *frame);
     void clearSD();
     void readSDDirectory();
+    void readFileContents(XBee::ReceivePacket::Struct *frame);
     bool assertSD();
 };

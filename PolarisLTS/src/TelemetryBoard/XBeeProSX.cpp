@@ -75,6 +75,58 @@ void XbeeProSX::readSDDirectory()
         numBytesInPacket += fileNameLength;
     }
     sendTransmitRequestCommand(0x0013A200423F474C, fileListPacket, sizeof(fileListPacket));
+    // Send the following packet to denote the end of the directory
+    uint8_t req = 0xCC;
+    sendTransmitRequestCommand(0x0013A200423F474C, &req, 1);
+}
+
+void XbeeProSX::readFileContents(XBee::ReceivePacket::Struct *frame)
+{
+    int filenameLength = 0;
+    // Add 1 to skip the frame type
+    while(frame->data[1 + filenameLength] != '\0')
+    {
+        filenameLength++;
+    }
+
+    // Next, we need to see if there exists a file with the filename specified in the frame (beginning at byte 1 and ending at byte [filenameLength]). If the file exists, read its contents
+
+    int fileLength = 10000;
+    int bytesRead = 0;
+    char file[fileLength];
+
+    // Three additional bytes are reserved: first is the packet type, next two are for the packet index
+    uint8_t maxBytes = XBee::MaxPacketBytes - XBee::TransmitRequest::PacketBytes - 3;
+    uint8_t filePacket[maxBytes + 3];
+    memset(&filePacket[3], 0, maxBytes);
+    filePacket[0] = 0xFC; // "File Contents"
+    filePacket[1] = 0; // The first packet
+    filePacket[2] = 0;
+
+    uint16_t packetIndex = 0;
+    uint16_t packetsRequired = (uint16_t)((float)fileLength / ((float)maxBytes) + 1);
+
+    uint32_t numPacketsReq = 0x000000FC | packetsRequired << 8;
+
+    // Send a packet telling us how many packets will be required
+    sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&numPacketsReq,4);
+
+    for (int i = 0; i < fileLength; i++)
+    {
+        for (int n = 0; n < maxBytes && i < fileLength; n++, i++)
+        {
+            filePacket[i+3] = (uint8_t)file[i];
+        }
+        sendTransmitRequestCommand(0x0013A200423F474C, filePacket, sizeof(filePacket));
+        *(uint16_t *)&filePacket[1] = ++packetIndex;
+        memset(&filePacket[3], 0, maxBytes);
+    }
+
+    sendTransmitRequestCommand(0x0013A200423F474C, filePacket, sizeof(filePacket));
+    
+    // Send the following packet to denote the end of the packet
+    uint8_t req = 0xFC;
+    sendTransmitRequestCommand(0x0013A200423F474C, &req, 1);
 }
 
 void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
@@ -89,6 +141,8 @@ void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
             clearSD();
         case 0xCD: // "Card Directory"
             readSDDirectory();
+        case 0xFC: // "File Contents"
+            readFileContents(frame);
         default:
             return;
     };

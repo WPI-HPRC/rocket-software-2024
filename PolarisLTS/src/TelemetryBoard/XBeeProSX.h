@@ -27,6 +27,7 @@ private:
     uint8_t attn_pin;
 
     bool canReadSPI() override;
-
     void readBytes_spi(uint8_t *buffer, size_t length_bytes) override;
+
+    void actuateAirbrakes(XBee::ReceivePacket::Struct *frame);
 };

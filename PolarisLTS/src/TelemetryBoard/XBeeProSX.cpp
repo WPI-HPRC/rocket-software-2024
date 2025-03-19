@@ -29,13 +29,23 @@ void XbeeProSX::writeBytes_spi(char *data_io, size_t length_bytes)
     digitalWrite(cs_pin, HIGH);
 }
 
+void XbeeProSX::actuateAirbrakes(XBee::ReceivePacket::Struct *frame)
+{
+    airbrakesServo.write(*(uint16_t*)&frame->data[1]);
+}
+
 void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
 {
     // TODO: Add more types of packets and figure out a way to prevent control commands from being executed during flight
-    if(frame->data[0] == 0xAB)
+    uint8_t packetType = frame->data[0];
+    switch(packetType)
     {
-        airbrakesServo.write(*(uint16_t*)&frame->data[1]);
-    }
+        case 0xAB:
+            actuateAirbrakes(frame);
+
+        default:
+            return;
+    };
 }
 
 void XbeeProSX::handleReceivePacket64Bit(XBee::ReceivePacket64Bit::Struct *frame)

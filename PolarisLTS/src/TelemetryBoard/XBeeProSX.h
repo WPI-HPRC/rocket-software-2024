@@ -30,4 +30,5 @@ private:
     void readBytes_spi(uint8_t *buffer, size_t length_bytes) override;
 
     void actuateAirbrakes(XBee::ReceivePacket::Struct *frame);
+    void clearSD();
 };

@@ -34,15 +34,26 @@ void XbeeProSX::actuateAirbrakes(XBee::ReceivePacket::Struct *frame)
     airbrakesServo.write(*(uint16_t*)&frame->data[1]);
 }
 
+void XbeeProSX::clearSD()
+{
+    #ifdef NO_SD
+        return
+    #endif
+    if(!sdCardInitialized) return;
+
+    // Add code to clear the SD card
+}
+
 void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
 {
     // TODO: Add more types of packets and figure out a way to prevent control commands from being executed during flight
     uint8_t packetType = frame->data[0];
     switch(packetType)
     {
-        case 0xAB:
+        case 0xAB: // "Air Brakes"
             actuateAirbrakes(frame);
-
+        case 0xCC: // "Clear Card"
+            clearSD();
         default:
             return;
     };

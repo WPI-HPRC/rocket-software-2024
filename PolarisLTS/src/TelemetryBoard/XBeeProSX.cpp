@@ -36,12 +36,45 @@ void XbeeProSX::actuateAirbrakes(XBee::ReceivePacket::Struct *frame)
 
 void XbeeProSX::clearSD()
 {
-    #ifdef NO_SD
-        return
-    #endif
     if(!sdCardInitialized) return;
 
     // Add code to clear the SD card
+}
+
+void XbeeProSX::readSDDirectory()
+{
+    if(!sdCardInitialized) return;
+    
+    uint8_t maxBytes = XBee::MaxPacketBytes - XBee::TransmitRequest::PacketBytes - 2;
+    uint8_t fileListPacket[maxBytes + 2];
+    fileListPacket[0] = 0xCC; // "Card Contents"
+    fileListPacket[1] = 0; // The first packet
+
+    uint8_t packetIndex = 0;
+    uint8_t numBytesInPacket = 0;
+
+    // These are all placeholders for looping through an actual directory.
+    int numFiles = 99;
+    for (int i = 0; i < numFiles; i++)
+    {
+        int fileNameLength = 7;
+        char fileName[fileNameLength];
+        sprintf(fileName, "file%02d", i);
+
+        // Check to make sure there is space in the current packet for the new filename
+        if ((int)numBytesInPacket + fileNameLength > maxBytes)
+        {
+            // Send the current frame
+           sendTransmitRequestCommand(0x0013A200423F474C, fileListPacket, sizeof(fileListPacket));
+            // Clear the list
+            memset(&fileListPacket[2], 0, sizeof(fileListPacket) - 2);
+            fileListPacket[1] = ++packetIndex;
+            numBytesInPacket = 0;
+        }
+        memcpy(&fileListPacket[numBytesInPacket + 2], (uint8_t *)fileName, fileNameLength);
+        numBytesInPacket += fileNameLength;
+    }
+    sendTransmitRequestCommand(0x0013A200423F474C, fileListPacket, sizeof(fileListPacket));
 }
 
 void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
@@ -54,6 +87,8 @@ void XbeeProSX::handleReceivePacket(XBee::ReceivePacket::Struct *frame)
             actuateAirbrakes(frame);
         case 0xCC: // "Clear Card"
             clearSD();
+        case 0xCD: // "Card Directory"
+            readSDDirectory();
         default:
             return;
     };

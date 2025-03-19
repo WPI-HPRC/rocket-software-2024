@@ -92,7 +92,6 @@ void XbeeProSX::readFileContents(XBee::ReceivePacket::Struct *frame)
     // Next, we need to see if there exists a file with the filename specified in the frame (beginning at byte 1 and ending at byte [filenameLength]). If the file exists, read its contents
 
     int fileLength = 10000;
-    int bytesRead = 0;
     char file[fileLength];
 
     // Three additional bytes are reserved: first is the packet type, next two are for the packet index
@@ -123,7 +122,7 @@ void XbeeProSX::readFileContents(XBee::ReceivePacket::Struct *frame)
     }
 
     sendTransmitRequestCommand(0x0013A200423F474C, filePacket, sizeof(filePacket));
-    
+
     // Send the following packet to denote the end of the packet
     uint8_t req = 0xFC;
     sendTransmitRequestCommand(0x0013A200423F474C, &req, 1);

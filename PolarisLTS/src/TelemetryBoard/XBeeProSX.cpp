@@ -39,6 +39,8 @@ void XbeeProSX::clearSD()
     if(!sdCardInitialized) return;
 
     // Add code to clear the SD card
+
+    readSDDirectory(); // Read back the directory to show the card is cleared
 }
 
 void XbeeProSX::readSDDirectory()
@@ -59,7 +61,9 @@ void XbeeProSX::readSDDirectory()
     {
         int fileNameLength = 7;
         char fileName[fileNameLength];
-        sprintf(fileName, "file%02d", i);
+
+        // We need to have this null character to denote the end of a filename
+        sprintf(fileName, "file%02d\0", i);
 
         // Check to make sure there is space in the current packet for the new filename
         if ((int)numBytesInPacket + fileNameLength > maxBytes)
@@ -105,10 +109,10 @@ void XbeeProSX::readFileContents(XBee::ReceivePacket::Struct *frame)
     uint16_t packetIndex = 0;
     uint16_t packetsRequired = (uint16_t)((float)fileLength / ((float)maxBytes) + 1);
 
-    uint32_t numPacketsReq = 0x000000FC | packetsRequired << 8;
+    uint32_t numPacketsReq = 0x000000FC | packetsRequired << 8; // This is a uint32 for convenience of creating this packet, but the actual information we want to send is not a uint32
 
     // Send a packet telling us how many packets will be required
-    sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&numPacketsReq,4);
+    sendTransmitRequestCommand(0x0013A200423F474C, (uint8_t *)&numPacketsReq, 4);
 
     for (int i = 0; i < fileLength; i++)
     {
